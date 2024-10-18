@@ -1,8 +1,8 @@
 export const path={
     HOMEPAGE:'/',
-    LOGIN:'/login',
+    CUSTOMERLOGIN:'/login',
     FORGOTPASSWORD:'/forgotpassword',
-    REGISTER:'/register',
+    CUSTOMERREGISTER:'/customerregister',
     SHOPPINGCART:'/shoppingcart',
     LISTPRODUCTS: '/listproducts',
     LOOKORDERS:'/lookorders',

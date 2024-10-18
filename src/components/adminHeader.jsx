@@ -1,0 +1,1 @@
+//them cac component vao day

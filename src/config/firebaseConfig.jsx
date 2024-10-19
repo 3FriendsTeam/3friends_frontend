@@ -8,12 +8,23 @@ import { getDatabase } from "firebase/database";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  // apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  // authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  // databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  // projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  // storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  // messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  // appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  // measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  
+  apiKey: "AIzaSyCwq7W_CVOsgGuK-pWuBiVUfWQ_9mmaxdQ",
+  authDomain: "e-commercewebsite-645fb.firebaseapp.com",
+  databaseURL: "https://e-commercewebsite-645fb-default-rtdb.firebaseio.com",
+  projectId: "e-commercewebsite-645fb",
+  storageBucket: "e-commercewebsite-645fb.appspot.com",
+  messagingSenderId: "682014935245",
+  appId: "1:682014935245:web:3459224b3ea8e33c040184",
+  measurementId: "G-4F29WG76RC"
 };
 
 

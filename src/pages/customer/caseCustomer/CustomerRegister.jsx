@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-// import login from '../../../assets/client/login.png';
-// import google from '../../../assets/client/google.png';
-// import icons from '../../../utils/icons.jsx';
-import { auth, database } from '../../../config/firebaseConfig.jsx';
+import { auth } from '../../../config/firebaseConfig.jsx';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { ref, set } from 'firebase/database';
+import axios from 'axios';
+
+
+
 const CustomerRegister = () => {
     const [formData, setFormData] = useState({
         customerName: '',
-        address: '',
         email: '',
         phoneNumber: '',
         birthday: '',
@@ -82,49 +81,102 @@ const CustomerRegister = () => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
     };
+    
+
+/**
+ * Lưu thông tin người dùng vào CSDL
+ * @param {Object} param0 các thông tin người dùng
+ * @param {string} param0.uid ID của người dùng
+ * @param {string} param0.customerName tên người dùng
+ * @param {string} param0.gender giới tính
+ * @param {string} param0.address địa chỉ
+ * @param {string} param0.email email
+ * @param {string} param0.phoneNumber số điện thoại
+ * @param {string} param0.birthDate ngày sinh
+ * @param {boolean} [param0.isVerified=false] có xác minh email hay không
+ * @returns {Promise<boolean>} true nếu lưu thành công, false nếu có lỗi
+ */
+    const saveAccount =async (
+        {
+            uid,
+            customerName,
+            gender,
+            email,
+            phoneNumber,
+            birthDate,
+            isVerified = false,
+        }
+    ) => {
+        try{
+            console.log(uid,customerName,gender,email,phoneNumber,birthDate,isVerified);
+            const response = await axios.post('http://localhost:7000/api/register', {
+            uid,
+            customerName,
+            gender,
+            email,
+            phoneNumber,
+            birthDate,
+            isVerified,
+            })
+            if(response.status === 200){
+                console.log("save accounting success");
+                return true;
+            }
+        }catch(error){
+            console.log("error save accounting",error.message);
+            return false;
+        }
+
+    }
+
+    const checkEmail = async ({ email }) => {
+        try {
+            // Thêm email vào query string
+            const response = await axios.get(`http://localhost:7000/api/check-email?email=${email}`);
+    
+            console.log("res: ", response);
+    
+            if (response.data.success) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.error("error check mail: ", error.message);
+            return false;
+        }
+    };
+    
+
+
     const handleRegister = async (e) => {
         e.preventDefault();
         const { email, password } = formData;
     
         try {
-            // Tạo tài khoản với email và password
+           
+            const checkCreatedEmail = await checkEmail({ email });
+            if (checkCreatedEmail) {
+                alert('Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!');
+                throw new Error('Email đã đăng ký');
+            }
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
-            // Lấy ID token để gửi đến backend
-            const token = await userCredential.user.getIdToken();
-    
-            // Lưu thông tin người dùng vào Realtime Database
-            await set(ref(database, 'users/' + userCredential.user.uid), {
-                email: userCredential.user.email,
-                userActive: false,
-                createdAt: new Date().toString(),
-            });
-    
-            // Gửi thông tin đến backend
-            const response = await fetch('http://localhost:3001/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ email }),
-            });
-    
-            // Kiểm tra xem phản hồi từ backend có thành công không
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error response from backend:', errorText);
-                throw new Error('Lỗi đăng ký từ máy chủ.');
+            if (userCredential) {
+                await saveAccount({
+                    uid: userCredential.user.uid,
+                    customerName: formData.customerName,
+                    gender: formData.gender,
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    birthDate: formData.birthday,
+                });
             }
-    
-            const data = await response.json(); // Chỉ gọi response.json() khi phản hồi ok
-    
-            console.log('Đăng ký thành công:', data);
+            console.log('Đăng ký thành công vui lòng đăng nhập và xác thực email');
     
             // Reset form sau khi đăng ký thành công
             setFormData({
                 customerName: '',
-                address: '',
                 email: '',
                 phoneNumber: '',
                 birthday: '',
@@ -133,17 +185,18 @@ const CustomerRegister = () => {
             });
     
             // Hiển thị thông báo thành công
-            alert('Đăng ký thành công!');
+            alert('Đăng ký thành công vui lòng xác thực email!');
     
-            // Gửi email xác nhận
-            await userCredential.user.sendEmailVerification();
-            alert('Email xác nhận đã được gửi. Vui lòng kiểm tra hộp thư.');
+            // // Gửi email xác nhận
+            // await userCredential.user.sendEmailVerification();
+            // alert('Email xác nhận đã được gửi. Vui lòng kiểm tra hộp thư.');
             
         } catch (error) {
             console.error('Lỗi đăng ký:', error.message);
             setErrors({ ...errors, email: error.message || 'Đăng ký thất bại. Thử lại email khác.' });
         }
     };
+
     return (
         <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
             <div className="w-[700px] p-8 rounded-lg shadow-lg mt-[50px]">
@@ -191,7 +244,41 @@ const CustomerRegister = () => {
                         
                         {errors.customerName && <p className="text-sm text-red-500 mt-1">{errors.customerName}</p>}
                     </div>
+                    <div className="relative mt-4">
+                        <label className="block text-sm mb-2">Giới tính</label>
+                        <div className="flex items-center">
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Nam"
+                                className="mr-2"
+                                checked={formData.gender === 'Nam'}
+                                onChange={handleChange}
+                            />
+                            <label className="mr-4">Nam</label>
 
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Nữ"
+                                className="mr-2"
+                                checked={formData.gender === 'Nữ'}
+                                onChange={handleChange}
+                            />
+                            <label className="mr-4">Nữ</label>
+
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Khác"
+                                className="mr-2"
+                                checked={formData.gender === 'Khác'}
+                                onChange={handleChange}
+                            />
+                            <label>Khác</label>
+                            </div>
+                    </div>
+                    {errors.gender && <p className="text-sm text-red-500 mt-1">{errors.gender}</p>}  
                     {/* Phone Input */}
                     <div className="relative">
                         <input

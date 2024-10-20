@@ -24,7 +24,7 @@ const CustomerRegister = () => {
         password: '',
         confirmPassword: '',
     });
-
+    // kiểm tra định dạng email
     useEffect(() => {
         if (formData.email && !validateEmail(formData.email)) {
             setErrors((prevErrors) => ({
@@ -50,7 +50,7 @@ const CustomerRegister = () => {
             }));
         }
     }, [formData]);
-
+    //kiểm tra dữ liệu bị bỏ trống
     const handleBlur = (e) => {
         const { name, value } = e.target;
         // Nếu giá trị trống thì thông báo lỗi
@@ -67,7 +67,7 @@ const CustomerRegister = () => {
             });
         }
     };
-
+    // kiểm tra thay đổi dữ liệu
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -75,27 +75,18 @@ const CustomerRegister = () => {
             [name]: value,
         });
     };
-
+    //kiểm tra email hợp lệ
     const validateEmail = (email) => {
+        // A regular expression to check if the email address is valid
         // Hàm kiểm tra định dạng email
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
     };
-    
 
-/**
- * Lưu thông tin người dùng vào CSDL
- * @param {Object} param0 các thông tin người dùng
- * @param {string} param0.uid ID của người dùng
- * @param {string} param0.customerName tên người dùng
- * @param {string} param0.gender giới tính
- * @param {string} param0.address địa chỉ
- * @param {string} param0.email email
- * @param {string} param0.phoneNumber số điện thoại
- * @param {string} param0.birthDate ngày sinh
- * @param {boolean} [param0.isVerified=false] có xác minh email hay không
- * @returns {Promise<boolean>} true nếu lưu thành công, false nếu có lỗi
- */
+//các hàm xử lí đăng ký
+
+
+    //lưu thông tin người dùng
     const saveAccount =async (
         {
             uid,
@@ -109,7 +100,7 @@ const CustomerRegister = () => {
     ) => {
         try{
             console.log(uid,customerName,gender,email,phoneNumber,birthDate,isVerified);
-            const response = await axios.post('http://localhost:7000/api/register', {
+            const response = await axios.post('http://localhost:3001/api/register', {
             uid,
             customerName,
             gender,
@@ -129,11 +120,10 @@ const CustomerRegister = () => {
 
     }
 
+    // check email tồn tại hay chưa
     const checkEmail = async ({ email }) => {
         try {
-            // Thêm email vào query string
-            const response = await axios.get(`http://localhost:7000/api/check-email?email=${email}`);
-    
+            const response = await axios.get(`http://localhost:3001/api/check-email?email=${email}`);
             console.log("res: ", response);
     
             if (response.data.success) {
@@ -146,9 +136,7 @@ const CustomerRegister = () => {
             return false;
         }
     };
-    
-
-
+    //xử lý đăng ký
     const handleRegister = async (e) => {
         e.preventDefault();
         const { email, password } = formData;
@@ -156,41 +144,39 @@ const CustomerRegister = () => {
         try {
            
             const checkCreatedEmail = await checkEmail({ email });
+            console.log("checkCreatedEmail: ", checkCreatedEmail);
             if (checkCreatedEmail) {
                 alert('Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!');
                 throw new Error('Email đã đăng ký');
             }
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    
-            if (userCredential) {
-                await saveAccount({
-                    uid: userCredential.user.uid,
-                    customerName: formData.customerName,
-                    gender: formData.gender,
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    birthDate: formData.birthday,
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                if (userCredential) {
+                    await saveAccount({
+                        uid: userCredential.user.uid,
+                        customerName: formData.customerName,
+                        gender: formData.gender,
+                        email: formData.email,
+                        phoneNumber: formData.phoneNumber,
+                        birthDate: formData.birthday,
+                    });
+                }
+                setFormData({
+                    customerName: '',
+                    email: '',
+                    phoneNumber: '',
+                    birthday: '',
+                    password: '',
+                    confirmPassword: '',
                 });
+                alert('Đăng ký thành công vui lòng xác thực email!');
+            } catch (error) {
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!');
+                } else {
+                    console.error('Error creating user:', error.message);
+                }
             }
-            console.log('Đăng ký thành công vui lòng đăng nhập và xác thực email');
-    
-            // Reset form sau khi đăng ký thành công
-            setFormData({
-                customerName: '',
-                email: '',
-                phoneNumber: '',
-                birthday: '',
-                password: '',
-                confirmPassword: '',
-            });
-    
-            // Hiển thị thông báo thành công
-            alert('Đăng ký thành công vui lòng xác thực email!');
-    
-            // // Gửi email xác nhận
-            // await userCredential.user.sendEmailVerification();
-            // alert('Email xác nhận đã được gửi. Vui lòng kiểm tra hộp thư.');
-            
         } catch (error) {
             console.error('Lỗi đăng ký:', error.message);
             setErrors({ ...errors, email: error.message || 'Đăng ký thất bại. Thử lại email khác.' });
@@ -279,12 +265,26 @@ const CustomerRegister = () => {
                             </div>
                     </div>
                     {errors.gender && <p className="text-sm text-red-500 mt-1">{errors.gender}</p>}  
+                    <div className="relative">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Nhập email*"
+                            className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
+                                errors.email ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            value={formData.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                        />
+                        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                    </div>
                     {/* Phone Input */}
                     <div className="relative">
                         <input
                             type="text"
                             name="phoneNumber"
-                            placeholder="Nhập số điện thoại"
+                            placeholder="Nhập số điện thoại*"
                             className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
                                 errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
                             }`}
@@ -295,20 +295,7 @@ const CustomerRegister = () => {
                         {errors.phoneNumber && <p className="text-sm text-red-500 mt-1">{errors.phoneNumber}</p>}
                     </div>
 
-                    <div className="relative">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Nhập email"
-                            className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
-                                errors.email ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            value={formData.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                        />
-                        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-                    </div>
+                    
 
                     <div className="relative">
                         <input

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { auth } from '../../../config/firebaseConfig.jsx';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import axios from 'axios';
-
+import { signInWithGoogle } from '../../../config/firebaseService.jsx';
 
 
 const CustomerRegister = () => {
@@ -136,13 +136,51 @@ const CustomerRegister = () => {
             return false;
         }
     };
+
+    // đăng kí bằng gg
+    const handleGoogleLogin = async () => {
+        try {
+            const userCredential = await signInWithGoogle();
+            console.log('userCredential: ', userCredential.displayName, userCredential.email, userCredential.emailVerified, userCredential.uid);
+            if (userCredential) {
+                const user = userCredential;
+                console.log('thong tin user: ', user.displayName, user.email, user.emailVerified, user.uid);
+                if (user) {
+                    const checkCreatedEmail = await checkEmail({ email: user.email });
+                    if (!checkCreatedEmail) {
+                        try {
+                            await saveAccount({
+                                uid: user.uid,
+                                customerName: user.displayName,
+                                gender: user.gender || 'Unknown',
+                                email: user.email,
+                                phoneNumber: user.phoneNumber || 'Unknown',
+                                birthDate: user.birthDate || null,
+                                isVerified: true,
+                            });
+                            localStorage.setItem("token", await user.getIdToken());
+                            alert('Đăng nhập thành công!');
+                        } catch (error) {
+                            console.error('Error saving account: ', error);
+                            alert('Đã xảy ra lỗi khi lưu tài khoản.');
+                        }
+                    } else {
+                        localStorage.setItem("token", await user.getIdToken());
+                        alert('Đăng nhập thành công!');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error signing in with Google:', error);
+            alert('Đã xảy ra lỗi khi đăng nhập.');
+        }
+    }
     //xử lý đăng ký
     const handleRegister = async (e) => {
         e.preventDefault();
         const { email, password } = formData;
     
         try {
-           
             const checkCreatedEmail = await checkEmail({ email });
             console.log("checkCreatedEmail: ", checkCreatedEmail);
             if (checkCreatedEmail) {
@@ -342,7 +380,9 @@ const CustomerRegister = () => {
                         Đăng ký
                     </button>
                 </form>
-
+                <button onClick={handleGoogleLogin} className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 text-sm">
+                    Nhập bằng gg
+                </button>
                 {/* Login link */}
                 <div className="text-center mt-4 text-gray-500 text-sm">
                     Bạn đã có tài khoản?{' '}

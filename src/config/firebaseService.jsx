@@ -1,4 +1,4 @@
-import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithEmailAndPassword } from "firebase/auth";
 
 const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -15,4 +15,21 @@ const signInWithGoogle = async () => {
     }
 };
 
-export { signInWithGoogle };
+
+const signInWithEmailPassword = async (email, password) => {
+    const auth = getAuth();
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('userCredential: ', userCredential);
+        return userCredential.user;
+    } catch (error) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error("Error logging in with email and password: ", errorCode, errorMessage);
+        throw new Error(`${errorCode}: ${errorMessage}`);
+
+       // throw new Error(errorCode).message;
+    }
+};
+
+export { signInWithGoogle, signInWithEmailPassword };

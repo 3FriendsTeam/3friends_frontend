@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import chat from "../../../assets/admin/chat.png";
 import logout from "../../../assets/admin/logout.png";
 import orders from "../../../assets/admin/orders.png";
 import products from "../../../assets/admin/products.png";
 import shop from "../../../assets/admin/shop.png";
-
+import PropTypes from 'prop-types';
 
 
 const Sidebar = ({ onSectionClick }) => {
@@ -130,5 +130,9 @@ const Sidebar = ({ onSectionClick }) => {
         </aside>
     );
 }
+Sidebar.propTypes = {
+    onSectionClick: PropTypes.func.isRequired,
+  };
+  
 
 export default Sidebar;

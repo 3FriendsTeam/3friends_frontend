@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const SpecificationSection = ({ specifications, onAddSpecification, onRemoveSpecification }) => {
     const [specName, setSpecName] = useState('');
@@ -110,6 +111,16 @@ const SpecificationSection = ({ specifications, onAddSpecification, onRemoveSpec
             </table>
         </div>
     );
-}
+};
+
+SpecificationSection.propTypes = {
+    specifications: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+    })).isRequired,
+    onAddSpecification: PropTypes.func.isRequired,
+    onRemoveSpecification: PropTypes.func.isRequired,
+};
 
 export default SpecificationSection;
+

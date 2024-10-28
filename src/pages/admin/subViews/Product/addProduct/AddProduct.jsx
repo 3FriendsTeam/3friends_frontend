@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ImageUploadSection from './ImageUploadSection'; // Import phần upload ảnh
 import SpecificationSection from './SpecificationSection'; // Import phần thông số sản phẩm
 

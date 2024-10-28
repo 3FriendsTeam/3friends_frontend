@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AddEmployee from '../addEmployee/AddEmployee'; // Giả sử bạn đã có component AddEmployee
 
 const ViewEmployee = () => {
-    const [employees, setEmployees] = useState([
+    //const [employees, setEmployees] = useState([
+    const [employees] = useState([
         {
             id: 1,
             name: 'Trần Văn Tình',

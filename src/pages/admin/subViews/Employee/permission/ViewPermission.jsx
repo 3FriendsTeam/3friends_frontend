@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const ViewPermission = () => {
-    const [permissions, setPermissions] = useState([
+    //const [permissions, setPermissions] = useState([
+    const [permissions] = useState([
         {
             id: 1,
             name: 'Admin',

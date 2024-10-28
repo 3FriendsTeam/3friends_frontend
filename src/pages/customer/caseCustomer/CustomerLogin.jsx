@@ -58,7 +58,7 @@ const CustomerLogin = () => {
     }) => {
         try {
             console.log(uid, customerName, gender, email, phoneNumber, birthDate, isVerified);
-            const response = await axios.post('http://localhost:3001/api/register', {
+            const response = await axios.post('http://localhost:7000/api/register', {
                 uid,
                 customerName,
                 gender,
@@ -79,7 +79,7 @@ const CustomerLogin = () => {
 
     const checkEmail = async ({ email }) => {
         try {
-            const response = await axios.get(`http://localhost:3001/api/check-email?email=${email}`);
+            const response = await axios.get(`http://localhost:7000/api/check-email?email=${email}`);
             console.log("res: ", response);
 
             if (response.data.success) {

@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
 
 function UploadImgEmployee({ onThumbnailChange }) {
     const [thumbnail, setThumbnail] = useState(null);
+    const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
     // Xử lý khi thay đổi ảnh đại diện
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
         setThumbnail(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+            setThumbnailPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
         onThumbnailChange(file); // Gửi file ảnh đại diện lên component cha
     };
 
     // Xóa ảnh đại diện
     const handleRemoveThumbnail = () => {
         setThumbnail(null);
+        setThumbnailPreview(null);
         onThumbnailChange(null); // Gửi thông báo ảnh đại diện đã bị xóa lên component cha
     };
 
@@ -28,11 +36,11 @@ function UploadImgEmployee({ onThumbnailChange }) {
                 className="w-full mb-2"
                 disabled={thumbnail !== null} // Vô hiệu hóa nếu đã chọn ảnh đại diện
             />
-            {thumbnail && (
+            {thumbnailPreview && (
                 <div className="mb-2 relative">
                     <p>Ảnh đại diện đã chọn: {thumbnail.name}</p>
                     <img
-                        src={URL.createObjectURL(thumbnail)}
+                        src={thumbnailPreview}
                         alt="Ảnh đại diện"
                         className="w-full h-32 object-cover rounded mb-2"
                     />
@@ -47,4 +55,8 @@ function UploadImgEmployee({ onThumbnailChange }) {
     );
 }
 
+UploadImgEmployee.propTypes = {
+    onThumbnailChange: PropTypes.func.isRequired,
+};
 export default UploadImgEmployee;
+

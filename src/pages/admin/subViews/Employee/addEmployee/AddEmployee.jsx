@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import UploadImgEmployee from './UploadImgEmployee'; // Import phần upload ảnh
+import PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 const AddEmployee = ({ onBack }) => {
     const [FullName, setFullName] = useState('');
@@ -7,12 +10,27 @@ const AddEmployee = ({ onBack }) => {
     const [Gender, setGender] = useState('');
     const [Address, setAddress] = useState('');
     const [Email, setEmail] = useState('');
-    const [PhoneNumber, setPhoneNumber] = useState('');
     const [Role, setRole] = useState('');
+    const [PhoneNumber, setPhoneNumber] = useState('');
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
     const [thumbnail, setThumbnail] = useState(null);
-
+    const [roles, setRoles] = useState([]);
+    
+    useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const response = await axios.get('http://localhost:7000/api/positions');
+                const data = response.data; // Directly access response data
+                console.log(data);
+                setRoles(data);
+            } catch (error) {
+                console.error("Error fetching roles:", error);
+            }
+        };
+    
+        fetchRoles();
+    }, []); 
     // Hàm xử lý submit form
     const handleSubmit = (e) => {
         e.preventDefault(); // Ngăn hành vi mặc định của form
@@ -89,20 +107,21 @@ const AddEmployee = ({ onBack }) => {
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             className="w-full border p-2 mb-2"
                         />
-
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium">Chức vụ</label>
+                    <label className="block text-sm font-medium">Chức vụ</label>
                         <select
                             value={Role}
                             onChange={(e) => setRole(e.target.value)}
                             className="w-full border p-2 mb-2"
                         >
                             <option value="">-- Chọn chức vụ --</option>
-                            <option value="Quản lý">Quản lý</option>
-                            <option value="Nhân viên">Nhân viên</option>
-                            <option value="Kỹ sư">Kỹ sư</option>
+                            {roles.map((role) => (
+                                <option key={role.id} value={role.PositionName}>
+                                    {role.PositionName}
+                                </option>
+                            ))}
                         </select>
 
                         <label className="block text-sm font-medium">Tên đăng nhập</label>
@@ -146,4 +165,9 @@ const AddEmployee = ({ onBack }) => {
     );
 }
 
+AddEmployee.propTypes = {
+    onBack: PropTypes.func.isRequired,
+};
+
 export default AddEmployee;
+

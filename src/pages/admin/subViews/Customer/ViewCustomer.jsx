@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const ViewCustomer = () => {
-    const [customers, setCustomers] = useState([
+    //const [customers, setCustomers] = useState([
+    const [customers] = useState([
         {
             id: 1,
             name: 'Trần Văn Tình',
@@ -18,9 +19,9 @@ const ViewCustomer = () => {
         },
     ]);
 
-    /*const handleDelete = (id) => {
-        setCustomers(customers.filter(customer => customer.id !== id));
-    };*/
+    // const handleDelete = (id) => {
+    //     setCustomers(customers.filter(customer => customer.id !== id));
+    // };
 
     // State để lưu giá trị tìm kiếm người dùng nhập
     const [searchTerm, setSearchTerm] = useState('');
@@ -81,3 +82,4 @@ const ViewCustomer = () => {
 };
 
 export default ViewCustomer;
+

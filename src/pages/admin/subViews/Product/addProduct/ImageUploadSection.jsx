@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 const ImageUploadSection = ({ onThumbnailChange, onGalleryChange, onSpecImageChange }) => {
     const [thumbnail, setThumbnail] = useState(null);
     const [gallery, setGallery] = useState([]);
@@ -128,5 +128,10 @@ const ImageUploadSection = ({ onThumbnailChange, onGalleryChange, onSpecImageCha
         </div>
     );
 }
+ImageUploadSection.propTypes = {
+    onThumbnailChange: PropTypes.func.isRequired,
+    onGalleryChange: PropTypes.func.isRequired,
+    onSpecImageChange: PropTypes.func.isRequired,
+  };
 
 export default ImageUploadSection;

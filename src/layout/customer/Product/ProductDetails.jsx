@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import NavigationBar from "../Animations/NavigationBar";
 import Footer from "../../../components/Client/Footer";
 import Header from "../../../components/Client/Header";
@@ -6,8 +6,11 @@ import icons from "../../../utils/icons";
 import ctsp1 from "../../../assets/client/ctsp1.jpeg";
 import ProductsDescribe from "./ProductsDescribe";
 import { CartContext } from "../ShoppingCart/CartContext";
+import { useNavigate } from "react-router-dom";
+import { path } from "../../../utils/constant";
 
 const ProductDetails = () => {
+  const navigate = useNavigate();
   const products = [
     {
       name: "Samsung Galaxy Z Fold6 5G 12GB 256GB",
@@ -66,24 +69,38 @@ const ProductDetails = () => {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { addToCart } = useContext(CartContext);
-  const handleBuyNow = (product) => {
-    addToCart(product);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(null);
+
+  const handleProductClick = (index) => {
+    setSelectedIndex(index);
+  };
+
+  const handleColorClick = (index) => {
+    setSelectedColorIndex(index);
+  };
+
+  const handleBuyNow = () => {
+    if (selectedIndex !== null && selectedColorIndex !== null) {
+      const selectedProduct = {
+        name: products[selectedIndex].name,
+        price: products[selectedIndex].price,
+        color: colors[selectedColorIndex].name,
+        imgSrc: colors[selectedColorIndex].imgSrc,
+      };
+      addToCart(selectedProduct);
+      navigate(path.SHOPPINGCART);
+    } else {
+      alert("Vui lòng chọn cấu hình và màu sắc.");
+    }
   };
 
   const toggleDetails = () => {
     setIsExpanded(!isExpanded);
   };
-
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const handleProductClick = (index) => {
-    setSelectedIndex(index);
-  };
-
-  const [selectedColorIndex, setSelectedColorIndex] = useState(null);
-  const handleColorClick = (index) => {
-    setSelectedColorIndex(index);
-  };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex flex-wrap flex-row w-full ">
       <div className="w-[1536px]">
@@ -268,19 +285,14 @@ const ProductDetails = () => {
             </div>
             <div className="bg-[#e90628] flex flex-col items-center justify-center rounded-lg mt-4 h-[69px]">
               <button
-                onClick={() =>
-                  handleBuyNow({
-                    name: "Samsung Galaxy Z Fold6 5G 12GB 512GB",
-                    price: "25.990.000 ₫",
-                  })
-                }
+                onClick={handleBuyNow}
                 className="text-white text-[20px] font-bold"
               >
                 MUA NGAY
+                <span className="text-white font-semibold text-[14px] block">
+                  Thoải mái lựa chọn, xem hàng tại nhà
+                </span>
               </button>
-              <span className="text-white font-semibold">
-                Thoải mái lựa chọn, xem hàng tại nhà
-              </span>
             </div>
           </div>
         </div>

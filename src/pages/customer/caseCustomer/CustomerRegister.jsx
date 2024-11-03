@@ -61,7 +61,7 @@ const CustomerRegister = () => {
             setErrors({
                 ...errors,
                 [name]:  (
-                    <span className="text-[12px] text-red-500">
+                    <span className="text-[12px] text-red-500 ml-[10px]">
                         Vui lòng không bỏ trống
                     </span>
                 ),
@@ -230,12 +230,12 @@ const CustomerRegister = () => {
 
     return (
         <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
-            <div className="w-[700px] p-8 rounded-lg shadow-lg mt-[50px]">
+            <div className="w-[700px]  rounded-lg shadow-lg mt-[50px]">
                 <div className="flex justify-start">
                     {/* <icons.IoArrowBackSharp className="text-xl" /> */}
                 </div>
                 {/* Icon logo */}
-                <div className="flex justify-center mb-6">
+                <div className="flex justify-center mb-4">
                     <img src={login} alt="Logo" className="w-20 h-20" />
                 </div>
 
@@ -275,9 +275,9 @@ const CustomerRegister = () => {
                         
                         {errors.customerName && <p className="text-sm text-red-500 mt-1">{errors.customerName}</p>}
                     </div>
-                    <div className="relative mt-4">
-                        <label className="block text-sm mb-2">Giới tính</label>
-                        <div className="flex items-center">
+                    <div className="relative ">
+                        <label className="block text-sm mb-2 ml-[10px]">Giới tính</label>
+                        <div className="flex items-center ml-[10px] ">
                             <input
                                 type="radio"
                                 name="gender"

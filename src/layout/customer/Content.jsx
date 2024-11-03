@@ -1,5 +1,5 @@
 
-import logo1 from "../../assets/client/logo1.jpg";
+import logo2 from "../../assets/client/logo2.png";
 import { useState, useEffect, useCallback,useMemo } from "react";
 import icons from '../../utils/icons'
 import a1 from "../../assets/client/a1.png";
@@ -77,7 +77,7 @@ const FeaturedProducts = () => {
   return (    <div className="bg-[#F2F2F2]">
       <div className="hidden md:flex">
         <img
-          src={logo1}
+          src={logo2}
           alt=""
           className="rounded-bl-3xl rounded-br-3xl w-full h-auto"
         />

@@ -13,15 +13,15 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const products = [
     {
-      name: "Samsung Galaxy Z Fold6 5G 12GB 256GB",
+      name: "Samsung Galaxy Z 12GB 256GB",
       price: "41.990.000 ₫",
     },
     {
-      name: "Samsung Galaxy Z Fold6 5G 12GB 512GB",
+      name: "Samsung Galaxy Z 12GB 512GB",
       price: "41.990.000 ₫",
     },
     {
-      name: "Samsung Galaxy Z Fold6 5G 12GB 1TB",
+      name: "Samsung Galaxy Z 12GB 1TB",
       price: "41.990.000 ₫",
     },
   ];

@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import anh1 from "../../assets/client/anh1.jpg";
 import anh2 from "../../assets/client/anh2.jpg";
 import anh3 from "../../assets/client/anh3.png";
-import logohome1 from "../../assets/client/logohome1.png";
+import logohome3 from "../../assets/client/logohome3.png";
 import { path } from "../../utils/constant";
 import icons from "../../utils/icons";
 import Button from "./Button";
@@ -86,16 +86,14 @@ const Header = () => {
       </div>
 
       {/* searchbar */}
-      <div
-        className=" bg-[#EE0033] flex flex-col md:flex-row md:h-16 items-center "
-      >
+      <div className=" bg-[#EE0033] flex flex-col md:flex-row md:h-16 items-center ">
         <div className="ml-4 md:ml-[183px] z-50">
           <div className="border border-transparent rounded p-2 bg-transparent ">
             <NavLink to="/">
               <img
-                src={logohome1}
+                src={logohome3}
                 alt="logo"
-                className=" w-32 md:w-auto h-auto"
+                className=" h-[70px] w-[167px] "
               />
             </NavLink>
           </div>
@@ -171,15 +169,13 @@ const Header = () => {
 
           {/* Nút Đăng nhập / Xin chào */}
           <div className="text-xs text-white rounded-xl w-[85px] h-[80px] hidden md:flex relative">
-            <div
-              className="flex flex-col justify-center z-50  items-center h-full cursor-pointer"
-             
-            >
+            <div className="flex flex-col justify-center z-50  items-center h-full cursor-pointer">
               <div className="flex items-start mb-1">
                 <icons.RxAvatar className="text-white text-2xl" />
               </div>
-              <div className="flex flex-col items-center"
-               onClick={toggleDropdown}
+              <div
+                className="flex flex-col items-center"
+                onClick={toggleDropdown}
               >
                 {username ? (
                   <span className="font-bold  whitespace-nowrap  ">
@@ -212,7 +208,10 @@ const Header = () => {
                       className="w-10 h-10 mr-3"
                     />
                     <div className="flex justify-between items-center w-full">
-                      <NavLink to={path.CUSTOMERINFORMATION} className="text-red-500 font-bold text-[14px]">
+                      <NavLink
+                        to={path.CUSTOMERINFORMATION}
+                        className="text-red-500 font-bold text-[14px]"
+                      >
                         Truy cập 3Fmember
                       </NavLink>
                       <span className="text-red-500 text-[20px]">

@@ -28,6 +28,9 @@ import { MdAddLocationAlt } from "react-icons/md";
 import { MdLocalPolice } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { IoIosAddCircle } from "react-icons/io";
+import { IoIosRemoveCircle } from "react-icons/io";
 
 const icons={
     IoIosArrowDropright,
@@ -60,5 +63,8 @@ const icons={
     MdLocalPolice,
     IoIosArrowDown,
     IoIosArrowUp,
+    RiDeleteBin5Line,
+    IoIosAddCircle,
+    IoIosRemoveCircle
 }
 export default icons

@@ -3,7 +3,10 @@ import { auth } from '../../../config/firebaseConfig.jsx';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import axios from 'axios';
 import { signInWithGoogle } from '../../../config/firebaseService.jsx';
-
+import { NavLink } from 'react-router-dom';
+import { path } from '../../../utils/constant.jsx';
+import login from '../../../assets/client/login.png';
+import google from '../../../assets/client/google.png';
 
 const CustomerRegister = () => {
     const [formData, setFormData] = useState({
@@ -57,7 +60,11 @@ const CustomerRegister = () => {
         if (!value.trim()) {
             setErrors({
                 ...errors,
-                [name]: 'Vui lòng không bỏ trống',
+                [name]:  (
+                    <span className="text-[12px] text-red-500 ml-[10px]">
+                        Vui lòng không bỏ trống
+                    </span>
+                ),
             });
         } else {
             // Xóa thông báo lỗi nếu đã có giá trị
@@ -223,13 +230,13 @@ const CustomerRegister = () => {
 
     return (
         <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
-            <div className="w-[700px] p-8 rounded-lg shadow-lg mt-[50px]">
+            <div className="w-[700px]  rounded-lg shadow-lg mt-[50px]">
                 <div className="flex justify-start">
                     {/* <icons.IoArrowBackSharp className="text-xl" /> */}
                 </div>
                 {/* Icon logo */}
-                <div className="flex justify-center mb-6">
-                    {/* <img src={login} alt="Logo" className="w-20 h-20" /> */}
+                <div className="flex justify-center mb-4">
+                    <img src={login} alt="Logo" className="w-20 h-20" />
                 </div>
 
                 {/* Title */}
@@ -237,8 +244,8 @@ const CustomerRegister = () => {
 
                 {/* Social Login */}
                 <div className="flex justify-center space-x-4 mb-4">
-                    <button className="flex items-center py-2 px-4 rounded-lg">
-                        {/* <img src={google} alt="Google" className="w-6 h-6 mr-2" /> Google */}
+                    <button onClick={handleGoogleLogin} className="flex items-center py-2 px-4 rounded-lg">
+                        <img src={google} alt="Google" className="w-6 h-6 mr-2" /> Google
                     </button>
                 </div>
 
@@ -263,14 +270,14 @@ const CustomerRegister = () => {
                             }`}
                             value={formData.customerName}
                             onChange={handleChange}
-                            onBlur={handleBlur}
+                            onBlur={handleBlur} 
                         />
                         
                         {errors.customerName && <p className="text-sm text-red-500 mt-1">{errors.customerName}</p>}
                     </div>
-                    <div className="relative mt-4">
-                        <label className="block text-sm mb-2">Giới tính</label>
-                        <div className="flex items-center">
+                    <div className="relative ">
+                        <label className="block text-sm mb-2 ml-[10px]">Giới tính</label>
+                        <div className="flex items-center ml-[10px] ">
                             <input
                                 type="radio"
                                 name="gender"
@@ -376,17 +383,15 @@ const CustomerRegister = () => {
                     />
                     {errors.confirmPassword && <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>}
                     {/* Submit button */}
-                    <button type='submit' className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 text-sm">
+                    <button type='submit' className="w-full bg-[#e0052b] text-white py-3 rounded-lg font-semibold hover:bg-red-600 text-sm">
                         Đăng ký
                     </button>
                 </form>
-                <button onClick={handleGoogleLogin} className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 text-sm">
-                    Nhập bằng gg
-                </button>
+
                 {/* Login link */}
                 <div className="text-center mt-4 text-gray-500 text-sm">
                     Bạn đã có tài khoản?{' '}
-                    <span className="text-red-500 hover:underline cursor-pointer text-sm">Đăng nhập ngay</span>
+                    <NavLink to={path.CUSTOMERLOGIN} className="text-red-500 font-bold hover:underline cursor-pointer text-sm">Đăng nhập ngay</NavLink>
                 </div>
             </div>
         </div>

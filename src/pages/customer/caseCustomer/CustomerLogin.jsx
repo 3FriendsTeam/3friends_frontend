@@ -64,16 +64,7 @@ const CustomerLogin = () => {
     isVerified = true,
   }) => {
     try {
-      console.log(
-        uid,
-        customerName,
-        gender,
-        email,
-        phoneNumber,
-        birthDate,
-        isVerified
-      );
-      const response = await axios.post("http://localhost:7000/api/register", {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
         uid,
         customerName,
         gender,
@@ -83,11 +74,9 @@ const CustomerLogin = () => {
         isVerified,
       });
       if (response.status === 200) {
-        console.log("save accounting success");
         return true;
       }
-    } catch (error) {
-      console.log("error save accounting", error.message);
+    } catch {
       return false;
     }
   };
@@ -95,9 +84,8 @@ const CustomerLogin = () => {
   const checkEmail = async ({ email }) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/check-email?email=${email}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/check-email?email=${email}`
       );
-      console.log("res: ", response);
 
       if (response.data.success) {
         return true;
@@ -113,11 +101,9 @@ const CustomerLogin = () => {
   const handleGoogleLogin = async () => {
     try {
       const userCredential = await signInWithGoogle();
-      // console.log('userCredential: ', userCredential.displayName, userCredential.email, userCredential.emailVerified, userCredential.uid);
       if (userCredential) {
         setIsLoading(true);
         const user = userCredential;
-        // console.log('thong tin user: ', user.displayName, user.email, user.emailVerified, user.uid);
         if (user) {
           const checkCreatedEmail = await checkEmail({ email: user.email });
           if (!checkCreatedEmail) {
@@ -163,9 +149,16 @@ const CustomerLogin = () => {
 
     try {
       const user = await signInWithEmailPassword(email, password);
+      const isVerified = user.emailVerified;
+      if(isVerified){
       localStorage.setItem("username", user.displayName || "Người dùng");
       localStorage.setItem("token", await user.getIdToken());
       navigate(path.HOMEPAGE);
+      }
+      else{
+        setLoginError("Vui lý kiểm tra và xác thực email trước khi đăng nhập.");
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error("Error logging in:", error);
       setLoginError("Đã xảy ra lỗi khi đăng nhập.");

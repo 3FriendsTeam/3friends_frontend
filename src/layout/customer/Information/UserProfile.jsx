@@ -1,15 +1,25 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const UserProfile = () => {
-  const [username] = useState("xhZv0y4bcj");
-  const [name, setName] = useState("");
-  const [email] = useState("hu*********@gmail.com");
-  const [gender, setGender] = useState("");
-  const [birthday, setBirthday] = useState({
-    day: "1",
-    month: "11",
-    year: "2024",
-  });
+  const [formData, setFormData] = useState({
+    customerName: '',
+    email: '',
+    phoneNumber: '',
+    birthday: '',
+    gender: '',
+    joinDate: '',
+});
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    try {
+      const response = axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-customer-info?token=${token}`);
+      console.log(response.data);
+      setFormData(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
     <div className="flex mr-[150px] -mt-5 bg-gray-100  ">

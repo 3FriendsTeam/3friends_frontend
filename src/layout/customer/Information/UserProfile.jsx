@@ -1,21 +1,21 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-
+import api from "../../../middlewares/tokenMiddleware";
 const UserProfile = () => {
   const [formData, setFormData] = useState({
-    customerName: '',
-    email: '',
-    phoneNumber: '',
-    birthday: '',
-    gender: '',
-    joinDate: '',
+    CustomerName: '',
+    Email: '',
+    PhoneNumber: '',
+    Birthday: '',
+    Gender: '',
+    createdAt: '',
 });
-  const token = localStorage.getItem("token");
   useEffect(() => {
     try {
-      const response = axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-customer-info?token=${token}`);
-      console.log(response.data);
+      const response = api.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-customer-info`);  
+      console.log("Customer data retrieved:", response);
+
       setFormData(response.data);
+      console.log(formData);
     } catch (error) {
       console.log(error);
     }
@@ -42,7 +42,7 @@ const UserProfile = () => {
             <div className="flex-1">
               <input
                 type="text"
-                value={username}
+                //value={formData.CustomerName}
                 disabled
                 className="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
               />
@@ -54,7 +54,7 @@ const UserProfile = () => {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              // onChange={(e) => setName(e.target.value)}
               className="w-full p-2 mt-1 border border-gray-300 rounded"
               placeholder="Nhập tên của bạn"
             />
@@ -64,7 +64,7 @@ const UserProfile = () => {
           <div className="col-span-3 flex items-center space-x-4 ">
             <label className="block text-gray-700 whitespace-nowrap ml-[70px]">Email</label>
             <div className="">
-                {email}  
+                {/* {email}   */}
               <button className="text-blue-500 ml-4">Thay Đổi</button>
             </div>
           </div>
@@ -84,8 +84,8 @@ const UserProfile = () => {
                   type="radio"
                   name="gender"
                   value="Nam"
-                  checked={gender === "Nam"}
-                  onChange={() => setGender("Nam")}
+                  // checked={gender === "Nam"}
+                  // onChange={() => setGender("Nam")}
                   className="mr-2"
                 />
                 Nam
@@ -95,8 +95,8 @@ const UserProfile = () => {
                   type="radio"
                   name="gender"
                   value="Nữ"
-                  checked={gender === "Nữ"}
-                  onChange={() => setGender("Nữ")}
+                  // checked={gender === "Nữ"}
+                  // onChange={() => setGender("Nữ")}
                   className="mr-2"
                 />
                 Nữ
@@ -106,8 +106,8 @@ const UserProfile = () => {
                   type="radio"
                   name="gender"
                   value="Khác"
-                  checked={gender === "Khác"}
-                  onChange={() => setGender("Khác")}
+                  // checked={gender === "Khác"}
+                  // onChange={() => setGender("Khác")}
                   className="mr-2"
                 />
                 Khác
@@ -120,10 +120,10 @@ const UserProfile = () => {
             <label className="block text-gray-700">Ngày sinh</label>
             <div className="flex space-x-2 mt-1">
               <select
-                value={birthday.day}
-                onChange={(e) =>
-                  setBirthday({ ...birthday, day: e.target.value })
-                }
+                // value={birthday.day}
+                // onChange={(e) =>
+                //   setBirthday({ ...birthday, day: e.target.value })
+                // }
                 className="border border-gray-300 p-2 rounded"
               >
                 {Array.from({ length: 31 }, (_, i) => (
@@ -133,10 +133,10 @@ const UserProfile = () => {
                 ))}
               </select>
               <select
-                value={birthday.month}
-                onChange={(e) =>
-                  setBirthday({ ...birthday, month: e.target.value })
-                }
+                // value={birthday.month}
+                // onChange={(e) =>
+                //   setBirthday({ ...birthday, month: e.target.value })
+                // }
                 className="border border-gray-300 p-2 rounded"
               >
                 {Array.from({ length: 12 }, (_, i) => (
@@ -146,10 +146,10 @@ const UserProfile = () => {
                 ))}
               </select>
               <select
-                value={birthday.year}
-                onChange={(e) =>
-                  setBirthday({ ...birthday, year: e.target.value })
-                }
+                // value={birthday.year}
+                // onChange={(e) =>
+                //   setBirthday({ ...birthday, year: e.target.value })
+                // }
                 className="border border-gray-300 p-2 rounded"
               >
                 {Array.from({ length: 100 }, (_, i) => (
@@ -174,5 +174,4 @@ const UserProfile = () => {
     </div>
   );
 };
-
 export default UserProfile;

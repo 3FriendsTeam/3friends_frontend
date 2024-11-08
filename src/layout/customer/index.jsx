@@ -12,5 +12,5 @@ export {default as ListBestSellingProducts} from './Product/ListBestSellingProdu
 export {default as LookOrders} from './Order/LookOrders';
 export {default as ProductDetails} from './Product/ProductDetails';
 export {default as ProductsDescribe} from './Product/ProductsDescribe';
-export {default as CustomerInformation} from './Information/CustomerInformation';
+export {default as Fmenber} from './Information/Fmenber';
 

@@ -209,7 +209,7 @@ const Header = () => {
                     />
                     <div className="flex justify-between items-center w-full">
                       <NavLink
-                        to={path.CUSTOMERINFORMATION}
+                        to={path.FMMENBER}
                         className="text-red-500 font-bold text-[14px]"
                       >
                         Truy cập 3Fmember

@@ -10,6 +10,12 @@ const UserProfile = () => {
     Gender: '',
     createdAt: '',
   });
+  const [isEditing, setIsEditing] = useState({
+    email: false,
+    phoneNumber: false,
+  });
+  const [updatedEmail, setUpdatedEmail] = useState('');
+  const [updatedPhoneNumber, setUpdatedPhoneNumber] = useState('');
 
   const formatDate = (isoDate) => {
     return isoDate ? isoDate.split("T")[0] : "";
@@ -20,13 +26,42 @@ const UserProfile = () => {
       try {
         const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-customer-info`);
         setFormData(response.data);
-        console.log(formData);
       } catch (error) {
         console.log(error);
       }
     };
     fetchCustomerData();
   }, []);
+
+  const handleSaveChanges = async () => {
+    try {
+      await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/update-customer-info`, formData);
+      alert("Thông tin đã được cập nhật thành công!");
+    } catch (error) {
+      console.log(error);
+      alert("Đã xảy ra lỗi khi cập nhật thông tin!");
+    }
+  };
+
+  const handleEditEmail = () => {
+    setIsEditing({ ...isEditing, email: true });
+    setUpdatedEmail(formData.Email);
+  };
+
+  const handleEditPhoneNumber = () => {
+    setIsEditing({ ...isEditing, phoneNumber: true });
+    setUpdatedPhoneNumber(formData.PhoneNumber);
+  };
+
+  const handleSaveEmail = () => {
+    setFormData({ ...formData, Email: updatedEmail });
+    setIsEditing({ ...isEditing, email: false });
+  };
+
+  const handleSavePhoneNumber = () => {
+    setFormData({ ...formData, PhoneNumber: updatedPhoneNumber });
+    setIsEditing({ ...isEditing, phoneNumber: false });
+  };
 
   return (
     <div className="flex mr-[150px] -mt-5 bg-gray-100">
@@ -50,15 +85,41 @@ const UserProfile = () => {
             </div>
             <div className="col-span-3 flex items-center space-x-4">
               <label className="block text-gray-700 whitespace-nowrap ml-[70px]">Email</label>
-              <div>
-                {formData.Email}
-                <button className="text-blue-500 ml-4">Thay Đổi</button>
-              </div>
+              {isEditing.email ? (
+                <div className="flex items-center">
+                  <input
+                    type="email"
+                    value={updatedEmail}
+                    onChange={(e) => setUpdatedEmail(e.target.value)}
+                    className="border border-gray-300 p-2 rounded"
+                  />
+                  <button onClick={handleSaveEmail} className="text-blue-500 ml-4">Lưu</button>
+                </div>
+              ) : (
+                <div>
+                  {formData.Email}
+                  <button onClick={handleEditEmail} className="text-blue-500 ml-4">Thay Đổi</button>
+                </div>
+              )}
             </div>
             <div className="col-span-3 flex items-center space-x-4">
               <label className="block text-gray-700">Số điện thoại:</label>
-              <div>{formData.PhoneNumber}</div>
-              <button className="text-blue-500">chỉnh sửa</button>
+              {isEditing.phoneNumber ? (
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    value={updatedPhoneNumber}
+                    onChange={(e) => setUpdatedPhoneNumber(e.target.value)}
+                    className="border border-gray-300 p-2 rounded"
+                  />
+                  <button onClick={handleSavePhoneNumber} className="text-blue-500 ml-4">Lưu</button>
+                </div>
+              ) : (
+                <div>
+                  {formData.PhoneNumber}
+                  <button onClick={handleEditPhoneNumber} className="text-blue-500 ml-4">Chỉnh sửa</button>
+                </div>
+              )}
             </div>
             <div className="col-span-3 flex items-center space-x-4">
               <label className="block text-gray-700">Giới tính</label>
@@ -114,7 +175,7 @@ const UserProfile = () => {
           </div>
         </div>
         <div className="mt-6 ml-6">
-          <button className="bg-red-500 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
+          <button onClick={handleSaveChanges} className="bg-red-500 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
             Lưu
           </button>
         </div>
@@ -124,4 +185,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-

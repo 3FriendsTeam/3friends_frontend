@@ -6,16 +6,19 @@ const UserProfile = () => {
     CustomerName: '',
     Email: '',
     PhoneNumber: '',
-    Birthday: '',
+    BirthDate: '',
     Gender: '',
     createdAt: '',
   });
+
+  const formatDate = (isoDate) => {
+    return isoDate ? isoDate.split("T")[0] : "";
+  };
 
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
         const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-customer-info`);
-        console.log("Customer data retrieved:", response.data);
         setFormData(response.data);
         console.log(formData);
       } catch (error) {
@@ -95,44 +98,19 @@ const UserProfile = () => {
                 </label>
               </div>
             </div>
-            {/* <div className="col-span-3 flex items-center space-x-4">
+            <div className="col-span-3 flex items-center space-x-4">
               <label className="block text-gray-700">Ngày sinh</label>
-              <div className="flex space-x-2 mt-1">
-                <select
-                  value={formData.Birthday.day}
-                  onChange={(e) => setFormData({ ...formData, Birthday: { ...formData.Birthday, day: e.target.value } })}
-                  className="border border-gray-300 p-2 rounded"
-                >
-                  {Array.from({ length: 31 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={formData.Birthday.month}
-                  onChange={(e) => setFormData({ ...formData, Birthday: { ...formData.Birthday, month: e.target.value } })}
-                  className="border border-gray-300 p-2 rounded"
-                >
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      Tháng {i + 1}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={formData.Birthday.year}
-                  onChange={(e) => setFormData({ ...formData, Birthday: { ...formData.Birthday, year: e.target.value } })}
-                  className="border border-gray-300 p-2 rounded"
-                >
-                  {Array.from({ length: 100 }, (_, i) => (
-                    <option key={i} value={2024 - i}>
-                      {2024 - i}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div> */}
+              <input
+                type="date"
+                value={formatDate(formData.BirthDate)}
+                onChange={(e) => setFormData({ ...formData, BirthDate: e.target.value })}
+                className="border border-gray-300 p-2 rounded"
+              />
+            </div>
+            <div className="col-span-3 flex items-center space-x-4">
+              <label className="block text-gray-700">Gia nhập ngày</label>
+              <span className="border border-gray-300 p-2 rounded">{formatDate(formData.createdAt)}</span>
+            </div>
           </div>
         </div>
         <div className="mt-6 ml-6">

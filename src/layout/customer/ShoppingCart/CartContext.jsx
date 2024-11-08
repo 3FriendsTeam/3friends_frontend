@@ -1,24 +1,48 @@
-import  { createContext, useState } from "react";
+import { createContext, useState } from "react";
 import PropTypes from "prop-types";
-// Tạo context
-export const CartContext = createContext();
 
-// Component provider cho giỏ hàng
+export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (product) => {
-    setCartItems([...cartItems, product]);
+    const productId = `${product.name}-${product.color}`;
+  
+    const existingProductIndex = cartItems.findIndex(
+      (item) => item.id === productId
+    );
+  
+    if (existingProductIndex !== -1) {
+      const updatedCartItems = cartItems.map((item, index) =>
+        index === existingProductIndex
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+      setCartItems(updatedCartItems);
+    } else {
+      setCartItems([
+        ...cartItems,
+        { ...product, id: productId, quantity: 1 },
+      ]);
+    }
   };
-  const removeFromCart = (index) => {
-    setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
+  
+  
+
+  const removeFromCart = (id) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
+
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart,removeFromCart  }}>
+    <CartContext.Provider
+      value={{ cartItems,setCartItems, addToCart, removeFromCart }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
+
 CartProvider.propTypes = {
-  children: PropTypes.node.isRequired // children là một node và bắt buộc
+  children: PropTypes.node.isRequired, 
 };

@@ -12,7 +12,6 @@ import { path } from "../../../utils/constant";
 const CustomerLogin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",

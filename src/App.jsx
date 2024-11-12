@@ -6,6 +6,8 @@ import Admin from "./pages/admin/LayoutAdmin/Admin";
 import {  CustomerInformation, HomePage, ListProducts, LookOrders, ProductDetails, ShoppingCart } from "./layout/customer";
 import { CartProvider } from "./layout/customer/ShoppingCart/CartContext";
 import ForgotPassword from "./pages/customer/caseCustomer/ForgotPassword";
+import AdminLogin from "./layout/admin/auth/AdminLogin";
+import ForgotPasswordAdmin from "./layout/admin/auth/ForgotPassword";
 function App() {
   return (
     <CartProvider>
@@ -21,6 +23,8 @@ function App() {
       <Route path={path.CUSTOMERINFORMATION} element={<CustomerInformation />} />
       <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
       <Route path={path.ADMIN} element={<Admin />} />
+      <Route path={path.ADMINLOGIN} element={<AdminLogin />} />
+      <Route path={path.FORGOTPASSWORDADMIN} element={<ForgotPasswordAdmin />} />
     </Routes>
     </CartProvider>
     

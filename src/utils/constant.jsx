@@ -9,4 +9,6 @@ export const path = {
   PRODUCTSDETAILS: "/productsdetails",
   ADMIN: "/admin",
   CUSTOMERINFORMATION: "/customerinformation",
+  ADMINLOGIN: "/adminlogin",
+  FORGOTPASSWORDADMIN: "/forgotpasswordadmin",
 };

@@ -1,4 +1,4 @@
-import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
 const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -32,4 +32,14 @@ const signInWithEmailPassword = async (email, password) => {
     }
 };
 
-export { signInWithGoogle, signInWithEmailPassword };
+const resetPassword = async (email) => {
+    const auth = getAuth();
+    try {
+        await sendPasswordResetEmail(auth, email);
+        return true;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export { signInWithGoogle, signInWithEmailPassword, resetPassword };

@@ -5,6 +5,7 @@ import CustomerLogin from "./pages/customer/caseCustomer/CustomerLogin";
 import Admin from "./pages/admin/LayoutAdmin/Admin";
 import {  CustomerInformation, HomePage, ListProducts, LookOrders, ProductDetails, ShoppingCart } from "./layout/customer";
 import { CartProvider } from "./layout/customer/ShoppingCart/CartContext";
+import ForgotPassword from "./pages/customer/caseCustomer/ForgotPassword";
 function App() {
   return (
     <CartProvider>
@@ -18,6 +19,7 @@ function App() {
       <Route path={path.CUSTOMERREGISTER} element={<CustomerRegister />} />
       <Route path={path.CUSTOMERLOGIN} element={<CustomerLogin />} />
       <Route path={path.CUSTOMERINFORMATION} element={<CustomerInformation />} />
+      <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
       <Route path={path.ADMIN} element={<Admin />} />
     </Routes>
     </CartProvider>

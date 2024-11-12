@@ -6,7 +6,7 @@ import {
   signInWithEmailPassword,
 } from "../../../config/firebaseService";
 import { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
 
 const CustomerLogin = () => {
@@ -131,6 +131,11 @@ const CustomerLogin = () => {
             }
           } else {
             localStorage.setItem("token", await user.getIdToken());
+            localStorage.setItem(
+                "username",
+                user.displayName || "Người dùng"
+            )
+            navigate(path.HOMEPAGE);
           }
         }
       }
@@ -238,9 +243,9 @@ const CustomerLogin = () => {
               )}
             </div>
             <div className="flex justify-between items-center mb-4">
-              <a href="#" className="text-blue-500 text-sm ml-[280px]">
+              <Link to={path.FORGOTPASSWORD} className="text-blue-500 text-sm ml-[280px]">
                 Quên mật khẩu?
-              </a>
+              </Link>
             </div>
 
             {loginError && <p className="text-red-500">{loginError}</p>}

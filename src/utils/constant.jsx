@@ -8,7 +8,7 @@ export const path = {
   LOOKORDERS: "/lookorders",
   PRODUCTSDETAILS: "/productsdetails",
   ADMIN: "/admin",
-  CUSTOMERINFORMATION: "/customerinformation",
+  FMEMBER: "/fmember",
   ADMINLOGIN: "/adminlogin",
   FORGOTPASSWORDADMIN: "/forgotpasswordadmin",
 };

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { auth } from '../../../config/firebaseConfig.jsx';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import axios from 'axios';
 import { signInWithGoogle } from '../../../config/firebaseService.jsx';
-import { NavLink } from 'react-router-dom';
+import { Navigate, NavLink } from 'react-router-dom';
 import { path } from '../../../utils/constant.jsx';
 import login from '../../../assets/client/login.png';
 import google from '../../../assets/client/google.png';
@@ -106,8 +106,7 @@ const CustomerRegister = () => {
         }
     ) => {
         try{
-            console.log(uid,customerName,gender,email,phoneNumber,birthDate,isVerified);
-            const response = await axios.post('http://localhost:7000/api/register', {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
             uid,
             customerName,
             gender,
@@ -130,9 +129,7 @@ const CustomerRegister = () => {
     // check email tồn tại hay chưa
     const checkEmail = async ({ email }) => {
         try {
-            const response = await axios.get(`http://localhost:7000/api/check-email?email=${email}`);
-            console.log("res: ", response);
-    
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/check-email?email=${email}`);
             if (response.data.success) {
                 return true;
             } else {
@@ -148,10 +145,8 @@ const CustomerRegister = () => {
     const handleGoogleLogin = async () => {
         try {
             const userCredential = await signInWithGoogle();
-            console.log('userCredential: ', userCredential.displayName, userCredential.email, userCredential.emailVerified, userCredential.uid);
             if (userCredential) {
                 const user = userCredential;
-                console.log('thong tin user: ', user.displayName, user.email, user.emailVerified, user.uid);
                 if (user) {
                     const checkCreatedEmail = await checkEmail({ email: user.email });
                     if (!checkCreatedEmail) {
@@ -167,6 +162,7 @@ const CustomerRegister = () => {
                             });
                             localStorage.setItem("token", await user.getIdToken());
                             alert('Đăng nhập thành công!');
+                            Navigate(path.HOMEPAGE);
                         } catch (error) {
                             console.error('Error saving account: ', error);
                             alert('Đã xảy ra lỗi khi lưu tài khoản.');
@@ -174,6 +170,7 @@ const CustomerRegister = () => {
                     } else {
                         localStorage.setItem("token", await user.getIdToken());
                         alert('Đăng nhập thành công!');
+                        Navigate(path.HOMEPAGE);
                     }
                 }
             }
@@ -189,7 +186,6 @@ const CustomerRegister = () => {
     
         try {
             const checkCreatedEmail = await checkEmail({ email });
-            console.log("checkCreatedEmail: ", checkCreatedEmail);
             if (checkCreatedEmail) {
                 alert('Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!');
                 throw new Error('Email đã đăng ký');
@@ -197,7 +193,7 @@ const CustomerRegister = () => {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 if (userCredential) {
-                    await saveAccount({
+                    const success = await saveAccount({
                         uid: userCredential.user.uid,
                         customerName: formData.customerName,
                         gender: formData.gender,
@@ -205,6 +201,10 @@ const CustomerRegister = () => {
                         phoneNumber: formData.phoneNumber,
                         birthDate: formData.birthday,
                     });
+                    if (!success) {
+                        alert('lỗi hệ thống vui lòng thử lại sau');
+                        throw new Error('Error saving account');
+                    }
                 }
                 setFormData({
                     customerName: '',
@@ -214,12 +214,12 @@ const CustomerRegister = () => {
                     password: '',
                     confirmPassword: '',
                 });
+                sendEmailVerification(userCredential.user);
                 alert('Đăng ký thành công vui lòng xác thực email!');
+
             } catch (error) {
                 if (error.code === 'auth/email-already-in-use') {
                     alert('Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!');
-                } else {
-                    console.error('Error creating user:', error.message);
                 }
             }
         } catch (error) {
@@ -309,38 +309,7 @@ const CustomerRegister = () => {
                             <label>Khác</label>
                             </div>
                     </div>
-                    {errors.gender && <p className="text-sm text-red-500 mt-1">{errors.gender}</p>}  
-                    <div className="relative">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Nhập email*"
-                            className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
-                                errors.email ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            value={formData.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                        />
-                        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-                    </div>
-                    {/* Phone Input */}
-                    <div className="relative">
-                        <input
-                            type="text"
-                            name="phoneNumber"
-                            placeholder="Nhập số điện thoại*"
-                            className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
-                                errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            value={formData.phoneNumber}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                        />
-                        {errors.phoneNumber && <p className="text-sm text-red-500 mt-1">{errors.phoneNumber}</p>}
-                    </div>
-
-                    
+                    {errors.gender && <p className="text-sm text-red-500 mt-1">{errors.gender}</p>}
 
                     <div className="relative">
                         <input
@@ -355,7 +324,40 @@ const CustomerRegister = () => {
                         />
                         {errors.birthday && <p className="text-sm text-red-500 mt-1">{errors.birthday}</p>}
                     </div>
+                    {/* Phone Input */}
+                    <div className="relative">
+                        <input
+                            type="text"
+                            name="phoneNumber"
+                            placeholder="Nhập số điện thoại (không bắt buộc)"
+                            className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
+                                errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            value={formData.phoneNumber}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                        />
+                    </div>
+  
+                    <div className="relative">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Nhập email*"
+                            className={`w-full p-3 text-sm rounded-lg focus:outline-none focus:ring-2 ${
+                                errors.email ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            value={formData.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                        />
+                        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                    </div>
+                    
 
+                    
+
+                    
                     {/* Other Inputs... */}
                     <input
                         type="password"

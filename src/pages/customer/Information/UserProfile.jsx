@@ -74,7 +74,7 @@ const UserProfile = () => {
           </div>
           <div className="grid grid-cols-4 gap-6 text-[15px]">
             <div className="col-span-3 flex items-center space-x-4">
-              <label className="text-gray-700 whitespace-nowrap ml-20">Tên khách hàng</label>
+              <label className="text-gray-700 whitespace-nowrap">Tên khách hàng</label>
               <input
                 type="text"
                 value={formData.CustomerName}
@@ -84,7 +84,7 @@ const UserProfile = () => {
               />
             </div>
             <div className="col-span-3 flex items-center space-x-4">
-              <label className="block text-gray-700 whitespace-nowrap ml-[70px]">Email</label>
+              <label className="block text-gray-700 whitespace-nowrap ">Email</label>
               {isEditing.email ? (
                 <div className="flex items-center">
                   <input

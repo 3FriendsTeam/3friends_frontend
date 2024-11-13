@@ -1,18 +1,17 @@
 import { Route, Routes } from "react-router-dom";
-import CustomerRegister from "./pages/customer/caseCustomer/CustomerRegister";
 import { path } from "./utils/constant";
+import { CartProvider } from "./pages/customer/ShoppingCart/CartContext";
+import { Fmember, HomePage, ListProducts, LookOrders, ProductDetails, ShoppingCart } from "./pages/customer";
+import CustomerRegister from "./pages/customer/caseCustomer/CustomerRegister";
 import CustomerLogin from "./pages/customer/caseCustomer/CustomerLogin";
-import Admin from "./pages/admin/LayoutAdmin/Admin";
-import { Fmember, HomePage, ListProducts, LookOrders, ProductDetails, ShoppingCart } from "./layout/customer";
-import { CartProvider } from "./layout/customer/ShoppingCart/CartContext";
 import ForgotPassword from "./pages/customer/caseCustomer/ForgotPassword";
-import AdminLogin from "./layout/admin/auth/AdminLogin";
-import ForgotPasswordAdmin from "./layout/admin/auth/ForgotPassword";
+import Admin from "./pages/admin/LayoutAdmin/Admin";
+import AdminLogin from "./pages/admin/auth/AdminLogin";
+import ForgotPasswordAdmin from "./pages/admin/auth/ForgotPassword";
 function App() {
   return (
     <CartProvider>
     <Routes>
-      {/* console.log(import.meta.env.VITE_FIREBASE_API_KEY) */}
       <Route path={path.HOMEPAGE} element={<HomePage />} />
       <Route path={path.LISTPRODUCTS} element={<ListProducts/>}/>
       <Route path={path.LOOKORDERS} element={<LookOrders/>}/>

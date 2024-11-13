@@ -1,7 +1,7 @@
 export { default as Button } from "../../components/Client/Button"; 
 export { default as Header } from "../../components/Client/Header";
 export { default as Home } from "./Home";
-export {default as HomePage} from "../../pages/customer/HomePage";
+export {default as HomePage} from "./HomePage";
 export { default as Footer } from "../../components/Client/Footer";
 export { default as Content } from "./Content";
 export { default as ListProducts } from "./Product/ListProducts";

@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import NavigationBar from "../Animations/NavigationBar";
+import NavigationBar from "../../../pages/customer/Animations/NavigationBar";
 import Footer from "../../../components/Client/Footer";
 import Header from "../../../components/Client/Header";
 import icons from "../../../utils/icons";

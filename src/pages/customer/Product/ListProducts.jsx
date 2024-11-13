@@ -4,8 +4,8 @@ import km1 from '../../../assets/client/km1.png'
 import km2 from '../../../assets/client/km2.png'
 import Header from '../../../components/Client/Header';
 import Footer from '../../../components/Client/Footer';
-import NavigationBar from '../Animations/NavigationBar';
-import Animation from '../Animations/Animation';
+import NavigationBar from '../../../pages/customer/Animations/NavigationBar';
+import Animation from '../../../pages/customer/Animations/Animation';
 import ProductClassification from './ProductClassification';
 import { NavLink } from 'react-router-dom';
 import {path} from '../../../utils/constant'

@@ -1,4 +1,4 @@
-import { Home } from "../../layout/customer";
+import { Home } from ".";
 
 function HomePage() {
     return (

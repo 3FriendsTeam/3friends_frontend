@@ -83,17 +83,22 @@ const ProductDetails = () => {
   const handleBuyNow = () => {
     if (selectedIndex !== null && selectedColorIndex !== null) {
       const selectedProduct = {
+        id: `${products[selectedIndex].id}-${colors[selectedColorIndex].name}`, // Tạo id duy nhất
         name: products[selectedIndex].name,
         price: products[selectedIndex].price,
         color: colors[selectedColorIndex].name,
         imgSrc: colors[selectedColorIndex].imgSrc,
       };
+  
       addToCart(selectedProduct);
       navigate(path.SHOPPINGCART);
     } else {
       alert("Vui lòng chọn cấu hình và màu sắc.");
     }
   };
+  
+  
+  
 
   const toggleDetails = () => {
     setIsExpanded(!isExpanded);

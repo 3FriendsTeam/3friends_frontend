@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import Footer from "../../../components/Client/Footer";
 import Header from "../../../components/Client/Header";
 import { NavLink } from "react-router-dom";
@@ -6,30 +6,38 @@ import icons from "../../../utils/icons";
 import { CartContext } from "./CartContext";
 
 const ShoppingCart = () => {
-  const { cartItems, removeFromCart } = useContext(CartContext);
-
-  const [quantities, setQuantities] = useState(cartItems.map(() => 1));
-
-  const handleIncreaseQuantity = (index) => {
-    const newQuantities = [...quantities];
-    newQuantities[index] += 1;
-    setQuantities(newQuantities);
+  const { cartItems,setCartItems, removeFromCart } = useContext(CartContext);
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
   };
 
+  const handleIncreaseQuantity = (productId, color) => {
+    const updatedCartItems = cartItems.map((item) =>
+      item.id === productId && item.color === color
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+    setCartItems(updatedCartItems);
+  };
   // Hàm để giảm số lượng sản phẩm
-  const handleDecreaseQuantity = (index) => {
-    const newQuantities = [...quantities];
-    if (newQuantities[index] > 1) {
-      newQuantities[index] -= 1;
-      setQuantities(newQuantities);
-    }
+  const handleDecreaseQuantity = (productId, color) => {
+    const updatedCartItems = cartItems.map((item) =>
+      item.id === productId && item.color === color && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    setCartItems(updatedCartItems);
   };
-  const handleRemoveItem = (index) => {
-    removeFromCart(index);
+  const handleRemoveItem = (id) => {
+    removeFromCart(id); 
   };
-  const totalAmount = cartItems.reduce((total, item, index) => {
+  
+  const totalAmount = cartItems.reduce((total, item) => {
     const price = parseFloat(item.price.replace(/\D/g, ""));
-    return total + price * quantities[index];
+    return total + price * item.quantity;
   }, 0);
 
   return (
@@ -73,53 +81,53 @@ const ShoppingCart = () => {
                 <div className="flex items-center space-x-2 -mt-4">
                   <button
                     className=" hover:text-[#e0052b] mr-1"
-                    onClick={() => handleRemoveItem(index)}
+                    onClick={() => handleRemoveItem(item.id)}
                   >
                     <icons.RiDeleteBin5Line size={20} />
                   </button>
                   <div className="flex items-center text-[20px]  space-x-1 bg-slate-200 rounded-2xl">
                     <button
                       className="w-8 h-8 rounded-full  flex items-center justify-center text-black"
-                      onClick={() => handleDecreaseQuantity(index)}
+                      onClick={() => handleDecreaseQuantity(item.id, item.color)}
                     >
                       <icons.IoIosRemoveCircle />
                     </button>
-                    <span className="font-semibold">{quantities[index]}</span>
+                    <span className="font-semibold">{item.quantity}</span>
                     <button
                       className="w-8 h-8 rounded-full flex items-center justify-center text-black"
-                      onClick={() => handleIncreaseQuantity(index)}
+                      onClick={() => handleIncreaseQuantity(item.id, item.color)}
                     >
                       <icons.IoIosAddCircle />
                     </button>
                   </div>
                 </div>
                 <p className="text-red-500 font-bold text-base -mt-4 ml-6">
-                  {item.price}
+                {formatPrice(parseFloat(item.price.replace(/\D/g, "")) * item.quantity)}
                 </p>
               </div>
             ))}
           </div>
         )}
-        {cartItems.length > 0 && ( 
-        <div className="w-[758.4px] bg-[#f5f5f5] p-4 rounded-b-lg shadow-md flex justify-between items-center">
-          <p className="text-[#e0052b] font-bold text-[12px] mt-[50px]">
-            Chính sách hoàn tiền khi thanh toán online
-          </p>
-          <div className="flex flex-col items-end text-[14px]">
-            <div className="text-right flex items-center mb-6">
-              <p className="font-semibold mr-[70px]">
-                Tổng tiền ({cartItems.length} sản phẩm):
-              </p>
-              <p className="text-[#e0052b] font-bold">
-                {totalAmount.toLocaleString()} đ
-              </p>
+        {cartItems.length > 0 && (
+          <div className="w-[758.4px] bg-[#f5f5f5] p-4 rounded-b-lg shadow-md flex justify-between items-center">
+            <p className="text-[#e0052b] font-bold text-[12px] mt-[50px]">
+              Chính sách hoàn tiền khi thanh toán online
+            </p>
+            <div className="flex flex-col items-end text-[14px]">
+              <div className="text-right flex items-center mb-6">
+                <p className="font-semibold mr-[70px]">
+                  Tổng tiền ({cartItems.length} sản phẩm):
+                </p>
+                <p className="text-[#e0052b] font-bold">
+                {formatPrice(totalAmount)}
+                </p>
+              </div>
+              <button className="bg-[#e0052b] mr-4 text-white font-semibold py-3 px-6 rounded-3xl hover:bg-red-600 transition">
+                MUA NGAY
+              </button>
             </div>
-            <button className="bg-[#e0052b] mr-4 text-white font-semibold py-3 px-6 rounded-3xl hover:bg-red-600 transition">
-              THANH TOÁN
-            </button>
           </div>
-        </div>
-      )}
+        )}
       </div>
       <Footer />
     </div>

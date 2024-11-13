@@ -1,12 +1,21 @@
 import { useContext } from "react";
 import Footer from "../../../components/Client/Footer";
 import Header from "../../../components/Client/Header";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import icons from "../../../utils/icons";
 import { CartContext } from "./CartContext";
+import { path } from "../../../utils/constant";
 
 const ShoppingCart = () => {
   const { cartItems,setCartItems, removeFromCart } = useContext(CartContext);
+  const navigate = useNavigate();
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      alert("Giỏ hàng của bạn đang trống!");
+      return;
+    }
+    navigate(path.PAYMENTINFO, { state: { cartItems } }); // Truyền dữ liệu cartItems
+  };
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -122,7 +131,9 @@ const ShoppingCart = () => {
                 {formatPrice(totalAmount)}
                 </p>
               </div>
-              <button className="bg-[#e0052b] mr-4 text-white font-semibold py-3 px-6 rounded-3xl hover:bg-red-600 transition">
+              <button 
+              onClick={handleCheckout}
+              className="bg-[#e0052b] mr-4 text-white font-semibold py-3 px-6 rounded-3xl hover:bg-red-600 transition">
                 MUA NGAY
               </button>
             </div>

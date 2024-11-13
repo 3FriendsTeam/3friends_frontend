@@ -31,6 +31,8 @@ import { IoIosArrowUp } from "react-icons/io";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosAddCircle } from "react-icons/io";
 import { IoIosRemoveCircle } from "react-icons/io";
+import { IoArrowBack } from "react-icons/io5";
+import { MdOutlinePayments } from "react-icons/md";
 
 const icons={
     IoIosArrowDropright,
@@ -65,6 +67,8 @@ const icons={
     IoIosArrowUp,
     RiDeleteBin5Line,
     IoIosAddCircle,
-    IoIosRemoveCircle
+    IoIosRemoveCircle,
+    IoArrowBack,
+    MdOutlinePayments
 }
 export default icons

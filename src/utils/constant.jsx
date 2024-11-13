@@ -11,4 +11,5 @@ export const path = {
   FMEMBER: "/fmember",
   ADMINLOGIN: "/adminlogin",
   FORGOTPASSWORDADMIN: "/forgotpasswordadmin",
+  PAYMENTINFO: "/paymentinfo",
 };

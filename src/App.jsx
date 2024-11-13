@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { path } from "./utils/constant";
 import { CartProvider } from "./pages/customer/ShoppingCart/CartContext";
-import { Fmember, HomePage, ListProducts, LookOrders, ProductDetails, ShoppingCart } from "./pages/customer";
+import { Fmember, HomePage, ListProducts, LookOrders, PaymentInfo, ProductDetails, ShoppingCart } from "./pages/customer";
 import CustomerRegister from "./pages/customer/caseCustomer/CustomerRegister";
 import CustomerLogin from "./pages/customer/caseCustomer/CustomerLogin";
 import ForgotPassword from "./pages/customer/caseCustomer/ForgotPassword";
@@ -24,6 +24,7 @@ function App() {
       <Route path={path.ADMIN} element={<Admin />} />
       <Route path={path.ADMINLOGIN} element={<AdminLogin />} />
       <Route path={path.FORGOTPASSWORDADMIN} element={<ForgotPasswordAdmin />} />
+      <Route path={path.PAYMENTINFO} element={<PaymentInfo />} /> 
     </Routes>
     </CartProvider>
     

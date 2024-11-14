@@ -1,35 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from "../../../../middlewares/tokenMiddleware";
+
 
 const ViewCustomer = () => {
-    //const [customers, setCustomers] = useState([
-    const [customers] = useState([
-        {
-            id: 1,
-            name: 'Trần Văn Tình',
-            gender: 'Nam',
-            email: 'tinh@gmail.com',
-            phonenumber: '0123456789',
-        },
-        {
-            id: 2,
-            name: 'Trần Vân Anh',
-            gender: 'Nữ',
-            email: 'va123@gmail.com',
-            phonenumber: '0123456987',
-        },
-    ]);
-
-    // const handleDelete = (id) => {
-    //     setCustomers(customers.filter(customer => customer.id !== id));
-    // };
+    const [customers, setCustomers] = useState([]);
 
     // State để lưu giá trị tìm kiếm người dùng nhập
     const [searchTerm, setSearchTerm] = useState('');
 
     // Lọc danh sách khách hàng theo từ khóa tìm kiếm
     const filteredCustomers = customers.filter(customer =>
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+        customer.CustomerName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    useEffect(() => {
+        // Lấy danh sách nhân viên
+        const fetchCustomerData = async () => {
+            try {
+                const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-all-customer`);
+                setCustomers(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchCustomerData();
+    }, []);
 
     return (
         <div className="container mx-auto">
@@ -61,10 +56,10 @@ const ViewCustomer = () => {
                         {filteredCustomers.map((customer) => (
                             <tr key={customer.id} className="bg-white text-center hover:bg-gray-100">
                                 <td className="py-2 px-4 border">{customer.id}</td>
-                                <td className="py-2 px-4 border">{customer.name}</td>
-                                <td className="py-2 px-4 border">{customer.gender}</td>
-                                <td className="py-2 px-4 border">{customer.email}</td>
-                                <td className="py-2 px-4 border">{customer.phonenumber}</td>
+                                <td className="py-2 px-4 border">{customer.CustomerName}</td>
+                                <td className="py-2 px-4 border">{customer.Gender}</td>
+                                <td className="py-2 px-4 border">{customer.Email}</td>
+                                <td className="py-2 px-4 border">{customer.PhoneNumber}</td>
                                 <td className="py-2 px-4 border">
                                     <button
                                         className="hover:text-white hover:bg-red-700 text-red-400 font-bold py-1 px-2 rounded mx-1"

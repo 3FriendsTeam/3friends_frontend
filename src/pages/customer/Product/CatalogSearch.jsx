@@ -1,7 +1,6 @@
 import { useLocation } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ProductCard from "./ProductCard";
-import PropTypes from "prop-types";
 import { useListProductContext } from "./useListProductContext";
 import Header from "../../../components/Client/Header";
 import Footer from "../../../components/Client/Footer";
@@ -12,7 +11,9 @@ const CatalogSearch = () => {
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get("query")?.toLowerCase() || "";
 
-  // Lọc sản phẩm theo từ khóa
+
+  const [sortType, setSortType] = useState("relevant"); 
+
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     return products.filter((product) =>
@@ -20,16 +21,60 @@ const CatalogSearch = () => {
     );
   }, [query, products]);
 
+  const sortedProducts = useMemo(() => {
+    if (sortType === "price_high") {
+      return [...filteredProducts].sort(
+        (a, b) => parseFloat(b.productPrice.replace(/[^\d]/g, "")) - parseFloat(a.productPrice.replace(/[^\d]/g, ""))
+      );
+    }
+    if (sortType === "price_low") {
+      return [...filteredProducts].sort(
+        (a, b) => parseFloat(a.productPrice.replace(/[^\d]/g, "")) - parseFloat(b.productPrice.replace(/[^\d]/g, ""))
+      );
+    }
+    return filteredProducts; 
+  }, [sortType, filteredProducts]);
+
   return (
     <div className="bg-white">
-    <Header/>
+      <Header />
       <div className="bg-white w-full">
         <h2 className="text-center text-2xl font-bold my-4">
           {`Kết quả tìm kiếm cho: "${query}"`}
         </h2>
-        <div className=" ml-[183px] w-[1170px]  flex flex-wrap rounded-lg bg-white mt-3">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product, index) => (
+
+
+        <div className="flex justify-start items-center ml-[183px] mb-4">
+          <span className="font-semibold mr-4">Sắp xếp theo:</span>
+          <button
+            className={`mr-2 px-4 py-2 rounded-lg ${
+              sortType === "relevant" ? "bg-red-100 text-red-500" : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSortType("relevant")}
+          >
+            Liên quan
+          </button>
+          <button
+            className={`mr-2 px-4 py-2 rounded-lg ${
+              sortType === "price_high" ? "bg-red-100 text-red-500" : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSortType("price_high")}
+          >
+            Giá cao
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              sortType === "price_low" ? "bg-red-100 text-red-500" : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setSortType("price_low")}
+          >
+            Giá thấp
+          </button>
+        </div>
+
+        <div className="ml-[183px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-3">
+          {sortedProducts.length > 0 ? (
+            sortedProducts.map((product, index) => (
               <ProductCard
                 key={index}
                 sp1={product.sp1}
@@ -45,13 +90,9 @@ const CatalogSearch = () => {
           )}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
-};
-
-CatalogSearch.propTypes = {
-  products: PropTypes.array, // Không cần .isRequired
 };
 
 export default CatalogSearch;

@@ -10,7 +10,7 @@ const initialProducts = [
     km1: km1,
     km2: km2,
     productName: "iPhone 10 Pro 128GB",
-    productPrice: "28.990.000 ₫",
+    productPrice: "38.990.000 ₫",
     promoText:
       "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
   },
@@ -28,7 +28,7 @@ const initialProducts = [
     km1: km1,
     km2: km2,
     productName: "SamSung 12 Pro 128GB",
-    productPrice: "28.990.000 ₫",
+    productPrice: "18.990.000 ₫",
     promoText:
       "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
   },
@@ -46,7 +46,7 @@ const initialProducts = [
     km1: km1,
     km2: km2,
     productName: "SamSung 10 Pro 128GB",
-    productPrice: "28.990.000 ₫",
+    productPrice: "23.990.000 ₫",
     promoText:
       "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
   },
@@ -64,7 +64,7 @@ const initialProducts = [
     km1: km1,
     km2: km2,
     productName: "Xiaomi 12 Pro 128GB",
-    productPrice: "28.990.000 ₫",
+    productPrice: "8.990.000 ₫",
     promoText:
       "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
   },
@@ -94,7 +94,7 @@ const initialProducts = [
     km1: km1,
     km2: km2,
     productName: "iPhone 15 Pro 128GB",
-    productPrice: "28.990.000 ₫",
+    productPrice: "48.990.000 ₫",
     promoText:
       "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
   },

@@ -5,14 +5,44 @@ import logohome3 from "../../assets/client/logohome3.png";
 import { useEffect, useState } from "react";
 
 function Toolbar() {
-
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
+  useEffect(() => {
+    const storedHistory =
+      JSON.parse(localStorage.getItem("searchHistory")) || [];
+    setSearchHistory(storedHistory);
+  }, []);
   const handleSearch = (e) => {
     if (e.key === "Enter" && searchTerm.trim() !== "") {
+      const updatedHistory = [
+        searchTerm,
+        ...searchHistory.filter((term) => term !== searchTerm),
+      ].slice(0, 10); // Giới hạn 10 lịch sử
+      setSearchHistory(updatedHistory);
+      localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
       navigate(`${path.CATALOGSEARCH}?query=${searchTerm}`);
+      setShowHistory(false);
     }
+  };
+  const handleHistoryClick = (term) => {
+    setSearchTerm(term);
+    setShowHistory(false);
+    navigate(`${path.CATALOGSEARCH}?query=${term}`);
+  };
+  const handleInputFocus = () => {
+    if (searchHistory.length > 0) {
+      setShowHistory(true);
+    }
+  };
+  const clearHistory = () => {
+    setSearchHistory([]);
+    localStorage.removeItem("searchHistory");
+  };
+  const handleInputBlur = () => {
+    setTimeout(() => setShowHistory(false), 200);
   };
 
   const [username, setUsername] = useState(
@@ -51,12 +81,44 @@ function Toolbar() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={handleSearch} 
+            onKeyPress={handleSearch}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             placeholder="Bạn cần tìm sản phẩm nào..."
             className="w-full border-none outline-none px-2 py-1 bg-transparent"
           />
+          {showHistory && (
+            <div className="absolute top-[65%] left-[35.5%] transform -translate-x-[33%] bg-white shadow-lg border rounded-lg max-h-[450px] w-[450px] overflow-y-auto z-50">
+              <div className="flex justify-between items-center px-4 py-2 border-b">
+                <h4 className="text-gray-800 f">
+                  Lịch sử tìm kiếm
+                </h4>
+                <button
+                  onClick={clearHistory}
+                  className="text-gray-400 text-sm flex items-center gap-1 hover:underline"
+                >
+                  Xóa tất cả
+                  <icons.RiDeleteBin5Line />
+                </button>
+              </div>
+              {searchHistory.length > 0 ? (
+                searchHistory.map((term, index) => (
+                  <div
+                    key={index}
+                    className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                    onMouseDown={() => handleHistoryClick(term)}
+                  >
+                    {term}
+                  </div>
+                ))
+              ) : (
+                <div className="px-4 py-2 text-gray-500">
+                  Không có lịch sử tìm kiếm
+                </div>
+              )}
+            </div>
+          )}
         </div>
-
         <div
           className="text-xs text-white p-2 rounded-xl ml-6 w-auto z-50 md:w-[141px] h-[40px] mt-2 md:mt-0  hidden md:flex"
           style={{ backgroundColor: "#C81B1B" }}
@@ -114,7 +176,6 @@ function Toolbar() {
             </div>
           </div>
 
-          {/* Nút Đăng nhập / Xin chào */}
           <div className="text-xs text-white rounded-xl w-[85px] h-[80px] hidden md:flex relative">
             <div className="flex flex-col justify-center z-50  items-center h-full cursor-pointer">
               <div className="flex items-start mb-1">
@@ -137,7 +198,6 @@ function Toolbar() {
             </div>
 
             <div className="relative">
-              {/* Overlay */}
               {isDropdownOpen && (
                 <div
                   className="fixed inset-0 bg-black opacity-50 z-10"

@@ -6,6 +6,7 @@ import ViewProduct from '../subViews/Product/viewProduct/ViewProduct';
 import ViewCustomer from '../subViews/Customer/ViewCustomer';
 import ViewEmployee from '../subViews/Employee/viewEmployee/ViewEmployee';
 import Permission from '../subViews/Employee/permission/ViewPermission'; // Component quản lý quyền
+import ViewPermission from '../subViews/Employee/permission/ViewPermission';
 
 const Admin = () => {
     const [activeContent, setActiveContent] = useState(''); // Theo dõi nội dung hiện tại
@@ -32,35 +33,12 @@ const Admin = () => {
                         <AddProduct />
                     ) : activeContent === 'Danh sách sản phẩm' ? (
                         <ViewProduct />
-                    ) : activeContent === 'Khách hàng' ? (
+                    ) : activeContent === 'Danh sách khách hàng' ? (
                         <ViewCustomer />
-                    ) : activeContent === 'Nhân viên' ? (
-                        <>
-                            {/* Tabs Quản lý nhân viên và Quyền */}
-                            <div className="flex border-b-2 mb-4">
-                                <button
-                                    onClick={() => setActiveEmployeeTab('Quản lý nhân viên')}
-                                    className={`py-2 px-4 font-semibold ${activeEmployeeTab === 'Quản lý nhân viên' ? 'border-b-4 border-blue-500' : ''
-                                        }`}
-                                >
-                                    Quản lý nhân viên
-                                </button>
-                                <button
-                                    onClick={() => setActiveEmployeeTab('Quyền')}
-                                    className={`py-2 px-4 font-semibold ${activeEmployeeTab === 'Quyền' ? 'border-b-4 border-blue-500' : ''
-                                        }`}
-                                >
-                                    Quyền
-                                </button>
-                            </div>
-
-                            {/* Nội dung của tab hiện tại */}
-                            {activeEmployeeTab === 'Quản lý nhân viên' ? (
-                                <ViewEmployee />
-                            ) : (
-                                <Permission />
-                            )}
-                        </>
+                    ) : activeContent === 'Tài khoản Quản trị' ? (
+                        <ViewEmployee />
+                    ) : activeContent === 'Phân quyền' ? (
+                        <ViewPermission />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

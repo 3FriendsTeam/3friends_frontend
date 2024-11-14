@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import AddEmployee from '../addEmployee/AddEmployee'; // Giả sử bạn đã có component AddEmployee
+import AddEmployee from '../addEmployee/AddEmployee'; 
 import api from "../../../../../middlewares/tokenMiddleware";
 
 const ViewEmployee = () => {

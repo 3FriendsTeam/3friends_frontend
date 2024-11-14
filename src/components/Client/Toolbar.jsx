@@ -1,10 +1,20 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import icons from "../../utils/icons";
 import { path } from "../../utils/constant";
 import logohome3 from "../../assets/client/logohome3.png";
 import { useEffect, useState } from "react";
 
 function Toolbar() {
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchTerm.trim() !== "") {
+      navigate(`${path.CATALOGSEARCH}?query=${searchTerm}`);
+    }
+  };
+
   const [username, setUsername] = useState(
     localStorage.getItem("username") || ""
   );
@@ -39,6 +49,9 @@ function Toolbar() {
           </div>
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={handleSearch} 
             placeholder="Bạn cần tìm sản phẩm nào..."
             className="w-full border-none outline-none px-2 py-1 bg-transparent"
           />

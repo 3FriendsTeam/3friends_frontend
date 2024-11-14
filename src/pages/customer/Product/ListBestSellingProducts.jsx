@@ -13,25 +13,7 @@ const ListBestSellingProducts = () => {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 16 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "iPhone 10 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
@@ -40,7 +22,7 @@ const ListBestSellingProducts = () => {
         sp1: sp2,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "Xiaomi 11 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
@@ -49,7 +31,16 @@ const ListBestSellingProducts = () => {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "SamSung 12 Pro 128GB",
+        productPrice: "28.990.000 ₫",
+        promoText:
+          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
+      },
+      {
+        sp1: sp2,
+        km1: km1,
+        km2: km2,
+        productName: "SamSung 13 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
@@ -58,7 +49,7 @@ const ListBestSellingProducts = () => {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "SamSung 10 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
@@ -67,43 +58,46 @@ const ListBestSellingProducts = () => {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "iPhone 11 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
       },
       {
-        sp1: sp1,
+        sp1: sp2,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "Xiaomi 12 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
       },
+    
       {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "iPhone 13 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
       },
+    
       {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "iPhone 14 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
       },
+    
       {
         sp1: sp1,
         km1: km1,
         km2: km2,
-        productName: "iPhone 16 Pro 128GB",
+        productName: "iPhone 15 Pro 128GB",
         productPrice: "28.990.000 ₫",
         promoText:
           "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",

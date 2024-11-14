@@ -14,3 +14,4 @@ export {default as ProductDetails} from './Product/ProductDetails';
 export {default as ProductsDescribe} from './Product/ProductsDescribe';
 export {default as Fmember} from './Information/Fmember';
 export {default as PaymentInfo} from './ShoppingCart/PaymentInfo';
+export {default as CatalogSearch} from './Product/CatalogSearch';

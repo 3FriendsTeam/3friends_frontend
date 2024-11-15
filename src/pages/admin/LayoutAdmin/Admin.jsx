@@ -5,12 +5,10 @@ import AddProduct from '../subViews/Product/addProduct/AddProduct';
 import ViewProduct from '../subViews/Product/viewProduct/ViewProduct';
 import ViewCustomer from '../subViews/Customer/ViewCustomer';
 import ViewEmployee from '../subViews/Employee/viewEmployee/ViewEmployee';
-import Permission from '../subViews/Employee/permission/ViewPermission'; // Component quản lý quyền
 import ViewPermission from '../subViews/Employee/permission/ViewPermission';
 
 const Admin = () => {
     const [activeContent, setActiveContent] = useState(''); // Theo dõi nội dung hiện tại
-    const [activeEmployeeTab, setActiveEmployeeTab] = useState('Quản lý nhân viên'); // Theo dõi tab Nhân viên
 
     // Hàm xử lý khi nhấn vào các mục trong sidebar
     const handleSectionClick = (sectionName) => {

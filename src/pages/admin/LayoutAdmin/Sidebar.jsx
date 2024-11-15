@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import icons from "../../../utils/icons";
 import { FaBoxOpen } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn } from 'react-icons/md';
 import { FaUsers } from 'react-icons/fa6';

@@ -14,4 +14,8 @@ export {default as ProductDetails} from './Product/ProductDetails';
 export {default as ProductsDescribe} from './Product/ProductsDescribe';
 export {default as Fmember} from './Information/Fmember';
 export {default as PaymentInfo} from './ShoppingCart/PaymentInfo';
+export {default as UserProfile} from './Information/UserProfile';
+export {default as CustomerLogin} from "./caseCustomer/CustomerLogin";
+export {default as ForgotPassword} from "./caseCustomer/ForgotPassword";
+export {default as CustomerRegister} from "./caseCustomer/CustomerRegister";
 export {default as CatalogSearch} from './Product/CatalogSearch';

@@ -1,18 +1,16 @@
-import login from "../../../assets/client/login.png";
+// Updated CustomerLogin.jsx
+// import login from "../../../assets/client/login.png";
 import google from "../../../assets/client/google.png";
-import axios from "axios";
-import {
-  signInWithGoogle,
-  signInWithEmailPassword,
-} from "../../../config/firebaseService";
-import { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
+import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext";
 
 const CustomerLogin = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, loginWithGoogle } = useContext(CustomerAuthContext);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -54,121 +52,32 @@ const CustomerLogin = () => {
     }
   }, [formData]);
 
-  const saveAccount = async ({
-    uid,
-    customerName,
-    gender,
-    email,
-    phoneNumber,
-    birthDate,
-    isVerified = true,
-  }) => {
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
-        uid,
-        customerName,
-        gender,
-        email,
-        phoneNumber,
-        birthDate,
-        isVerified,
-      });
-      if (response.status === 200) {
-        return true;
-      }
-    } catch {
-      return false;
-    }
-  };
+  const handleSubmitLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const { email, password } = formData;
 
-  const checkEmail = async ({ email }) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/check-email?email=${email}`
-      );
-
-      if (response.data.success) {
-        return true;
-      } else {
-        return false;
-      }
+      await login(email, password);
+      navigate(path.HOMEPAGE);
     } catch (error) {
-      console.error("error check mail: ", error.message);
-      return false;
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      const userCredential = await signInWithGoogle();
-      if (userCredential) {
-        setIsLoading(true);
-        const user = userCredential;
-        if (user) {
-          const checkCreatedEmail = await checkEmail({ email: user.email });
-          if (!checkCreatedEmail) {
-            try {
-              await saveAccount({
-                uid: user.uid,
-                customerName: user.displayName,
-                gender: user.gender || "Unknown",
-                email: user.email,
-                phoneNumber: user.phoneNumber || "Unknown",
-                birthDate: user.birthDate || null,
-                isVerified: true,
-              });
-              localStorage.setItem(
-                "username",
-                user.displayName || "Người dùng"
-              );
-              localStorage.setItem("token", await user.getIdToken());
-
-              setIsLoading(true);
-              navigate(path.HOMEPAGE);
-            } catch (error) {
-              console.error("Error saving account: ", error);
-              alert("Đã xảy ra lỗi khi lưu tài khoản.");
-            }
-          } else {
-            localStorage.setItem("token", await user.getIdToken());
-            localStorage.setItem(
-                "username",
-                user.displayName || "Người dùng"
-            )
-            navigate(path.HOMEPAGE);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
-      alert("Đã xảy ra lỗi khi đăng nhập.");
+      setLoginError("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.");
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmitLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true); // Bật loading
-    const { email, password } = formData;
-
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
     try {
-      const user = await signInWithEmailPassword(email, password);
-      const isVerified = user.emailVerified;
-      if(isVerified){
-      localStorage.setItem("username", user.displayName || "Người dùng");
-      localStorage.setItem("token", await user.getIdToken());
+      await loginWithGoogle();
       navigate(path.HOMEPAGE);
-      }
-      else{
-        setLoginError("Vui lý kiểm tra và xác thực email trước khi đăng nhập.");
-        setIsLoading(false);
-      }
     } catch (error) {
-      console.error("Error logging in:", error);
-      setLoginError("Đã xảy ra lỗi khi đăng nhập.");
+      setLoginError("Đã xảy ra lỗi khi đăng nhập với Google. Vui lòng thử lại.");
+      console.error("Google login error:", error);
     } finally {
-      setIsLoading(false); // Tắt loading
+      setIsLoading(false);
     }
   };
 
@@ -242,12 +151,6 @@ const CustomerLogin = () => {
                 <p className="text-red-500">{errors.password}</p>
               )}
             </div>
-            <div className="flex justify-between items-center mb-4">
-              <Link to={path.FORGOTPASSWORD} className="text-blue-500 text-sm ml-[280px]">
-                Quên mật khẩu?
-              </Link>
-            </div>
-
             {loginError && <p className="text-red-500">{loginError}</p>}
             <button
               type="submit"
@@ -265,7 +168,6 @@ const CustomerLogin = () => {
               </NavLink>
             </div>
           </form>
-
           <div className="flex items-center my-[10px]">
             <div className="border-t border-gray-300 flex-grow"></div>
             <span className="mx-3 text-gray-400">Hoặc</span>

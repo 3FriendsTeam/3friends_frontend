@@ -1,15 +1,10 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 const EmployeeProtectedRoute = ({ allowedPositions, children }) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'; // Chuyển sang boolean
-  const PositionID = parseInt(localStorage.getItem('PositionID'), 10); // Chuyển sang số
-  const location = useLocation(); // Lấy đường dẫn hiện tại
-
-  // Nếu người dùng đã đăng nhập và đang cố vào trang login
-  if (isAuthenticated && location.pathname === '/employee/login') {
-    return <Navigate to="/admin" replace />;
-  }
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  const employee = JSON.parse(localStorage.getItem('employee')) ?? null;
+  const PositionID = employee ? parseInt(employee.data.PositionID, 10) : null;
 
   // Nếu người dùng chưa đăng nhập
   if (!isAuthenticated) {
@@ -26,7 +21,7 @@ const EmployeeProtectedRoute = ({ allowedPositions, children }) => {
 
 
 EmployeeProtectedRoute.propTypes = {
-  allowedPositions: PropTypes.arrayOf(PropTypes.number).isRequired, // Chỉ định kiểu là mảng số
+  allowedPositions: PropTypes.arrayOf(PropTypes.number).isRequired,
   children: PropTypes.node.isRequired,
 };
 

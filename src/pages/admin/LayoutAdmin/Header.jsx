@@ -1,23 +1,19 @@
 import logo from "../../../assets/admin/logo.png";
 
-
 const Header = () => {
+    const employee = JSON.parse(localStorage.getItem('employee'));
+    const PositonName = localStorage.getItem('Position');
+    const NameUser = employee.data.FullName?employee.data.FullName:"admin";
+
     return (
         <header className="bg-white shadow-md p-3 z-50">
-            {/* Đảm bảo flex hoạt động */}
             <div className="w-full flex items-center justify-between">
-                {/* Left section - Logo and Title */}
                 <div className="flex items-center">
-                    {/* Logo */}
                     <img src={logo} alt="Logo" className="h-12 w-12 object-contain mr-3" />
-                    {/* Header Title */}
-                    <h3 className="text-gray-800 text-lg">Quản lý cửa hàng</h3>
+                    <h3 className="font-bold text-xl text-gray-800">{PositonName}</h3>
                 </div>
-
-                {/* Right section - User Icon and Name */}
                 <div className="flex items-center">
-                    {/* User Name */}
-                    <h4 className="ml-2 text-sm text-gray-500">admin</h4>
+                    {NameUser && <h2 className="ml-2 text-base font-semibold text-gray-500"><b>Xin chào, {NameUser}</b></h2>}
                 </div>
             </div>
         </header>

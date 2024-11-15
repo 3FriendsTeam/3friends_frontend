@@ -14,7 +14,7 @@ export const EmployeeAuthProvider = ({ children }) => {
       });
       if (response.status === 200) {
         localStorage.setItem('employee', JSON.stringify(response.data));
-        localStorage.setItem('PositionID', response.data.data.PositionID);
+        localStorage.setItem('Position', response.data.data.Position.PositionName);
         localStorage.setItem('isAuthenticated', 'true');
         return { success: true };
       }

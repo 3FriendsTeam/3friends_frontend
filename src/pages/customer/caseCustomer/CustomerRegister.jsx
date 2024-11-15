@@ -5,7 +5,7 @@ import axios from 'axios';
 import { signInWithGoogle } from '../../../config/firebaseService.jsx';
 import { Navigate, NavLink } from 'react-router-dom';
 import { path } from '../../../utils/constant.jsx';
-import login from '../../../assets/client/login.png';
+import login1 from '../../../assets/client/login1.png';
 import google from '../../../assets/client/google.png';
 
 const CustomerRegister = () => {
@@ -236,7 +236,7 @@ const CustomerRegister = () => {
                 </div>
                 {/* Icon logo */}
                 <div className="flex justify-center mb-4">
-                    <img src={login} alt="Logo" className="w-20 h-20" />
+                    <img src={login1} alt="Logo" className="w-20 h-20" />
                 </div>
 
                 {/* Title */}

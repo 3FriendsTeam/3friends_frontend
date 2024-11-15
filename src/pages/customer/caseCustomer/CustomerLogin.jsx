@@ -1,6 +1,6 @@
 // Updated CustomerLogin.jsx
-// import login from "../../../assets/client/login.png";
 import google from "../../../assets/client/google.png";
+import login1 from "../../../assets/client/login1.png";
 import { useState, useEffect, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
@@ -74,7 +74,9 @@ const CustomerLogin = () => {
       await loginWithGoogle();
       navigate(path.HOMEPAGE);
     } catch (error) {
-      setLoginError("Đã xảy ra lỗi khi đăng nhập với Google. Vui lòng thử lại.");
+      setLoginError(
+        "Đã xảy ra lỗi khi đăng nhập với Google. Vui lòng thử lại."
+      );
       console.error("Google login error:", error);
     } finally {
       setIsLoading(false);
@@ -99,7 +101,7 @@ const CustomerLogin = () => {
             ← Trở về trang chủ
           </NavLink>
           <img
-            src={login}
+            src={login1}
             alt="Illustration"
             className="w-full rounded-lg h-[440px]"
           />

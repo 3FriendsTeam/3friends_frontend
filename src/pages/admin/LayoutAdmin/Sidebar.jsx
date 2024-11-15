@@ -1,27 +1,33 @@
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Import các icon cần thiết
 import { FaBoxOpen } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn, MdAccountCircle, MdDashboard } from 'react-icons/md';
-import { FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaHeadset, FaHandshake, FaBell } from 'react-icons/fa6';
+import { FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaHeadset, FaHandshake, FaBell, FaChevronDown, FaChevronUp } from 'react-icons/fa6';
 import { FiLogOut } from 'react-icons/fi';
 
-const EmployeeSidebar = () => {
+const EmployeeSidebar = ({ onSectionClick }) => {
   const { logout } = useContext(EmployeeAuthContext);
-  const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState({});
   const employee = JSON.parse(localStorage.getItem('employee')) ?? null;
   const PositionID = parseInt(employee.data.PositionID, 10);
+  const navigate = useNavigate();
 
   if (!employee) {
     return null;
   }
 
   const handleLogout = () => {
-    logout();
+    // Xóa dữ liệu người dùng khỏi localStorage hoặc sessionStorage
+    localStorage.removeItem('employee');  // Hoặc dữ liệu liên quan đến đăng nhập
+
+    // Thực hiện logout trong context (nếu có)
+    logout(); // Nếu bạn đang sử dụng context để quản lý đăng nhập
+
+    // Điều hướng tới trang đăng nhập
     navigate('/employee/login');
   };
 
@@ -32,7 +38,7 @@ const EmployeeSidebar = () => {
     }));
   };
 
-  // Định nghĩa các mục menu với chức năng tương tự như file trên
+  // Định nghĩa các mục menu
   const menuItems = [
     {
       positionIds: [1, 2, 3],
@@ -40,7 +46,7 @@ const EmployeeSidebar = () => {
       icon: <MdDashboard className="h-6 w-6 mr-2" />,
       section: 'dashboard',
       subItems: [
-        { label: 'Tổng quan doanh thu', path: '/admin/dashboard/revenue' },
+        { label: 'Tổng quan doanh thu', section: 'revenue' },
       ],
     },
     {
@@ -49,12 +55,12 @@ const EmployeeSidebar = () => {
       icon: <FaBoxOpen className="h-6 w-6 mr-2" />,
       section: 'productManagement',
       subItems: [
-        { label: 'Thêm mới sản phẩm', path: '/admin/products/add' },
-        { label: 'Sửa/Xóa sản phẩm', path: '/admin/products/edit-delete' },
-        { label: 'Quản lý tồn kho', path: '/admin/products/stock' },
-        { label: 'Danh mục Sản phẩm', path: '/admin/products/categories' },
-        { label: 'Thương hiệu', path: '/admin/products/brands' },
-        { label: 'Đánh giá và Nhận xét', path: '/admin/products/reviews' },
+        { label: 'Thêm mới sản phẩm', section: 'addProduct' },
+        { label: 'Danh sách sản phẩm', section: 'listProduct' },
+        { label: 'Quản lý tồn kho', section: 'manageStock' },
+        { label: 'Danh mục Sản phẩm', section: 'productCategories' },
+        { label: 'Thương hiệu', section: 'brands' },
+        { label: 'Đánh giá và Nhận xét', section: 'reviews' },
       ],
     },
     {
@@ -63,11 +69,11 @@ const EmployeeSidebar = () => {
       icon: <MdAssignmentTurnedIn className="h-6 w-6 mr-2" />,
       section: 'orderManagement',
       subItems: [
-        { label: 'Danh sách đơn hàng', path: '/admin/orders/list' },
-        { label: 'Chi tiết đơn hàng', path: '/admin/orders/details' },
-        { label: 'Xác nhận/Hủy đơn hàng', path: '/admin/orders/confirm-cancel' },
-        { label: 'Cập nhật trạng thái giao hàng', path: '/admin/orders/update-status' },
-        { label: 'Trả hàng và Hoàn tiền', path: '/admin/orders/returns-refunds' },
+        { label: 'Danh sách đơn hàng', section: 'orderList' },
+        { label: 'Chi tiết đơn hàng', section: 'orderDetails' },
+        { label: 'Xác nhận/Hủy đơn hàng', section: 'confirmCancel' },
+        { label: 'Cập nhật trạng thái giao hàng', section: 'updateDeliveryStatus' },
+        { label: 'Trả hàng và Hoàn tiền', section: 'returnsRefunds' },
       ],
     },
     {
@@ -76,7 +82,7 @@ const EmployeeSidebar = () => {
       icon: <FaUsers className="h-6 w-6 mr-2" />,
       section: 'customerManagement',
       subItems: [
-        { label: 'Danh sách khách hàng', path: '/admin/customers/list' },
+        { label: 'Danh sách khách hàng', section: 'customerList' },
       ],
     },
     {
@@ -85,8 +91,8 @@ const EmployeeSidebar = () => {
       icon: <FaTags className="h-6 w-6 mr-2" />,
       section: 'promotionManagement',
       subItems: [
-        { label: 'Chương trình Khuyến mãi', path: '/admin/promotions/programs' },
-        { label: 'Mã giảm giá', path: '/admin/promotions/coupons' },
+        { label: 'Chương trình Khuyến mãi', section: 'promotionPrograms' },
+        { label: 'Mã giảm giá', section: 'coupons' },
       ],
     },
     {
@@ -95,7 +101,7 @@ const EmployeeSidebar = () => {
       icon: <FaCreditCard className="h-6 w-6 mr-2" />,
       section: 'paymentManagement',
       subItems: [
-        { label: 'Phương thức Thanh toán', path: '/admin/payments/methods' },
+        { label: 'Phương thức Thanh toán', section: 'paymentMethods' },
       ],
     },
     {
@@ -104,8 +110,8 @@ const EmployeeSidebar = () => {
       icon: <FaTruck className="h-6 w-6 mr-2" />,
       section: 'shippingManagement',
       subItems: [
-        { label: 'Phương thức Vận chuyển', path: '/admin/shipping/methods' },
-        { label: 'Theo dõi Vận chuyển', path: '/admin/shipping/tracking' },
+        { label: 'Phương thức Vận chuyển', section: 'shippingMethods' },
+        { label: 'Theo dõi Vận chuyển', section: 'tracking' },
       ],
     },
     {
@@ -114,8 +120,8 @@ const EmployeeSidebar = () => {
       icon: <FaUser className="h-6 w-6 mr-2" />,
       section: 'userManagement',
       subItems: [
-        { label: 'Tài khoản Quản trị', path: '/admin/users/accounts' },
-        { label: 'Phân quyền', path: '/admin/users/roles' },
+        { label: 'Tài khoản Quản trị', section: 'adminAccounts' },
+        { label: 'Phân quyền', section: 'roles' },
       ],
     },
     {
@@ -124,7 +130,7 @@ const EmployeeSidebar = () => {
       icon: <FaChartLine className="h-6 w-6 mr-2" />,
       section: 'reportStatistics',
       subItems: [
-        { label: 'Đơn hàng', path: '/admin/reports/orders' },
+        { label: 'Đơn hàng', section: 'orderReports' },
       ],
     },
     {
@@ -133,7 +139,7 @@ const EmployeeSidebar = () => {
       icon: <FaHeadset className="h-6 w-6 mr-2" />,
       section: 'customerSupport',
       subItems: [
-        { label: 'Chat Trực tuyến', path: '/admin/support/chat' },
+        { label: 'Chat Trực tuyến', section: 'onlineChat' },
       ],
     },
     {
@@ -142,7 +148,7 @@ const EmployeeSidebar = () => {
       icon: <FaHandshake className="h-6 w-6 mr-2" />,
       section: 'partnerManagement',
       subItems: [
-        { label: 'Nhà cung cấp', path: '/admin/partners/suppliers' },
+        { label: 'Nhà cung cấp', section: 'suppliers' },
       ],
     },
     {
@@ -151,8 +157,8 @@ const EmployeeSidebar = () => {
       icon: <FaBell className="h-6 w-6 mr-2" />,
       section: 'systemNotifications',
       subItems: [
-        { label: 'Thông báo Đẩy', path: '/admin/notifications/push' },
-        { label: 'Thiết lập Thông báo', path: '/admin/notifications/settings' },
+        { label: 'Thông báo Đẩy', section: 'pushNotifications' },
+        { label: 'Thiết lập Thông báo', section: 'notificationSettings' },
       ],
     },
     {
@@ -161,8 +167,8 @@ const EmployeeSidebar = () => {
       icon: <MdAccountCircle className="h-6 w-6 mr-2" />,
       section: 'accountSettings',
       subItems: [
-        { label: 'Thông tin tài khoản', path: '/account/info' },
-        { label: 'Đổi mật khẩu', path: '/account/change-password' },
+        { label: 'Thông tin tài khoản', section: 'accountInfo' },
+        { label: 'Đổi mật khẩu', section: 'changePassword' },
       ],
     },
   ];
@@ -180,13 +186,16 @@ const EmployeeSidebar = () => {
               >
                 {item.icon}
                 {item.label}
+                <span className="ml-auto">
+                  {expandedSections[item.section] ? <FaChevronUp /> : <FaChevronDown />}
+                </span>
               </h5>
               {expandedSections[item.section] && (
                 <ul className="ml-6 mt-2 space-y-1 text-gray-600">
                   {item.subItems.map((subItem) => (
                     <li
-                      key={subItem.path}
-                      onClick={() => navigate(subItem.path)}
+                      key={subItem.section}
+                      onClick={() => onSectionClick(subItem.label)}
                       className="cursor-pointer hover:text-gray-800"
                     >
                       {subItem.label}
@@ -209,7 +218,7 @@ const EmployeeSidebar = () => {
 };
 
 EmployeeSidebar.propTypes = {
-  onSectionClick: PropTypes.func,
+  onSectionClick: PropTypes.func.isRequired,
 };
 
 export default EmployeeSidebar;

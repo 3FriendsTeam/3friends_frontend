@@ -2,35 +2,41 @@ import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
 import { useNavigate } from 'react-router-dom';
-
-// Import các icon cần thiết
-import { FaBoxOpen } from 'react-icons/fa6';
+import { Menu, Layout } from 'antd';
+import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaHeadset, FaBell } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn, MdAccountCircle, MdDashboard } from 'react-icons/md';
-import { FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaHeadset, FaHandshake, FaBell, FaChevronDown, FaChevronUp } from 'react-icons/fa6';
 import { FiLogOut } from 'react-icons/fi';
+import logo3friend from '../../../assets/admin/logo3friend.png';
+const { Sider } = Layout;
 
 const EmployeeSidebar = ({ onSectionClick }) => {
   const { logout } = useContext(EmployeeAuthContext);
   const [expandedSections, setExpandedSections] = useState({});
   const employee = JSON.parse(localStorage.getItem('employee')) ?? null;
-  const PositionID = parseInt(employee.data.PositionID, 10);
+  const PositionID = parseInt(employee?.data?.PositionID, 10);
   const navigate = useNavigate();
 
   if (!employee) {
     return null;
   }
-
+  const siderStyle = {
+    overflow: 'auto',
+    height: '100vh',
+    position: 'fixed',
+    insetInlineStart: 0,
+    top: 0,
+    bottom: 0,
+    scrollbarWidth: 'thin',
+    scrollbarGutter: 'stable',
+  };
+  // Hàm xử lý đăng xuất
   const handleLogout = () => {
-    // Xóa dữ liệu người dùng khỏi localStorage hoặc sessionStorage
-    localStorage.removeItem('employee');  // Hoặc dữ liệu liên quan đến đăng nhập
-
-    // Thực hiện logout trong context (nếu có)
-    logout(); // Nếu bạn đang sử dụng context để quản lý đăng nhập
-
-    // Điều hướng tới trang đăng nhập
-    navigate('/employee/login');
+    localStorage.removeItem('employee'); // Xóa thông tin người dùng
+    logout(); // Thực hiện logout trong context (nếu có)
+    navigate('/employee/login'); // Điều hướng đến trang đăng nhập
   };
 
+  // Hàm toggle mở/đóng các mục con
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -38,7 +44,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
     }));
   };
 
-  // Định nghĩa các mục menu
+  // Các mục menu
   const menuItems = [
     {
       positionIds: [1, 2, 3],
@@ -144,15 +150,6 @@ const EmployeeSidebar = ({ onSectionClick }) => {
     },
     {
       positionIds: [1],
-      label: 'Quản lý Đối tác',
-      icon: <FaHandshake className="h-6 w-6 mr-2" />,
-      section: 'partnerManagement',
-      subItems: [
-        { label: 'Nhà cung cấp', section: 'suppliers' },
-      ],
-    },
-    {
-      positionIds: [1],
       label: 'Thông báo Hệ thống',
       icon: <FaBell className="h-6 w-6 mr-2" />,
       section: 'systemNotifications',
@@ -162,58 +159,47 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       ],
     },
     {
-      positionIds: [1, 2, 3, 4],
+      positionIds: [1],
       label: 'Tài khoản',
       icon: <MdAccountCircle className="h-6 w-6 mr-2" />,
       section: 'accountSettings',
       subItems: [
         { label: 'Thông tin tài khoản', section: 'accountInfo' },
-        { label: 'Đổi mật khẩu', section: 'changePassword' },
       ],
     },
   ];
 
   return (
-    <aside className="bg-white p-3 shadow-md w-64 overflow-y-auto">
-      <ul className="list-none">
+    <Sider width={250} style={siderStyle}>
+        <div className=" flex items-center justify-center h-16 rounded-sm">
+          <img src={logo3friend} alt="Logo" className="h-10 w-auto object-contain" />
+        </div>
+      <Menu theme="dark" mode="inline">
         {menuItems
           .filter((item) => item.positionIds.includes(PositionID))
           .map((item) => (
-            <li key={item.section} className="mb-4">
-              <h5
-                onClick={() => toggleSection(item.section)}
-                className="flex items-center cursor-pointer font-semibold text-gray-700"
-              >
-                {item.icon}
-                {item.label}
-                <span className="ml-auto">
-                  {expandedSections[item.section] ? <FaChevronUp /> : <FaChevronDown />}
-                </span>
-              </h5>
-              {expandedSections[item.section] && (
-                <ul className="ml-6 mt-2 space-y-1 text-gray-600">
-                  {item.subItems.map((subItem) => (
-                    <li
-                      key={subItem.section}
-                      onClick={() => onSectionClick(subItem.label)}
-                      className="cursor-pointer hover:text-gray-800"
-                    >
-                      {subItem.label}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+            <Menu.SubMenu
+              key={item.section}
+              icon={item.icon}
+              title={item.label}
+              onTitleClick={() => toggleSection(item.section)}
+              open={expandedSections[item.section]}
+            >
+              {item.subItems.map((subItem) => (
+                <Menu.Item
+                  key={subItem.section}
+                  onClick={() => onSectionClick(subItem.section)}
+                >
+                  {subItem.label}
+                </Menu.Item>
+              ))}
+            </Menu.SubMenu>
           ))}
-        <li
-          onClick={handleLogout}
-          className="cursor-pointer text-red-600 hover:text-red-800 flex items-center font-semibold text-gray-700"
-        >
-          <FiLogOut className="h-6 w-6 mr-2" />
+        <Menu.Item key="logout" onClick={handleLogout} icon={<FiLogOut className="h-6 w-6 mr-2" />}>
           Đăng xuất
-        </li>
-      </ul>
-    </aside>
+        </Menu.Item>
+      </Menu>
+    </Sider>
   );
 };
 

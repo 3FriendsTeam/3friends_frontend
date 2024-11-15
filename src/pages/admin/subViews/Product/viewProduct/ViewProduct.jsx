@@ -1,26 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from "../../../../../middlewares/tokenMiddleware";
+
 
 const ViewProduct = () => {
-    const [products, setProducts] = useState([
-        {
-            id: 1,
-            name: 'Sản phẩm 1',
-            image: 'https://via.placeholder.com/100',
-            quantity: 50,
-            manufacturer: 'Apple',
-            category: 'Điện thoại',
-            price: 100000,
-        },
-        {
-            id: 2,
-            name: 'Sản phẩm 2',
-            image: 'https://via.placeholder.com/100',
-            quantity: 20,
-            manufacturer: 'Samsung',
-            category: 'Máy tính bảng',
-            price: 150000,
-        },
-    ]);
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [manufacturers, setManufacturers] = useState([]);
 
     const handleDelete = (id) => {
         setProducts(products.filter(product => product.id !== id));
@@ -35,8 +20,55 @@ const ViewProduct = () => {
 
     // Lọc danh sách sản phẩm theo từ khóa tìm kiếm
     const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    useEffect(() => {
+        // Lấy danh sách sản phẩm
+        const fetchProductData = async () => {
+            try {
+                const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/products`);
+                setProducts(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        const fetchCategoryData = async () => {
+            try {
+                const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/categories`);
+                setCategories(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        const fetchManufacturerData = async () => {
+            try {
+                const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/manufacturers`);
+                setManufacturers(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchManufacturerData();
+        fetchCategoryData();
+        fetchProductData();
+    }, []);
+
+    // Hàm tìm tên loai sp dựa trên CategoryID
+    const getCategoryName = (ProductTypeID) => {
+        const categoryname = categories.find(p => p.id === parseInt(ProductTypeID));
+        return categoryname ? categoryname.CategoryName : 'Chưa xác định';
+    };
+
+    // Hàm tìm tên NSX dựa trên ManufacturerID
+    const getManufacturerName = (ManufacturerID) => {
+        const manufacturername = manufacturers.find(p => p.id === parseInt(ManufacturerID));
+        return manufacturername ? manufacturername.ManufacturerName : 'Chưa xác định';
+    };
+
 
     return (
         <div className="container mx-auto">
@@ -71,13 +103,21 @@ const ViewProduct = () => {
                             <tr key={product.id} className="text-center hover:bg-gray-100">
                                 <td className="py-2 px-4 border">{product.id}</td>
                                 <td className="py-2 px-4 border">
-                                    <img src={product.image} alt={product.name} className="w-20 h-20 object-cover mx-auto" />
+                                    {product.RepresentativeImage ? (
+                                        <img
+                                            src={`/assets/admin/${product.RepresentativeImage}`}
+                                            alt={product.ProductName}
+                                            className="w-20 h-20 object-cover mx-auto"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-500">Chưa có hình ảnh</span>
+                                    )}
                                 </td>
-                                <td className="py-2 px-4 border">{product.name}</td>
-                                <td className="py-2 px-4 border">{product.quantity}</td>
-                                <td className="py-2 px-4 border">{product.manufacturer}</td>
-                                <td className="py-2 px-4 border">{product.category}</td>
-                                <td className="py-2 px-4 border">{product.price.toLocaleString()} VND</td>
+                                <td className="py-2 px-4 border">{product.ProductName}</td>
+                                <td className="py-2 px-4 border">{product.Stock}</td>
+                                <td className="py-2 px-4 border">{getManufacturerName(product.ManufacturerID)}</td>
+                                <td className="py-2 px-4 border">{getCategoryName(product.ProductTypeID)}</td>
+                                <td className="py-2 px-4 border">{product.ListedPrice.toLocaleString()} VND</td>
                                 <td className="py-2 px-4 border">
                                     <button
                                         className="bg-blue-200 hover:bg-blue-700 hover:text-white text-blue-700 font-bold py-1 px-2 rounded mx-1"

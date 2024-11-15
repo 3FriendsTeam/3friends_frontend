@@ -27,11 +27,9 @@ const BestSellingPhone = () => {
         </NavLink>
       </div>
 
-      <NavLink 
-      to={path.PRODUCTSDETAILS}
-       className=" flex flex-row -mt-[550px]  ">
+      <div className=" flex flex-row -mt-[550px]  ">
         <ListBestSellingProducts />
-      </NavLink>
+      </div>
 
     </div>
   );

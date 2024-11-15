@@ -12,4 +12,5 @@ export const path = {
   ADMINLOGIN: "/adminlogin",
   FORGOTPASSWORDADMIN: "/forgotpasswordadmin",
   PAYMENTINFO: "/paymentinfo",
+  CATALOGSEARCH:"/catalogsearch",
 };

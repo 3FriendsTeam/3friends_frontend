@@ -17,8 +17,6 @@ function App() {
           </Routes>
         </EmployeeAuthProvider>
       </CustomerAuthProvider>
-      
-      
   );
 }
 

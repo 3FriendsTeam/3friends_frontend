@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,6 @@ const { Sider } = Layout;
 
 const EmployeeSidebar = ({ onSectionClick }) => {
   const { logout } = useContext(EmployeeAuthContext);
-  const [expandedSections, setExpandedSections] = useState({});
   const employee = JSON.parse(localStorage.getItem('employee')) ?? null;
   const PositionID = parseInt(employee?.data?.PositionID, 10);
   const navigate = useNavigate();
@@ -29,22 +28,12 @@ const EmployeeSidebar = ({ onSectionClick }) => {
     scrollbarWidth: 'thin',
     scrollbarGutter: 'stable',
   };
-  // Hàm xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem('employee'); // Xóa thông tin người dùng
-    logout(); // Thực hiện logout trong context (nếu có)
-    navigate('/employee/login'); // Điều hướng đến trang đăng nhập
+    localStorage.removeItem('employee');
+    logout(); 
+    navigate('/employee/login');
   };
 
-  // Hàm toggle mở/đóng các mục con
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
-  // Các mục menu
   const menuItems = [
     {
       positionIds: [1, 2, 3],
@@ -171,36 +160,36 @@ const EmployeeSidebar = ({ onSectionClick }) => {
 
   return (
     <Sider width={250} style={siderStyle}>
-        <div className=" flex items-center justify-center h-16 rounded-sm">
+        <div className="flex items-center justify-center h-16 rounded-sm">
           <img src={logo3friend} alt="Logo" className="h-10 w-auto object-contain" />
         </div>
-      <Menu theme="dark" mode="inline">
-        {menuItems
+      <Menu
+        theme="dark"
+        mode="inline"
+        items={menuItems
           .filter((item) => item.positionIds.includes(PositionID))
-          .map((item) => (
-            <Menu.SubMenu
-              key={item.section}
-              icon={item.icon}
-              title={item.label}
-              onTitleClick={() => toggleSection(item.section)}
-              open={expandedSections[item.section]}
-            >
-              {item.subItems.map((subItem) => (
-                <Menu.Item
-                  key={subItem.section}
-                  onClick={() => onSectionClick(subItem.section)}
-                >
-                  {subItem.label}
-                </Menu.Item>
-              ))}
-            </Menu.SubMenu>
-          ))}
-        <Menu.Item key="logout" onClick={handleLogout} icon={<FiLogOut className="h-6 w-6 mr-2" />}>
-          Đăng xuất
-        </Menu.Item>
-      </Menu>
+          .map((item) => ({
+            key: item.section,
+            icon: item.icon,
+            label: item.label,
+            children: item.subItems?.map((subItem) => ({
+              key: subItem.section,
+              label: subItem.label,
+              onClick: () => onSectionClick(subItem.section),
+            })),
+          }))
+          .concat([
+            {
+              key: 'logout',
+              icon: <FiLogOut className="h-6 w-6 mr-2" />,
+              label: 'Đăng xuất',
+              onClick: handleLogout,
+            },
+          ])}
+      />
     </Sider>
-  );
+);
+
 };
 
 EmployeeSidebar.propTypes = {

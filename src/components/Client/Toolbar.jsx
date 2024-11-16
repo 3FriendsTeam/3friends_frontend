@@ -88,7 +88,7 @@ function Toolbar() {
               className="w-full border-none outline-none px-2 py-1 bg-transparent"
             />
             {showHistory && (
-              <div className="absolute top-[65%] left-1/2 transform -translate-x-1/2 bg-white shadow-lg border rounded-lg max-h-[450px] w-[90%] md:w-[450px] overflow-y-auto z-50">
+              <div className="absolute top-[65%] left-[38%] transform -translate-x-1/2 bg-white shadow-lg border rounded-lg max-h-[450px] w-[90%] md:w-[450px] overflow-y-auto z-50">
                 <div className="flex justify-between items-center px-4 py-2 border-b">
                   <h4 className="text-gray-800">Lịch sử tìm kiếm</h4>
                   <button

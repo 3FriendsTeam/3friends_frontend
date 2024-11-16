@@ -6,6 +6,7 @@ import ViewEmployee from '../subViews/Employee/viewEmployee/ViewEmployee';
 import ViewPermission from '../subViews/Employee/permission/ViewPermission';
 import EmployeeSidebar from '../../../components/admin/LayoutAdmin/Sidebar';
 import { Layout } from 'antd';
+import DefaultPageAdmin from './DefaultPageAdmin';
 
 const { Header, Content } = Layout;
 
@@ -72,7 +73,7 @@ const Admin = () => {
                             <p>Đây là nội dung cho phần {activeContent}.</p>
                         </div>
                     ) : (
-                        <ViewCustomer />
+                        <DefaultPageAdmin />
                     )}
                 </Content>
             </Layout>

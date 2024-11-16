@@ -3,9 +3,9 @@ import footer2 from '../../assets/client/footer2.jpg'
 
 const Footer = () => {
     return (
-        <div className='w-[1536px] h-[450.3px] px-4'>
-            <div className="bg-white py-8 mx-auto max-w-[1170px]"> {/* max-w responsive */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5  leading-[2] text-[14px] "> {/* responsive grid */}
+        <div className='w-full px-4'>
+            <div className="bg-white py-8 mx-auto max-w-full lg:max-w-[1170px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 leading-[2] text-[14px]">
                     {/* Column 1 */}
                     <div className=''>
                         <h3 className="font-bold">Tư Vấn Và Đặt Hàng</h3>
@@ -56,22 +56,17 @@ const Footer = () => {
                             <li>CSKH & bảo hành: <strong>1900 8096</strong></li>
                             <li>Tư vấn bán hàng Doanh nghiệp: <strong>02466599666</strong></li>
                         </ul>
-                        <div className='flex w-[213.6px] '>
-                        <div className="mt-4 flex space-x-2">
-                            <img src={footer1} alt="footer1" className='' />
-                        </div>           
-                        <div className="mt-4 flex space-x-2">
-                            <img src={footer1} alt="footer1" className='' />
+                        <div className='flex flex-wrap mt-4 space-x-2'>
+                            <img src={footer1} alt="footer1" className='w-[100px] h-auto' />
+                            <img src={footer1} alt="footer1" className='w-[100px] h-auto' />
                         </div>
-                        </div>
-
                         <div className='mt-2'>
-                            <img src={footer2}  alt="footer2" className=' w-[213.6px]' />
+                            <img src={footer2} alt="footer2" className='w-full max-w-[213.6px]' />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-gray-100 py-4 mt-8 opacity-70 ">
+                <div className="bg-gray-100 py-4 mt-8 opacity-70">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-[13px]">
                         <div>
                             <p>Điện thoại – Điện thoại iPhone – iPhone 16 <br />
@@ -95,7 +90,7 @@ const Footer = () => {
 
                 <div className="py-4 mt-4">
                     <div className="text-center text-[13px] opacity-70">
-                        <p> © 2018 Công ty TNHH Nhà nước Một thành viên Thương mại và Xuất nhập khẩu Viettel. Đăng ký doanh nghiệp số 0104831030, do Sở Kế hoạch và Đầu tư Hà Nội cấp lần đầu ngày 25/01/2006, 
+                        <p>© 2018 Công ty TNHH Nhà nước Một thành viên Thương mại và Xuất nhập khẩu Viettel. Đăng ký doanh nghiệp số 0104831030, do Sở Kế hoạch và Đầu tư Hà Nội cấp lần đầu ngày 25/01/2006, 
                         thay đổi lần thứ 39 ngày 27 tháng 8 năm 2021. Địa chỉ: Số 01, Phố Giang Văn Minh, phường Kim Mã, quận Ba Đình, Thành phố Hà Nội. Chịu trách nhiệm nội dung: Đinh Sơn Tùng.</p>
                     </div>
                 </div>

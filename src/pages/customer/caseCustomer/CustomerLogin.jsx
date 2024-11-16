@@ -162,19 +162,27 @@ const CustomerLogin = () => {
             </button>
             <div className="flex justify-between items-center mt-2">
               <span className="">Bạn chưa có tài khoản?</span>
-              <NavLink
-                to={path.CUSTOMERREGISTER}
-                className="text-[#e0052b] font-semibold"
-              >
-                Đăng ký ngay
+              <NavLink to={path.FORGOTPASSWORD} className="text-gray-400">
+                Quên mật khẩu?
               </NavLink>
             </div>
           </form>
-          <div className="flex items-center my-[10px]">
+          <div className="flex items-center my-[8px]">
             <div className="border-t border-gray-300 flex-grow"></div>
             <span className="mx-3 text-gray-400">Hoặc</span>
             <div className="border-t border-gray-300 flex-grow"></div>
           </div>
+
+          <div className="text-center justify-between mb-4">
+            <span className="text-gray-500">Bạn chưa có tài khoản?</span>
+            <NavLink
+              to={path.CUSTOMERREGISTER}
+              className="ml-2 text-[#e0052b] font-semibold hover:underline"
+            >
+              Đăng ký ngay
+            </NavLink>
+          </div>
+
           <button
             onClick={handleGoogleLogin}
             className="w-full py-3 bg-gray-200 rounded-lg hover:bg-[#e0052b] hover:text-white transition flex items-center justify-center"

@@ -22,26 +22,29 @@ const Category = () => {
   }, []); 
 
   return (
-    <div className="w-[1536px] bg-[#F2F2F2]">
-      <div className="w-[1170px] h-[249px] mx-auto py-6 bg-white rounded-lg px-[50px]">
-        <h2 className="text-xl font-bold mb-8 -ml-4">Danh mục nổi bật</h2>
-        <div className="flex justify-between text-[12px]">
-          {categories.map((category, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center bg-pink-100 p-4 rounded-lg group hover:scale-110 transition-transform duration-300 relative"
-              style={{ width: "95px", height: "95px" }}
-            >
-              <img
-                src={category.pathImg ? getImagePath(category.pathImg) : ""}
-                className="w-[48px] h-[60px] mb-4"
-              />
-              <span className="text-[13px] font-bold mt-2 text-nowrap">{category.CategoryName}</span>
-            </div>
-          ))}
+<div className="w-full bg-[#F2F2F2]">
+  <div className="w-full max-w-[1170px] mx-auto py-12 bg-white rounded-lg px-[50px]">
+    <h2 className="text-xl font-bold mb-8 -ml-4 -mt-2">Danh mục nổi bật</h2>
+    <div className="flex flex-wrap justify-between text-[12px] gap-4 -mt-4">
+      {categories.map((category, index) => (
+        <div
+          key={index}
+          className={`flex flex-col items-center bg-pink-100 p-4 rounded-lg group hover:scale-110 transition-transform duration-300 relative ${
+            index > 4 ? 'hidden lg:flex' : ''
+          }`}
+          style={{ width: "95px", height: "95px" }}
+        >
+          <img
+            src={category.pathImg ? getImagePath(category.pathImg) : ""}
+            className="w-[48px] h-[60px] mb-4"
+          />
+          <span className="text-[13px] font-bold mt-2 text-nowrap">{category.CategoryName}</span>
         </div>
-      </div>
+      ))}
     </div>
+  </div>
+</div>
+
   );
 };
 

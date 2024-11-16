@@ -1,17 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { auth } from "../../../config/firebaseConfig.jsx";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
 import axios from "axios";
-import { signInWithGoogle } from "../../../config/firebaseService.jsx";
 import { Navigate, NavLink } from "react-router-dom";
 import { path } from "../../../utils/constant.jsx";
 import login1 from "../../../assets/client/login1.png";
 import google from "../../../assets/client/google.png";
+import Loading from "../../../components/Client/loading.jsx";
+import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext.jsx";
 
 const CustomerRegister = () => {
+  const {loginWithGoogle } = useContext(CustomerAuthContext);
+  const [errorResult, setErrorResult] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     customerName: "",
     email: "",
@@ -143,48 +147,24 @@ const CustomerRegister = () => {
       } else {
         return false;
       }
-    } catch (error) {
-      console.error("error check mail: ", error.message);
+    } catch  {
       return false;
     }
   };
 
   // đăng kí bằng gg
   const handleGoogleLogin = async () => {
+    setIsLoading(true);
     try {
-      const userCredential = await signInWithGoogle();
-      if (userCredential) {
-        const user = userCredential;
-        if (user) {
-          const checkCreatedEmail = await checkEmail({ email: user.email });
-          if (!checkCreatedEmail) {
-            try {
-              await saveAccount({
-                uid: user.uid,
-                customerName: user.displayName,
-                gender: user.gender || "Unknown",
-                email: user.email,
-                phoneNumber: user.phoneNumber || "Unknown",
-                birthDate: user.birthDate || null,
-                isVerified: true,
-              });
-              localStorage.setItem("token", await user.getIdToken());
-              alert("Đăng nhập thành công!");
-              Navigate(path.HOMEPAGE);
-            } catch (error) {
-              console.error("Error saving account: ", error);
-              alert("Đã xảy ra lỗi khi lưu tài khoản.");
-            }
-          } else {
-            localStorage.setItem("token", await user.getIdToken());
-            alert("Đăng nhập thành công!");
-            Navigate(path.HOMEPAGE);
-          }
-        }
-      }
+      await loginWithGoogle();
+      Navigate(path.HOMEPAGE);
     } catch (error) {
-      console.error("Error signing in with Google:", error);
-      alert("Đã xảy ra lỗi khi đăng nhập.");
+      setErrorResult(
+        "Đã xảy ra lỗi khi đăng nhập với Google. Vui lòng thử lại."
+      );
+      console.error("Google login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   //xử lý đăng ký
@@ -193,9 +173,10 @@ const CustomerRegister = () => {
     const { email, password } = formData;
 
     try {
+      setIsLoading(true);
       const checkCreatedEmail = await checkEmail({ email });
       if (checkCreatedEmail) {
-        alert("Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!");
+        setErrorResult("Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!");
         throw new Error("Email đã đăng ký");
       }
       try {
@@ -214,7 +195,7 @@ const CustomerRegister = () => {
             birthDate: formData.birthday,
           });
           if (!success) {
-            alert("lỗi hệ thống vui lòng thử lại sau");
+            setErrorResult("lỗi hệ thống vui lòng thử lại sau");
             throw new Error("Error saving account");
           }
         }
@@ -227,10 +208,11 @@ const CustomerRegister = () => {
           confirmPassword: "",
         });
         sendEmailVerification(userCredential.user);
-        alert("Đăng ký thành công vui lòng xác thực email!");
+        errorResult("Đăng ký thành công vui lòng xác thực email!");
+        Navigate(path.CUSTOMERLOGIN);
       } catch (error) {
         if (error.code === "auth/email-already-in-use") {
-          alert(
+          errorResult(
             "Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!"
           );
         }
@@ -241,12 +223,16 @@ const CustomerRegister = () => {
         ...errors,
         email: error.message || "Đăng ký thất bại. Thử lại email khác.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
+
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-red-100 via-white to-red-50">
       {/* Container */}
+      <Loading status={isLoading} />
       <div className="w-[700px] bg-white rounded-lg shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
@@ -423,6 +409,7 @@ const CustomerRegister = () => {
           </div>
 
           {/* Submit Button */}
+          {errorResult && <p className="text-red-500">{errorResult}</p>}
           <button
             type="submit"
             className="w-full bg-[#e0052b] text-white py-4 rounded-lg font-bold text-lg hover:bg-red-600 transition"

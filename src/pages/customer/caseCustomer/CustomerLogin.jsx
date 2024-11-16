@@ -5,6 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
 import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext";
+import Loading from "../../../components/Client/loading";
 
 const CustomerLogin = () => {
   const navigate = useNavigate();
@@ -85,16 +86,7 @@ const CustomerLogin = () => {
 
   return (
     <div className="bg-gray-100 h-screen flex items-center justify-center relative">
-      {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-50">
-          <div className="flex items-center">
-            <span className="animate-spin rounded-full h-12 w-12 border-t-[3px] border-b-[3px] border-[#e0052b]"></span>
-            <span className="ml-4 text-[#e0052b] text-xl font-semibold">
-              Đang đăng nhập...
-            </span>
-          </div>
-        </div>
-      )}
+      <Loading status={isLoading} />
       <div className="bg-white shadow-lg rounded-lg flex max-w-4xl w-full">
         <div className="w-1/2 p-8 flex flex-col justify-center">
           <NavLink to={path.HOMEPAGE} className="text-blue-500 text-sm mb-4">

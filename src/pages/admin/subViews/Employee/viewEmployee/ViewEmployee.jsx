@@ -1,121 +1,197 @@
-import { useState, useEffect } from 'react';
-import AddEmployee from '../addEmployee/AddEmployee'; // Giả sử bạn đã có component AddEmployee
-import api from "../../../../../middlewares/tokenMiddleware";
+import { useState, useEffect } from "react";
+import { Table, Input, Button, Popconfirm, message, Spin, Modal, Form } from "antd";
+import axios from "axios";
 
-const ViewEmployee = () => {
-    const [employees, setEmployees] = useState([]);
-    const [positions, setPositions] = useState([]); // Lưu danh sách chức vụ
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isAddingEmployee, setIsAddingEmployee] = useState(false); // Thêm state để quản lý hiển thị AddEmployee
+const ViewCustomer = () => {
+  const [customers, setCustomers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [editingCustomer, setEditingCustomer] = useState(null);
 
-    // Lọc danh sách nhân viên theo từ khóa tìm kiếm
-    const filteredEmployees = employees.filter(employee =>
-        employee.FullName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  // Lọc danh sách khách hàng theo từ khóa tìm kiếm
+  const filteredCustomers = customers.filter((customer) =>
+    customer.CustomerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    useEffect(() => {
-        // Lấy danh sách nhân viên
-        const fetchEmployeeData = async () => {
-            try {
-                const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/employees`);
-                setEmployees(response.data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        // Lấy danh sách chức vụ từ API
-        const fetchPositionData = async () => {
-            try {
-                const response = await api.get(`${import.meta.env.VITE_BACKEND_URL}/api/positions`);
-                setPositions(response.data); // Gán danh sách chức vụ vào state
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchEmployeeData();
-        fetchPositionData();
-    }, []);
-
-    // Hàm tìm tên chức vụ dựa trên PositionID
-    const getPositionName = (PositionID) => {
-        const position = positions.find(p => p.id === parseInt(PositionID)); // Chuyển PositionID sang kiểu số nếu cần
-        return position ? position.PositionName : 'Chưa xác định';
+  // Fetch danh sách khách hàng
+  useEffect(() => {
+    const fetchCustomerData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-all-customer`
+        );
+        setCustomers(
+          response.data.map((customer, index) => ({ key: index, ...customer }))
+        );
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        message.error("Không thể tải danh sách khách hàng. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchCustomerData();
+  }, []);
 
+  // Khoá khách hàng
+  const handleLock = async (key) => {
+    try {
+      setCustomers(customers.filter((customer) => customer.key !== key));
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/delete-customer/${key}`);
+      message.success("Xóa khách hàng thành công.");
+    } catch (error) {
+      console.error("Lỗi khi xóa khách hàng:", error);
+      message.error("Không thể xóa khách hàng. Vui lòng thử lại.");
+    }
+  };
 
+  // Mở modal chỉnh sửa
+  const showEditModal = (customer) => {
+    setEditingCustomer(customer);
+    setIsEditModalVisible(true);
+    form.setFieldsValue(customer);
+  };
 
-    return (
-        <div className="container mx-auto">
-            {isAddingEmployee ? (
-                <AddEmployee onBack={() => setIsAddingEmployee(false)} />
-            ) : (
-                <>
-                    <h1 className="text-3xl font-bold mb-5">Danh sách nhân viên</h1>
-                    <div className="mb-4 flex">
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm nhân viên..."
-                            className="p-2 border border-gray-300 rounded mr-2"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <button
-                            onClick={() => setIsAddingEmployee(true)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-auto cursor-pointer"
-                        >
-                            Thêm nhân viên
-                        </button>
-                    </div>
+  // Đóng modal chỉnh sửa
+  const handleEditCancel = () => {
+    setEditingCustomer(null);
+    setIsEditModalVisible(false);
+    form.resetFields();
+  };
 
-                    {employees.length === 0 ? (
-                        <p>Không có dữ liệu nhân viên.</p>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border border-gray-300">
-                                <thead>
-                                    <tr>
-                                        <th className="py-2 px-4 border">Mã</th>
-                                        <th className="py-2 px-4 border">Họ tên</th>
-                                        <th className="py-2 px-4 border">Email</th>
-                                        <th className="py-2 px-4 border">Số điện thoại</th>
-                                        <th className="py-2 px-4 border">Chức vụ</th>
-                                        <th className="py-2 px-4 border">Ngày tạo</th>
-                                        <th className="py-2 px-4 border">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredEmployees.map((employee) => (
-                                        <tr key={employee.id} className="text-center hover:bg-gray-100">
-                                            <td className="py-2 px-4 border">{employee.id}</td>
-                                            <td className="py-2 px-4 border">{employee.FullName}</td>
-                                            <td className="py-2 px-4 border">{employee.Email}</td>
-                                            <td className="py-2 px-4 border">{employee.PhoneNumber}</td>
-                                            <td className="py-2 px-4 border">{getPositionName(employee.PositionID)}</td>
-                                            <td className="py-2 px-4 border">{employee.createdAt ? new Date(employee.createdAt).toLocaleDateString() : 'N/A'}</td>
-                                            <td className="py-2 px-4 border">
-                                                <button
-                                                    className="bg-blue-200 hover:bg-blue-700 hover:text-white text-blue-700 font-bold py-1 px-2 rounded mx-1"
-                                                >
-                                                    Sửa
-                                                </button>
-                                                <button
-                                                    className="hover:text-white hover:bg-red-700 text-red-400 font-bold py-1 px-2 rounded mx-1"
-                                                >
-                                                    Xóa
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </>
-            )}
+  // Lưu chỉnh sửa
+  const handleEditSave = async () => {
+    try {
+      const updatedCustomer = form.getFieldsValue();
+      setCustomers((prev) =>
+        prev.map((customer) =>
+          customer.key === editingCustomer.key ? { ...customer, ...updatedCustomer } : customer
+        )
+      );
+      message.success("Cập nhật thông tin khách hàng thành công.");
+      handleEditCancel();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật khách hàng:", error);
+      message.error("Không thể cập nhật khách hàng. Vui lòng thử lại.");
+    }
+  };
+
+  const columns = [
+    {
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (text, record, index) => index + 1,
+    },
+
+    {
+      title: "Tên khách hàng",
+      dataIndex: "CustomerName",
+      key: "CustomerName",
+      render: (CustomerName) => CustomerName || "Chưa cập nhật",
+    },
+    {
+      title: "Giới tính",
+      dataIndex: "Gender",
+      key: "Gender",
+      render: (Gender) => Gender || "Chưa cập nhật",
+    },
+    {
+      title: "Email",
+      dataIndex: "Email",
+      key: "Email",
+      render: (Email) => Email || "Chưa cập nhật",
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "PhoneNumber",
+      key: "PhoneNumber",
+      render: (phoneNumber) => phoneNumber || "Chưa cập nhật",
+    },
+    {
+      title: "Thao tác",
+      key: "action",
+      render: (text, record) => (
+        <>
+          <Button
+            type="link"
+            onClick={() => showEditModal(record)}
+            className="text-blue-700 font-bold mx-1"
+          >
+            Sửa
+          </Button>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn xóa mục này không?"
+            onConfirm={() => handleLock(record.key)}
+            okText="Có"
+            cancelText="Không"
+          >
+            <Button type="link" className="text-red-600 font-bold mx-1">
+              Khóa tài khoản
+            </Button>
+          </Popconfirm>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <div className="container mx-auto">
+      <h1 className="text-3xl font-bold mb-5">Danh sách khách hàng</h1>
+      <Input
+        placeholder="Tìm kiếm khách hàng..."
+        className="mb-4"
+        style={{ width: "300px", height: "40px" }}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      {loading ? (
+        <div className="flex justify-center items-center">
+          <Spin size="large" />
         </div>
-    );
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={filteredCustomers}
+          pagination={{
+            pageSize:5,
+            showSizeChanger: false,
+          }}
+        />
+      )}
+      <div className="text-sm mt-2">{filteredCustomers.length} khách hàng</div>
+
+      <Modal
+        title="Sửa thông tin khách hàng"
+        open={isEditModalVisible}
+        onOk={handleEditSave}
+        onCancel={handleEditCancel}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="CustomerName"
+            label="Tên khách hàng"
+            rules={[{ required: true, message: "Vui lòng nhập tên khách hàng!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="Email"
+            label="Email"
+            rules={[{ type: "email", message: "Vui lòng nhập email hợp lệ!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item name="PhoneNumber" label="Số điện thoại">
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
 };
 
-export default ViewEmployee;
+export default ViewCustomer;

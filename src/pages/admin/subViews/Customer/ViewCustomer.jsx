@@ -36,10 +36,11 @@ const ViewCustomer = () => {
     fetchCustomerData();
   }, []);
 
-  // Xóa khách hàng
-  const handleDelete = async (key) => {
+  // Khoá khách hàng
+  const handleLock = async (key) => {
     try {
       setCustomers(customers.filter((customer) => customer.key !== key));
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/delete-customer/${key}`);
       message.success("Xóa khách hàng thành công.");
     } catch (error) {
       console.error("Lỗi khi xóa khách hàng:", error);
@@ -80,24 +81,29 @@ const ViewCustomer = () => {
 
   const columns = [
     {
-      title: "Mã",
-      dataIndex: "id",
-      key: "id",
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (text, record, index) => index + 1,
     },
+
     {
       title: "Tên khách hàng",
       dataIndex: "CustomerName",
       key: "CustomerName",
+      render: (CustomerName) => CustomerName || "Chưa cập nhật",
     },
     {
       title: "Giới tính",
       dataIndex: "Gender",
       key: "Gender",
+      render: (Gender) => Gender || "Chưa cập nhật",
     },
     {
       title: "Email",
       dataIndex: "Email",
       key: "Email",
+      render: (Email) => Email || "Chưa cập nhật",
     },
     {
       title: "Số điện thoại",
@@ -119,12 +125,12 @@ const ViewCustomer = () => {
           </Button>
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa mục này không?"
-            onConfirm={() => handleDelete(record.key)}
+            onConfirm={() => handleLock(record.key)}
             okText="Có"
             cancelText="Không"
           >
             <Button type="link" className="text-red-600 font-bold mx-1">
-              Xóa
+              Khóa tài khoản
             </Button>
           </Popconfirm>
         </>
@@ -151,7 +157,7 @@ const ViewCustomer = () => {
           columns={columns}
           dataSource={filteredCustomers}
           pagination={{
-            pageSize: 5,
+            pageSize:5,
             showSizeChanger: false,
           }}
         />

@@ -72,7 +72,7 @@ const Admin = () => {
                             <p>Đây là nội dung cho phần {activeContent}.</p>
                         </div>
                     ) : (
-                        <AddProduct />
+                        <ViewCustomer />
                     )}
                 </Content>
             </Layout>

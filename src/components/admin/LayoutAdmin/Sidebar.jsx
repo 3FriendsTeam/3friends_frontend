@@ -88,7 +88,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <FaUsers className="h-6 w-6 mr-2" />,
       section: 'customerManagement',
       subItems: [
-        { label: 'Danh sách khách hàng', section: 'customerList' },
+        { label: 'Danh sách khách hàng', section: 'Danh sách khách hàng' },
       ],
     },
     {

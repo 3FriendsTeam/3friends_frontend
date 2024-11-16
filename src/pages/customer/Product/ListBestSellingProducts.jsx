@@ -142,34 +142,37 @@ const ListBestSellingProducts = () => {
   };
 
   return (
-    <div className="flex flex-wrap flex-row relative items-center group ">
-    <button  
-          onClick={prevProduct}
-          className="absolute left-0 transform -translate-y-1/2 z-10 ml-[175px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl "  />
-            </button>
-     
-      <div
-       className=" ml-[195px] w-[1170px] mt-4  flex flex-wrap rounded-lg group relative ">
-        {visibleProducts.map((product, index) => (
-          <ProductCard
-            key={index}
-            sp1={product.sp1}
-            km1={product.km1}
-            km2={product.km2}
-            productName={product.productName}
-            productPrice={product.productPrice}
-            promoText={product.promoText}
-          />
-        ))}
-      </div>
-     <button
-        onClick={nextProduct}
-        className="absolute right-0 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
-      </button>
+    <div className="flex flex-wrap mx-auto flex-row relative items-center group sm:px-8 lg:px-16">
+    <button
+      onClick={prevProduct}
+      className="absolute left-0 transform -translate-y-1/2 z-10 sm:ml-4 md:ml-8 lg:ml-16 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+    >
+      <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl" />
+    </button>
+  
+    <div className="w-full sm:w-[95%] lg:w-[1170px] mt-4 ml-5 flex flex-wrap rounded-lg group relative mx-auto">
+      {visibleProducts.map((product, index) => (
+        <ProductCard
+          key={index}
+          sp1={product.sp1}
+          km1={product.km1}
+          km2={product.km2}
+          productName={product.productName}
+          productPrice={product.productPrice}
+          promoText={product.promoText}
+        />
+      ))}
     </div>
+  
+    <button
+      onClick={nextProduct}
+      className="absolute right-0 mr-16 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+    >
+      <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
+    </button>
+  </div>
+  
+  
   );
 };
 

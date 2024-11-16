@@ -1,112 +1,37 @@
-import { useEffect, useMemo, useState } from "react";
-import km1 from "../../../assets/client/km1.png";
-import km2 from "../../../assets/client/km2.png";
-import sp1 from "../../../assets/client/sp1.jpg";
-import sp2 from "../../../assets/client/sp2.jpg";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import icons from "../../../utils/icons";
-import ProductCard from "./ProductCard";
+import { useNavigate } from "react-router-dom";
+import { path } from "../../../utils/constant";
+
+const getImagePath = (imageName) => {
+  if (!imageName) return "";
+  return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
+};
 
 const ListBestSellingProducts = () => {
-  const products = useMemo(
-    () => [
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 10 Pro 128GB",
-        productPrice: "38.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp2,
-        km1: km1,
-        km2: km2,
-        productName: "Xiaomi 11 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "SamSung 12 Pro 128GB",
-        productPrice: "18.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp2,
-        km1: km1,
-        km2: km2,
-        productName: "SamSung 13 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "SamSung 10 Pro 128GB",
-        productPrice: "23.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 11 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-      {
-        sp1: sp2,
-        km1: km1,
-        km2: km2,
-        productName: "Xiaomi 12 Pro 128GB",
-        productPrice: "8.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-    
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 13 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-    
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 14 Pro 128GB",
-        productPrice: "28.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-    
-      {
-        sp1: sp1,
-        km1: km1,
-        km2: km2,
-        productName: "iPhone 15 Pro 128GB",
-        productPrice: "48.990.000 ₫",
-        promoText:
-          "Tặng voucher giảm giá lên đến 6,000,000₫ cho khách hàng đổi điểm Viettel++ trên ứng dụng ...",
-      },
-    ],
-    []
-  );
-  const [visibleProducts, setVisibleProducts] = useState(products.slice(0, 5)); // Bắt đầu với 5 sản phẩm đầu tiên
-  const [currentIndex, setCurrentIndex] = useState(5); // Bắt đầu từ sản phẩm thứ 6
+  const [products, setProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/products`
+        );
+        setProducts(response.data);
+        setVisibleProducts(response.data.slice(0, 5));
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+  const handleProductClick = () => {
+    navigate(path.PRODUCTSDETAILS); 
+  };
 
   useEffect(() => {
     const updateVisibleProducts = () => {
@@ -117,11 +42,12 @@ const ListBestSellingProducts = () => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length);
     };
 
-    const interval = setInterval(updateVisibleProducts, 5000);
-
-    return () => clearInterval(interval);
+    if (products.length > 0) {
+      const interval = setInterval(updateVisibleProducts, 5000);
+      return () => clearInterval(interval);
+    }
   }, [currentIndex, products]);
-  // Hàm điều hướng đến sản phẩm tiếp theo
+
   const nextProduct = () => {
     const nextIndex = (currentIndex + 1) % products.length;
     setCurrentIndex(nextIndex);
@@ -131,7 +57,6 @@ const ListBestSellingProducts = () => {
     });
   };
 
-  // Hàm điều hướng đến sản phẩm trước
   const prevProduct = () => {
     const prevIndex = (currentIndex - 1 + products.length) % products.length;
     setCurrentIndex(prevIndex);
@@ -143,36 +68,49 @@ const ListBestSellingProducts = () => {
 
   return (
     <div className="flex flex-wrap mx-auto flex-row relative items-center group sm:px-8 lg:px-16">
-    <button
-      onClick={prevProduct}
-      className="absolute left-0 transform -translate-y-1/2 z-10 sm:ml-4 md:ml-8 lg:ml-16 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-    >
-      <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl" />
-    </button>
-  
-    <div className="w-full sm:w-[95%] lg:w-[1170px] mt-4 ml-5 flex flex-wrap rounded-lg group relative mx-auto">
-      {visibleProducts.map((product, index) => (
-        <ProductCard
-          key={index}
-          sp1={product.sp1}
-          km1={product.km1}
-          km2={product.km2}
-          productName={product.productName}
-          productPrice={product.productPrice}
-          promoText={product.promoText}
-        />
-      ))}
+      <button
+        onClick={prevProduct}
+        className="absolute left-0 transform -translate-y-1/2 z-10 sm:ml-4 md:ml-8 lg:ml-16 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+        <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl" />
+      </button>
+
+      <div className="w-full sm:w-[95%] lg:w-[1170px] mt-4 ml-6 flex flex-wrap gap-x-2 gap-y-6 rounded-lg group relative mx-auto">
+        {visibleProducts.map((product, index) => (
+          <div
+            key={index}
+            onClick={() => handleProductClick()}
+            className="w-full sm:w-1/2 lg:w-[19%] p-4 flex flex-col items-start border border-gray-300 rounded-md shadow-sm bg-white"
+          >
+            <img
+              src={
+                product.RepresentativeImage
+                  ? getImagePath(product.RepresentativeImage)
+                  : ""
+              }
+              alt={product.ProductName}
+              className="rounded-lg object-cover w-full h-auto"
+            />
+            <h3 className="mt-2 text-[18px] font-bold text-left">
+              {product.ProductName || "Unknown Product"}
+            </h3>
+            <p className="text-lg font-bold text-[#e0052b] text-left mt-1">
+              {product.ListedPrice + " ₫"}
+            </p>
+            <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md">
+              {product.Description || "No promotion available"}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={nextProduct}
+        className="absolute right-0 mr-16 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+        <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
+      </button>
     </div>
-  
-    <button
-      onClick={nextProduct}
-      className="absolute right-0 mr-16 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-    >
-      <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
-    </button>
-  </div>
-  
-  
   );
 };
 

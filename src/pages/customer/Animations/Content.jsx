@@ -77,7 +77,7 @@ const FeaturedProducts = () => {
         <img
           src={logo2}
           alt=""
-          className="rounded-bl-3xl rounded-br-3xl  max-w-[1536px] w-full h-auto"
+          className="rounded-bl-3xl rounded-br-3xl  max-w-[1736px] w-full h-auto"
         />
       </div>
 
@@ -114,13 +114,13 @@ const FeaturedProducts = () => {
           </div>
 
           {/* Tên sản phẩm và giá */}
-          <div className="absolute bottom-[-70px] text-black text-center hidden lg:block">
+          <div className="absolute bottom-[-18px] text-black text-center hidden lg:block">
             <div className="flex justify-center flex-wrap ">
               {imageNames.map((name, index) => (
                 <div
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`bg-white p-4  w-[150px] lg:w-[18px] text-center cursor-pointer ${
+                  className={`bg-white p-4  w-[150px] lg:w-[190px] text-center cursor-pointer ${
                     index === currentIndex ? "border-b-4 border-red-500" : ""
                   }`}
                 >

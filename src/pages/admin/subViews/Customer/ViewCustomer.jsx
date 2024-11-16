@@ -116,13 +116,6 @@ const ViewCustomer = () => {
       key: "action",
       render: (text, record) => (
         <>
-          <Button
-            type="link"
-            onClick={() => showEditModal(record)}
-            className="text-blue-700 font-bold mx-1"
-          >
-            Sửa
-          </Button>
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa mục này không?"
             onConfirm={() => handleLock(record.key)}

@@ -57,15 +57,15 @@ const Admin = () => {
                         background: '#f0f2f5',
                     }}
                 >
-                    {activeContent === 'Thêm mới sản phẩm' ? (
+                    {activeContent === 'addProduct' ? (
                         <AddProduct />
-                    ) : activeContent === 'Danh sách sản phẩm' ? (
+                    ) : activeContent === 'listProduct' ? (
                         <ViewProduct />
                     ) : activeContent === 'Danh sách khách hàng' ? (
                         <ViewCustomer />
-                    ) : activeContent === 'Tài khoản Quản trị' ? (
+                    ) : activeContent === 'adminAccounts' ? (
                         <ViewEmployee />
-                    ) : activeContent === 'Phân quyền' ? (
+                    ) : activeContent === 'roles' ? (
                         <ViewPermission />
                     ) :activeContent === 'Danh sách đơn hàng' ? (
                         <ViewOrder />

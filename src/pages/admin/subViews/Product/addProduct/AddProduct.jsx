@@ -49,7 +49,7 @@ const AddProduct = () => {
 
     return (
         <div className="">
-            <h1 className="text-blue-800 text-3xl font-bold mb-5 flex justify-center">Thêm sản phẩm</h1>
+            <h1 className="text-blue-800 text-3xl font-bold mb-5 flex justify-center w-(1536px)">Thêm sản phẩm</h1>
             <form onSubmit={handleSubmit}>
                 {/* Phần thông tin cơ bản sản phẩm */}
                 <div className="p-4 border rounded bg-white shadow-md mb-4 grid grid-cols-2 gap-4">

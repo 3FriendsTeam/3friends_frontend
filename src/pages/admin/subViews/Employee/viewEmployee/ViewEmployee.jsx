@@ -19,10 +19,8 @@ const ViewEmployee = () => {
   const [positions, setPositions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // Modal thêm nhân viên
   const [form] = Form.useForm();
-  const [editingCustomer, setEditingCustomer] = useState(null);
   const [value4, setValue4] = useState("Apple");
   const nameAdmin = getEmployeeName();
 
@@ -36,12 +34,7 @@ const ViewEmployee = () => {
     const fetchEmployeeData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/employees`
-        );
-        setEmployees(
-          response.data.map((customer, index) => ({ key: index, ...customer }))
-        );
+        reloadEmployee();
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
         message.error(
@@ -75,6 +68,18 @@ const ViewEmployee = () => {
     fetchEmployeeData();
   }, []);
 
+  const reloadEmployee = async () => {
+  setLoading(true)
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/employees`)
+    setEmployees(response.data.map((employees, index) => ({ key: index, ...employees })))
+  } catch (error) {
+    console.error("Lỗi khi tải dữ liệu:", error)
+    message.error("Không thể tải danh sách nhân viên. Vui lòng thử lại sau.")
+  } finally {
+    setLoading(false)
+  }
+}
   // Hàm tìm tên chức vụ dựa trên PositionID
   const getPositionName = (PositionID) => {
     const position = positions.find((p) => p.id === parseInt(PositionID));
@@ -85,46 +90,43 @@ const ViewEmployee = () => {
   const handleDelete = async (key) => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/delete-employee/${key}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-employee-by-id`,{ data: { key } } 
       );
-      setEmployees(employees.filter((employee) => employee.key !== key));
+      reloadEmployee();
       message.success("Xóa nhân viên thành công.");
     } catch {
       message.error("Không thể xóa nhân viên. Vui lòng thử lại.");
     }
   };
 
-  // Mở modal chỉnh sửa
-  // const showEditModal = (employee) => {
-  //   setEditingCustomer(employee);
-  //   setIsEditModalVisible(true);
-  //   form.setFieldsValue(employee);
-  // };
-
-  // Đóng modal chỉnh sửa
-  const handleEditCancel = () => {
-    setEditingCustomer(null);
-    setIsEditModalVisible(false);
-    form.resetFields();
-  };
-
-  // Lưu chỉnh sửa
-  const handleEditSave = async () => {
+  const handleLock = async (key) => {
     try {
-      const updatedEmployee = form.getFieldsValue();
-      setEmployees((prev) =>
-        prev.map((employee) =>
-          employee.key === editingCustomer.key
-            ? { ...employee, ...updatedEmployee }
-            : employee
-        )
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/lock-employee`,
+        { key }
       );
-      message.success("Cập nhật thông tin nhân viên thành công.");
-      handleEditCancel();
-    } catch {
-      message.error("Không thể cập nhật nhân viên. Vui lòng thử lại.");
+      reloadEmployee();
+      console.log(response.data);
+      message.success(response.data.message);
+    } catch (error) {
+      console.error("Lỗi khi khóa tài khoản", error);
+      message.error("Không thể khóa tài khoản! Vui lòng thử lại.");
+    } finally{
+        setLoading(false);
     }
   };
+  const handleUnlock = async (key) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-employee`,{ key });
+        reloadEmployee();
+      message.success(response.data.message);
+    } catch (error) {
+      console.error("Lỗi khi mở khóa tài khoản", error);
+      message.error("Không thể mở khóa tài khoản! Vui lòng thử lại.");
+    }
+  };
+
 
   // Mở modal thêm nhân viên
   const showAddModal = () => {
@@ -159,10 +161,7 @@ const ViewEmployee = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/create-employee`,
         { newEmployee, nameAdmin }
       );
-      setEmployees([
-        ...employees,
-        { ...newEmployee, key: employees.length + 1 },
-      ]);
+      reloadEmployee();
       message.success("Thêm nhân viên thành công.");
       handleAddCancel();
     } catch {
@@ -211,24 +210,37 @@ const ViewEmployee = () => {
     {
       title: "Thao tác",
       key: "action",
-      render: (text, record) => (
+      render: (text, employees) => (
         <>
-          <Popconfirm
-            title="Bạn có chắc chắn muốn khóa nhân viên này không?"
-            onConfirm={() => handleDelete(record.key)}
-            okText="Có"
-            cancelText="Không"
-          >
-            <Button
-              type="link"
-              className="text-orange-600 font-bold mx-1 bg-orange-100"
+        <>
+        {employees.IsActive ? (
+            <Popconfirm
+              title="Bạn có chắc chắn muốn khóa tài khoản này không?"
+              onConfirm={() => handleLock(employees.id)}
+              okText="Có"
+              cancelText="Không"
             >
-              Khóa
-            </Button>
-          </Popconfirm>
+              <Button type="link" className="text-red-600 font-bold mx-1">
+                Khóa tài khoản
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="Bạn có chắc chắn muốn mở khóa tài khoản này không?"
+              onConfirm={() => handleUnlock(employees.id)}
+              okText="Có"
+              cancelText="Không"
+            >
+              <Button type="link" className="text-red-600 font-bold mx-1">
+                Mở khóa tài khoản
+              </Button>
+            </Popconfirm>
+          )}
+        </>
+          
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa nhân viên này không?"
-            onConfirm={() => handleDelete(record.key)}
+            onConfirm={() => handleDelete(employees.id)}
             okText="Có"
             cancelText="Không"
           >
@@ -359,36 +371,6 @@ const ViewEmployee = () => {
             ]}
           >
             <Input.Password />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Modal chỉnh sửa nhân viên */}
-      <Modal
-        title="Sửa thông tin nhân viên"
-        visible={isEditModalVisible}
-        onOk={handleEditSave}
-        onCancel={handleEditCancel}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="FullName"
-            label="Tên nhân viên"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên nhân viên!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="Email"
-            label="Email"
-            rules={[{ type: "email", message: "Vui lòng nhập email hợp lệ!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="PhoneNumber" label="Số điện thoại">
-            <Input />
           </Form.Item>
         </Form>
       </Modal>

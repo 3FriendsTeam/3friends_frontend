@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import icons from "../../utils/icons";
 import { path } from "../../utils/constant";
-import logohome3 from "../../assets/client/logohome3.png";
+import logoFriends from "../../assets/admin/3Friends.png";
 import { useEffect, useState } from "react";
 
 function Toolbar() {
@@ -65,9 +65,9 @@ function Toolbar() {
             <div className="border border-transparent rounded p-2 bg-transparent md:w-[167px]">
               <NavLink to="/">
                 <img
-                  src={logohome3}
+                  src={logoFriends}
                   alt="logo"
-                  className="h-[70px] w-[167px]"
+                  className="h-[100px] w-[167px]"
                 />
               </NavLink>
             </div>

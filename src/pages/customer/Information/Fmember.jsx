@@ -3,6 +3,10 @@ import Header from "../../../components/Client/Header";
 import UserProfile from "./UserProfile";
 import { NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
+import FmenberHome from "./FmemberHome";
+import icons from "../../../utils/icons";
+import PurchaseHistory from "./PurchaseHistory";
+import FmemberHome from "./FmemberHome";
 function CustomerInformation() {
   const [activeComponent, setActiveComponent] = useState("home");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -13,10 +17,8 @@ function CustomerInformation() {
     localStorage.removeItem("username");
     localStorage.removeItem("token");
 
-    // Đóng modal đăng xuất và cập nhật giao diện
     setShowLogoutModal(false);
 
-    // Điều hướng đến trang đăng nhập
     navigate(path.CUSTOMERLOGIN);
   };
 
@@ -26,93 +28,120 @@ function CustomerInformation() {
         <Header onLogout={handleLogout} />
       </div>
       <div className="flex justify-between ml-[173px] bg-[#F2F2F2] mt-4">
-        {/* Sidebar */}
-        <div className="w-1/5 p-5 bg-white shadow-md rounded h-full max-h-[calc(100vh+30px)]">
-          <nav className="space-y-5 text-gray-600">
-            <a
+
+        <div className="w-[19%] p-5 bg-white shadow-md rounded h-full max-h-[calc(100vh+30px)]">
+          <nav className="space-y-5 text-[#4a4a4a] ">
+          <a
               href="#"
-              className="flex items-center space-x-2 font-semibold"
+              className={`flex items-center space-x-2 font-semibold px-3 py-2 rounded ${
+                activeComponent === "home" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px] " : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
               onClick={() => setActiveComponent("home")}
             >
-              <span>Trang chủ</span>
+              <span className="flex items-center gap-3">
+                <icons.FaHome className="text-xl" /> Trang chủ
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "profile" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
               onClick={() => setActiveComponent("profile")}
             >
-              <span>Hồ sơ</span>
+              <span className="flex items-center gap-3">
+                <icons.ImProfile className="text-xl" /> Hồ sơ
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "history" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
+              onClick={() => setActiveComponent("history")}
             >
-              <span>Đổi mật khẩu</span>
+              <span className="flex items-center gap-3">
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
+              onClick={() => setActiveComponent("history")}
             >
-              <span>Địa chỉ</span>
+              <span className="flex items-center gap-3">
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
+              onClick={() => setActiveComponent("history")}
             >
-              <span>Ưu đãi</span>
+              <span className="flex items-center gap-3">
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
+              onClick={() => setActiveComponent("history")}
             >
-              <span>Hỗ trợ </span>
+              <span className="flex items-center gap-3">
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
+              onClick={() => setActiveComponent("history")}
             >
-              <span>Tra cứu bảo hành</span>
+              <span className="flex items-center gap-3">
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+              </span>
             </a>
             <a
               href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
+              onClick={() => setActiveComponent("history")}
             >
-              <span>Ưu đãi mua hàng</span>
+              <span className="flex items-center gap-3">
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+              </span>
             </a>
-            <a
-              href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
-            >
-              <span>Lịch sử mua hàng</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-2"
-              onClick={() => setActiveComponent("warranty")}
-            >
-              <span>Góp ý - Phản hồi</span>
-            </a>
-
+           
             <NavLink
               to="#"
-              className="flex items-center space-x-2"
+              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
+                showLogoutModal ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+              }`}
               onClick={() => setShowLogoutModal(true)}
             >
-              <p className="mb-[12px]">Thoát tài khoản</p>
+              <span className="flex items-center gap-3 ">
+                <icons.IoExitOutline className="text-2xl" /> Thoát tài khoản
+              </span>
             </NavLink>
           </nav>
         </div>
         <div className="flex-1 p-5">
+          {activeComponent === "home" && <FmenberHome />}
           {activeComponent === "profile" && <UserProfile />}
-          {activeComponent === "home" && <div>Trang chủ</div>}
-          {activeComponent === "warranty" && <div>Tra cứu bảo hành</div>}
+          {activeComponent === "history" && (
+            <div>
+              <FmemberHome />
+              <PurchaseHistory />
+            </div>
+          )}
         </div>
       </div>
       {showLogoutModal && (

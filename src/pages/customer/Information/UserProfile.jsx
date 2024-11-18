@@ -59,13 +59,18 @@ const UserProfile = () => {
   };
 
   const handleSavePhoneNumber = () => {
+    if (updatedPhoneNumber.length !== 10 || !/^\d+$/.test(updatedPhoneNumber)) {
+      alert("Số điện thoại phải bao gồm 10 chữ số.");
+      return;
+    }
     setFormData({ ...formData, PhoneNumber: updatedPhoneNumber });
     setIsEditing({ ...isEditing, phoneNumber: false });
   };
+  
 
   return (
     <div className="flex mr-[150px] -mt-5 bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-5 w-full max-w-4xl">
+      <div className="bg-gray-50 shadow-md rounded-lg p-5 w-full max-w-4xl">
         <div className="ml-6">
           <h2 className="text-lg font-sans mb-1">Hồ Sơ Của Tôi</h2>
           <p className="text-gray-500 mb-2 text-sm">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>

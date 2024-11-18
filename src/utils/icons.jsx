@@ -33,6 +33,12 @@ import { IoIosAddCircle } from "react-icons/io";
 import { IoIosRemoveCircle } from "react-icons/io";
 import { IoArrowBack } from "react-icons/io5";
 import { MdOutlinePayments } from "react-icons/md";
+import { ImProfile } from "react-icons/im";
+import { IoExitOutline } from "react-icons/io5";
+import { RiFileHistoryLine } from "react-icons/ri";
+import { HiOutlineHome } from "react-icons/hi2";
+import { FaEyeSlash } from "react-icons/fa";
+import { IoEyeSharp } from "react-icons/io5";
 
 const icons={
     IoIosArrowDropright,
@@ -69,6 +75,12 @@ const icons={
     IoIosAddCircle,
     IoIosRemoveCircle,
     IoArrowBack,
-    MdOutlinePayments
+    MdOutlinePayments,
+    ImProfile,
+    IoExitOutline,
+    RiFileHistoryLine,
+    HiOutlineHome,
+    FaEyeSlash,
+    IoEyeSharp
 }
 export default icons

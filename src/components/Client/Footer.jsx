@@ -3,7 +3,7 @@ import footer2 from '../../assets/client/footer2.jpg'
 
 const Footer = () => {
     return (
-        <div className='w-full px-4'>
+        <div className='w-full px-4 '>
             <div className="bg-white py-8 mx-auto max-w-full lg:max-w-[1170px]">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 leading-[2] text-[14px]">
                     {/* Column 1 */}

@@ -1,8 +1,8 @@
 // Updated CustomerAuthContext.jsx
-import { signInWithEmailAndPassword } from "firebase/auth";
 import PropTypes from "prop-types";
 import { createContext, useState } from "react";
-import { signInWithGoogle } from "../config/firebaseService";
+import { signInWithEmailPassword, signInWithGoogle } from "../config/firebaseService";
+import axios from "axios";
 
 export const CustomerAuthContext = createContext();
 
@@ -10,46 +10,99 @@ export const CustomerAuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [customer, setCustomer] = useState(null);
 
+  const saveAccount = async ({
+    uid,
+    customerName,
+    gender,
+    email,
+    phoneNumber,
+    birthDate,
+    isActive ,
+}) => {
+    try {
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
+            uid,
+            customerName,
+            gender,
+            email,
+            phoneNumber,
+            birthDate,
+            isActive,
+        });
+        if (response.status === 200) {
+            console.log("save accounting success");
+            return true;
+        }
+    } catch (error) {
+        console.log("error save accounting", error.message);
+        return false;
+    }
+};
+
+const checkEmail = async ({ email }) => {
+  try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/check-email?email=${email}`);
+      console.log("res: ", response);
+
+      if (response.data.success) {
+          return true;
+      } else {
+          return false;
+      }
+  } catch (error) {
+      console.error("error check mail: ", error.message);
+      return false;
+  }
+  };
+
   const login = async (email, password) => {
     try {
-      const user = await signInWithEmailAndPassword(email, password);
-      const isVerified = user.user.emailVerified;
-      if (isVerified) {
-        const token = await user.user.getIdToken();
-        localStorage.setItem("username", user.user.displayName || "Người dùng");
-        localStorage.setItem("token", token);
-        setIsAuthenticated(true);
-        setCustomer({
-          uid: user.user.uid,
-          email: user.user.email,
-          displayName: user.user.displayName || "Người dùng",
-        });
-      } else {
-        throw new Error("Email chưa được xác thực.");
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error;
+        const user = await signInWithEmailPassword(email, password);
+        localStorage.setItem("token", await user.getIdToken());
+        localStorage.setItem("username", user.displayName);
+        alert('Đăng nhập thành công!');
+    } catch {
+      throw new Error('Đã xảy ra lỗi khi đăng nhập.');
     }
-  };
+}
 
   const loginWithGoogle = async () => {
     try {
-      const user = await signInWithGoogle();
-      const token = await user.getIdToken();
-      localStorage.setItem("username", user.displayName || "Người dùng");
-      localStorage.setItem("token", token);
-      setIsAuthenticated(true);
-      setCustomer({
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || "Người dùng",
-      });
+        const userCredential = await signInWithGoogle();
+        if (userCredential) {
+            const user = userCredential;
+            if (user) {
+                const checkCreatedEmail = await checkEmail({ email: user.email });
+                if (!checkCreatedEmail) {
+                    try {
+                        await saveAccount({
+                            uid: user.uid,
+                            customerName: user.displayName,
+                            gender: user.gender || 'Unknown',
+                            email: user.email,
+                            phoneNumber: user.phoneNumber || 'Unknown',
+                            birthDate: user.birthDate || null,
+                            isActive: true,
+                        });
+                        localStorage.setItem("token", await user.getIdToken());
+                        localStorage.setItem("username", user.displayName);
+                        alert('Đăng nhập thành công!');
+                    } catch (error) {
+                        console.error('Error saving account: ', error);
+                        alert('Đã xảy ra lỗi khi lưu tài khoản.');
+                    }
+                } else {
+                    localStorage.setItem("token", await user.getIdToken());
+                    localStorage.setItem("username", user.displayName);
+                    alert('Đăng nhập thành công!');
+                }
+            }
+        }
     } catch (error) {
-      console.error("Google login failed:", error);
-      throw error;
+        console.error('Error signing in with Google:', error);
+        alert('Đã xảy ra lỗi khi đăng nhập.');
     }
-  };
+}
 
   const logout = () => {
     setIsAuthenticated(false);

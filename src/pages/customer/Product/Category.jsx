@@ -6,6 +6,7 @@ const getImagePath = (imageName) => {
 };
 
 const Category = () => {
+  
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {

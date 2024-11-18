@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, Input, Button, Popconfirm, message, Spin, Modal, Form, Radio, Select } from "antd";
 import axios from "axios";
+import { getEmployeeName } from "../../../../../helper/Admin/getInfoAdmin";
 
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);
@@ -12,6 +13,7 @@ const ViewEmployee = () => {
   const [form] = Form.useForm();
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [value4, setValue4] = useState('Apple');
+  const nameAdmin = getEmployeeName();
 
   // Lọc danh sách nhân viên theo từ khóa tìm kiếm
   const filteredEmployees = employees.filter((employees) =>
@@ -72,7 +74,7 @@ const ViewEmployee = () => {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/delete-employee/${key}`);
       setEmployees(employees.filter((employee) => employee.key !== key));
       message.success("Xóa nhân viên thành công.");
-    } catch (error) {
+    } catch {
       message.error("Không thể xóa nhân viên. Vui lòng thử lại.");
     }
   };
@@ -102,7 +104,7 @@ const ViewEmployee = () => {
       );
       message.success("Cập nhật thông tin nhân viên thành công.");
       handleEditCancel();
-    } catch (error) {
+    } catch {
       message.error("Không thể cập nhật nhân viên. Vui lòng thử lại.");
     }
   };
@@ -122,9 +124,9 @@ const ViewEmployee = () => {
     { label: 'Nữ', value: 'Nữ' },
   ];
 
-  const handleChange = (value) => {
+  /*const handleChange = (value) => {
     console.log(`selected ${value}`);
-  };
+  };*/
 
   // Đóng modal thêm nhân viên
   const handleAddCancel = () => {
@@ -136,11 +138,11 @@ const ViewEmployee = () => {
   const handleAddSave = async () => {
     try {
       const newEmployee = form.getFieldsValue();
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/add-employee`, newEmployee);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/add-employee`, {newEmployee, nameAdmin});
       setEmployees([...employees, { ...newEmployee, key: employees.length + 1 }]);
       message.success("Thêm nhân viên thành công.");
       handleAddCancel();
-    } catch (error) {
+        } catch {
       message.error("Không thể thêm nhân viên. Vui lòng thử lại.");
     }
   };

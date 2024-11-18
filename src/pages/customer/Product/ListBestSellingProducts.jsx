@@ -14,23 +14,36 @@ const ListBestSellingProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(
+        const productResponse = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/products`
         );
-        setProducts(response.data);
-        setVisibleProducts(response.data.slice(0, 5));
+
+        const warrantyResponse = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/warranty-policies`
+        );
+
+        const combinedProducts = productResponse.data.map((product, index) => {
+          const warrantyImg =
+            warrantyResponse.data[index % warrantyResponse.data.length]
+              ?.ImgProfile || "";
+          return { ...product, warrantyImg };
+        });
+
+        setProducts(combinedProducts);
+        setVisibleProducts(combinedProducts.slice(0, 5));
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching products or warranty policies:", error);
       }
     };
 
     fetchProducts();
   }, []);
   const handleProductClick = () => {
-    navigate(path.PRODUCTSDETAILS); 
+    navigate(path.PRODUCTSDETAILS);
   };
 
   useEffect(() => {
@@ -80,8 +93,18 @@ const ListBestSellingProducts = () => {
           <div
             key={index}
             onClick={() => handleProductClick()}
-            className="w-full sm:w-1/2 lg:w-[19%] p-4 flex flex-col items-start border border-gray-300 rounded-md shadow-sm bg-white"
+            className="w-full sm:w-1/2 lg:w-[19%] p-4 flex flex-col items-start border border-gray-300 rounded-md shadow-sm bg-white transition-transform duration-300 hover:scale-105 hover:shadow-xl  relative"
           >
+            {product.warrantyImg && (
+              <div className="absolute top-[40%] left-2 z-10 group-hover:scale-110 transition-all duration-300">
+                <img
+                  src={getImagePath(product.warrantyImg)}
+                  alt="Warranty Policy"
+                  className="w-16 h-16 rounded-md "
+                />
+              </div>
+            )}
+
             <img
               src={
                 product.RepresentativeImage
@@ -91,13 +114,16 @@ const ListBestSellingProducts = () => {
               alt={product.ProductName}
               className="rounded-lg object-cover w-full h-auto"
             />
-            <h3 className="mt-2 text-[18px] font-bold text-left">
+
+            <h3 className="mt-6 text-[16px] font-bold text-left">
               {product.ProductName || "Unknown Product"}
             </h3>
-            <p className="text-lg font-bold text-[#e0052b] text-left mt-1">
+
+            <p className="text-[16px] font-bold text-red-500 text-left">
               {product.ListedPrice + " ₫"}
             </p>
-            <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md">
+
+            <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200">
               {product.Description || "No promotion available"}
             </p>
           </div>

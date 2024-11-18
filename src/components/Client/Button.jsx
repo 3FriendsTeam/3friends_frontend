@@ -1,5 +1,7 @@
-import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import icons from "../../utils/icons";
+import React from "react";
 
 const {
   BsFillPhoneFill,
@@ -11,54 +13,111 @@ const {
   RiVipCrown2Fill,
 } = icons;
 
-const Button = () => {
-  const buttons = [
-    { text: "Điện thoại", IcAfter: BsFillPhoneFill },
-    { text: "Laptop", IcAfter: BsFillLaptopFill },
-    { text: "Máy tính bảng", IcAfter: FaTablet },
-    { text: "Đồng hồ thông minh", IcAfter: IoWatchSharp },
-    { text: "Phụ kiện", IcAfter: BsFillPhoneFill },
-    { text: "Điện máy - Gia dụng", IcAfter: GiRiceCooker },
-    { text: "Tivi", IcAfter: HiMiniTv },
-    { text: "Mua kèm gói cước", IcAfter: RiVipCrown2Fill },
-  ];
+const availableIcons = {
+  BsFillPhoneFill,
+  BsFillLaptopFill,
+  FaTablet,
+  IoWatchSharp,
+  GiRiceCooker,
+  HiMiniTv,
+  RiVipCrown2Fill,
+};
+
+const Category = () => {
+  const [categories, setCategories] = useState([]);
+  const [productTypes, setProductTypes] = useState([]); // Lưu product types
+  const [hoveredCategory, setHoveredCategory] = useState(null); // Theo dõi danh mục đang hover
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/categories`
+        );
+        const updatedCategories = response.data.map((category, index) => ({
+          ...category,
+          icon: Object.keys(availableIcons)[
+            index % Object.keys(availableIcons).length
+          ],
+        }));
+        setCategories(updatedCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const fetchProductTypes = async (categoryId) => {
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/get-all-manufacturer-Of-Product-By-Category?id=${categoryId}`
+      );
+      setProductTypes(response.data);
+    } catch (error) {
+      console.error("Error fetching product types:", error);
+      setProductTypes([]);
+    }
+  };
+
+  const handleMouseEnter = (category) => {
+    setHoveredCategory(category);
+    fetchProductTypes(category.id);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredCategory(null);
+    setProductTypes([]);
+  };
 
   return (
-    <div className="flex flex-wrap items-center justify-center w-full gap-2 mt-2  lg:gap-4">
-      {buttons.map(({ text, textColor, bgColor, IcAfter }, index) => (
-        <div className="relative group" key={index}>
-          <button
-            type="button"
-            className={`p-2 ${textColor} ${bgColor} outline-none rounded-md hover:opacity-50 flex items-center justify-center gap-1 h-[40px]`}
-          >
-            <span>{IcAfter && <IcAfter />}</span>
-            <span className="text-sm md:text-base">{text}</span>
-          </button>
-          <div className="fixed left-0 right-0 top-[60px] w-screen h-[200px] mt-[110px] bg-[#FFFFFF] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 border-t border-gray-300">
-            <div className="p-4 max-w-[1536px] mx-auto">
-              <h3 className="text-black font-bold text-lg">
-                Nội dung hiển thị
-              </h3>
-              <p className="text-black">
-                Đây là nội dung của thẻ xuất hiện khi hover vào button.
-              </p>
+    <div className="w-full bg-white relative group">
+      <div className="w-full max-w-[1170px] mx-auto bg-white rounded-lg">
+        <div className="flex justify-between gap-4">
+          {categories.map((category, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 rounded-lg"
+              style={{ width: "150px", height: "50px" }}
+              onMouseEnter={() => handleMouseEnter(category)}
+              onMouseLeave={handleMouseLeave}
+            >
+              {category.icon && (
+                <span className="text-[16px]">
+                  {React.createElement(availableIcons[category.icon])}
+                </span>
+              )}
+
+              <span className="text-[13px] font-medium truncate overflow-hidden">
+                {category.CategoryName}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {hoveredCategory && (
+        <div className="absolute top-full left-0 w-screen h-[250px] bg-white opacity-100 transition-opacity duration-300 z-50 border-y border-gray-300">
+          <div className="p-4 max-w-[1170px] mx-auto">
+            <h3 className="font-bold text-lg mb-4">Chọn theo hãng</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {productTypes.map((type) => (
+                <div
+                  key={type.id}
+                  className=" rounded-md shadow-sm  hover:bg-gray-300 transition"
+                >
+                  <span className="text-sm font-medium text-gray-500">{type.ManufacturerName}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };
 
-Button.propTypes = {
-  buttons: PropTypes.arrayOf(
-    PropTypes.shape({
-      text: PropTypes.string.isRequired,
-      textColor: PropTypes.string,
-      bgColor: PropTypes.string,
-      IcAfter: PropTypes.elementType,
-    })
-  ),
-};
-
-export default Button;
+export default Category;

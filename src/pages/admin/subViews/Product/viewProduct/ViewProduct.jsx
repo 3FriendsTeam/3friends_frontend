@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, Popconfirm, message, Spin, Modal, Form, Radio, Select } from "antd";
+import { Table, Input, Button, Popconfirm, message, Spin, Modal, Form, Select, Upload } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 const ViewProduct = () => {
@@ -97,7 +98,7 @@ const ViewProduct = () => {
             await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/delete-employee/${key}`);
             setProducts(products.filter((product) => product.key !== key));
             message.success("Xóa nhân viên thành công.");
-        } catch (error) {
+        } catch {
             message.error("Không thể xóa nhân viên. Vui lòng thử lại.");
         }
     };
@@ -127,7 +128,7 @@ const ViewProduct = () => {
             );
             message.success("Cập nhật thông tin nhân viên thành công.");
             handleEditCancel();
-        } catch (error) {
+        } catch {
             message.error("Không thể cập nhật nhân viên. Vui lòng thử lại.");
         }
     };
@@ -229,7 +230,7 @@ const ViewProduct = () => {
                 />
             )}
 
-            {/* Modal thêm nhân viên */}
+            {/* Modal sửa thông tin sản phẩm */}
             <Modal
                 title="Sửa thông tin sản phẩm"
                 centered
@@ -239,58 +240,158 @@ const ViewProduct = () => {
                 width={700}
             >
                 <Form form={form} layout="vertical">
+                    {/* Tên sản phẩm */}
                     <Form.Item
-                        name="FullName"
-                        label="Tên nhân viên"
-                        rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+                        name="ProductName"
+                        label="Tên sản phẩm"
+                        rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
                     >
-                        <Input placeholder="" />
-                    </Form.Item>
-                    <Form.Item
-                        name="DateOfBirth"
-                        label="Ngày sinh"
-                        rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
-                    >
-                        <Input placeholder="dd/mm/yyyy" />
+                        <Input placeholder="Nhập tên sản phẩm" />
                     </Form.Item>
 
+                    {/* Giá niêm yết */}
                     <Form.Item
-                        name="Address"
-                        label="Địa chỉ"
-                        rules={[{ type: "address", message: "Vui lòng nhập địa chỉ hợp lệ!" }]}
+                        name="ListedPrice"
+                        label="Giá niêm yết (VND)"
+                        rules={[
+                            { required: true, message: "Vui lòng nhập giá niêm yết!" },
+                            { type: "number", message: "Giá phải là số hợp lệ!" },
+                        ]}
                     >
-                        <Input />
+                        <Input type="number" placeholder="Nhập giá niêm yết" />
                     </Form.Item>
+
+                    {/* Giá khuyến mãi */}
                     <Form.Item
-                        name="Email"
-                        label="Email"
-                        rules={[{ type: "email", message: "Vui lòng nhập email hợp lệ!" }]}
+                        name="PromotionalPrice"
+                        label="Giá khuyến mãi (VND)"
+                        rules={[
+                            { type: "number", message: "Giá phải là số hợp lệ!" },
+                        ]}
                     >
-                        <Input />
+                        <Input type="number" placeholder="Nhập giá khuyến mãi (nếu có)" />
                     </Form.Item>
-                    <Form.Item name="PhoneNumber" label="Số điện thoại">
-                        <Input />
-                    </Form.Item>
+
+                    {/* Số lượng */}
                     <Form.Item
-                        name="PositionID"
-                        label="Chức vụ"
-                        rules={[{ required: true, message: "Vui lòng chọn chức vụ!" }]}
+                        name="Stock"
+                        label="Số lượng tồn kho"
+                        rules={[
+                            { required: true, message: "Vui lòng nhập số lượng!" },
+                            { type: "number", message: "Số lượng phải là số hợp lệ!" },
+                        ]}
+                    >
+                        <Input type="number" placeholder="Nhập số lượng sản phẩm" />
+                    </Form.Item>
+
+                    {/* Trạng thái */}
+                    <Form.Item
+                        name="Status"
+                        label="Trạng thái"
+                        rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}
+                    >
+                        <Select placeholder="Chọn trạng thái">
+                            <Select.Option value="hoạt động">Hoạt động</Select.Option>
+                            <Select.Option value="ngừng hoạt động">Ngừng hoạt động</Select.Option>
+                        </Select>
+                    </Form.Item>
+
+                    {/* Ảnh đại diện */}
+                    <Form.Item
+                        name="RepresentativeImage"
+                        label="Ảnh đại diện"
+                        rules={[{ required: true, message: "Vui lòng tải lên ảnh đại diện!" }]}
+                    >
+                        <Upload
+                            name="image"
+                            listType="picture-card"
+                            showUploadList={false} // Không hiển thị danh sách file đã tải lên
+                            action={`${import.meta.env.VITE_BACKEND_URL}/api/upload-image`}
+                            maxCount={1} // Chỉ cho phép tải lên 1 ảnh
+                            onChange={(info) => {
+                                if (info.file.status === "done") {
+                                    // Lấy URL ảnh từ phản hồi của server và gán vào form
+                                    form.setFieldsValue({
+                                        RepresentativeImage: info.file.response.url,
+                                    });
+                                    message.success("Tải ảnh lên thành công!");
+                                } else if (info.file.status === "error") {
+                                    message.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
+                                }
+                            }}
+                        >
+                            <div>
+                                <PlusOutlined />
+                                <div style={{ marginTop: 8 }}>Tải lên</div>
+                            </div>
+                        </Upload>
+                    </Form.Item>
+
+
+
+                    {/* Mô tả */}
+                    <Form.Item
+                        name="Description"
+                        label="Mô tả sản phẩm"
+                        rules={[{ required: true, message: "Vui lòng nhập mô tả sản phẩm!" }]}
+                    >
+                        <Input.TextArea rows={4} placeholder="Nhập mô tả chi tiết" />
+                    </Form.Item>
+
+                    {/* Loại sản phẩm */}
+                    <Form.Item
+                        name="CategoryID"
+                        label="Loại sản phẩm"
+                        rules={[{ required: true, message: "Vui lòng chọn loại sản phẩm!" }]}
                     >
                         <Select
                             loading={loading}
-
-                            placeholder="Chọn chức vụ"
-                        />
+                            placeholder="Chọn loại sản phẩm"
+                        >
+                            {categories.map((category) => (
+                                <Select.Option key={category.id} value={category.id}>
+                                    {category.CategoryName}
+                                </Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
+                    {/* Nhà sản xuất */}
                     <Form.Item
-                        name="Username"
-                        label="Tên tài khoản"
-                        rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+                        name="ManufacturerID"
+                        label="Nhà sản xuất"
+                        rules={[{ required: true, message: "Vui lòng chọn nhà sản xuất!" }]}
                     >
-                        <Input />
+                        <Select
+                            loading={loading}
+                            placeholder="Chọn nhà sản xuất"
+                        >
+                            {manufacturers.map((manufacturer) => (
+                                <Select.Option key={manufacturer.id} value={manufacturer.id}>
+                                    {manufacturer.ManufacturerName}
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+
+                    {/* Quốc gia sản xuất */}
+                    <Form.Item
+                        name="CountryID"
+                        label="Quốc gia sản xuất"
+                    >
+                        <Input placeholder="Nhập quốc gia sản xuất (nếu có)" />
+                    </Form.Item>
+
+                    {/* Chính sách bảo hành */}
+                    <Form.Item
+                        name="WarrantyPolicyID"
+                        label="Chính sách bảo hành"
+                    >
+                        <Input placeholder="Nhập mã chính sách bảo hành (nếu có)" />
                     </Form.Item>
                 </Form>
             </Modal>
+
         </div>
     );
 };

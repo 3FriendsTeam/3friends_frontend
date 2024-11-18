@@ -31,9 +31,8 @@ const ListProducts = () => {
     fetchProducts();
   }, []);
   const handleProductClick = () => {
-    navigate(path.PRODUCTSDETAILS); 
+    navigate(path.PRODUCTSDETAILS);
   };
-
 
   return (
     <div className="flex flex-wrap flex-row w-full ">
@@ -44,34 +43,34 @@ const ListProducts = () => {
         <NavigationBar current="Sản phẩm" />
         <Animation />
         <ProductClassification />
-          <div className="ml-[183px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-3 gap-x-1 gap-y-6 ">
-            {products.map((product, index) => (
-              <div
-                key={index}
-                onClick={handleProductClick}
-                className="w-full sm:w-1/2 lg:w-[19%] p-4 ml-[7px] flex flex-col items-center border border-gray-300"
-              >
-                <img
-                  src={
-                    product.RepresentativeImage
-                      ? getImagePath(product.RepresentativeImage)
-                      : ""
-                  }
-                  alt={product.ProductName}
-                  className="rounded-lg object-cover w-full h-auto"
-                />
-            <h3 className="mt-2 text-[18px] font-bold text-left">
-              {product.ProductName || "Unknown Product"}
-            </h3>
-            <p className="text-lg font-bold text-[#e0052b] text-left mt-1">
-              {product.ListedPrice + " ₫"}
-            </p>
-            <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md">
-              {product.Description || "No promotion available"}
-            </p>
-              </div>
-            ))}
-          </div>
+        <div className="ml-[183px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-3 gap-x-1 gap-y-6">
+          {products.map((product, index) => (
+            <div
+              key={index}
+              onClick={handleProductClick}
+              className="w-full sm:w-1/2 lg:w-[19%] p-4 ml-[7px] flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              <img
+                src={
+                  product.RepresentativeImage
+                    ? getImagePath(product.RepresentativeImage)
+                    : ""
+                }
+                alt={product.ProductName}
+                className="rounded-lg object-cover w-full h-auto"
+              />
+              <h3 className="mt-2 text-[16px] font-bold text-left">
+                {product.ProductName || "Unknown Product"}
+              </h3>
+              <p className="text-[16px] font-bold text-[#e0052b] text-left mt-1">
+                {product.ListedPrice + " ₫"}
+              </p>
+              <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md hover:bg-gray-200">
+                {product.Description || "No promotion available"}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
       <Footer />
     </div>

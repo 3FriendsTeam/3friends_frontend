@@ -20,7 +20,7 @@ function Toolbar() {
       const updatedHistory = [
         searchTerm,
         ...searchHistory.filter((term) => term !== searchTerm),
-      ].slice(0, 10); // Giới hạn 10 lịch sử
+      ].slice(0, 10);
       setSearchHistory(updatedHistory);
       localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
       navigate(`${path.CATALOGSEARCH}?query=${searchTerm}`);

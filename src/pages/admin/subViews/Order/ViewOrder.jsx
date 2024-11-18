@@ -1,83 +1,39 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, Popconfirm, message, Spin } from "antd";
+import { Table, Input, Button, message, Spin } from "antd";
 import axios from "axios";
 
 const ViewOrder = () => {
-  const [customers, setCustomers] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Lọc danh sách khách hàng theo từ khóa tìm kiếm
-  const filteredCustomers = customers.filter((customer) =>
-    customer.CustomerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  // Lọc danh sách đơn hàng theo từ khóa tìm kiếm
+  const filteredOrders = orders.filter((order) =>
+    order.OrderID?.toString().includes(searchTerm)
   );
 
-  // Fetch danh sách khách hàng
+  // Fetch danh sách đơn hàng
   useEffect(() => {
-    const fetchCustomerData = async () => {
+    const fetchOrderData = async () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-all-customer`
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-all-orders`
         );
-        setCustomers(
-          response.data.map((customer, index) => ({ key: index, ...customer }))
+        setOrders(
+          response.data.map((order, index) => ({ key: index, ...order }))
         );
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
         message.error(
-          "Không thể tải danh sách khách hàng. Vui lòng thử lại sau."
+          "Không thể tải danh sách đơn hàng. Vui lòng thử lại sau."
         );
       } finally {
         setLoading(false);
       }
     };
-    fetchCustomerData();
+    fetchOrderData();
   }, []);
-
-  const reloadCustomerList = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/get-all-customer`
-      );
-      setCustomers(
-        response.data.map((customer, index) => ({ key: index, ...customer }))
-      );
-    } catch {
-      message.error("vui lòng thử lại sau");
-    } finally{
-        setLoading(false);
-    }
-  };
-  // Khoá khách hàng
-  const handleLock = async (key) => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/lock-customer`,
-        { key }
-      );
-      reloadCustomerList();
-      console.log(response.data);
-      message.success(response.data.message);
-    } catch (error) {
-      console.error("Lỗi khi khóa tài khoản", error);
-      message.error("Không thể khóa tài khoản! Vui lòng thử lại.");
-    } finally{
-        setLoading(false);
-    }
-  };
-  const handleUnlock = async (key) => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-customer`,{ key });
-      reloadCustomerList();
-      message.success(response.data.message);
-    } catch (error) {
-      console.error("Lỗi khi mở khóa tài khoản", error);
-      message.error("Không thể mở khóa tài khoản! Vui lòng thử lại.");
-    }
-  };
 
   const columns = [
     {
@@ -86,69 +42,81 @@ const ViewOrder = () => {
       key: "index",
       render: (text, record, index) => index + 1,
     },
-
     {
-      title: "Tên khách hàng",
-      dataIndex: "CustomerName",
-      key: "CustomerName",
-      render: (CustomerName) => CustomerName || "Chưa cập nhật",
+      title: "Mã đơn hàng",
+      dataIndex: "OrderID",
+      key: "OrderID",
     },
     {
-      title: "Giới tính",
-      dataIndex: "Gender",
-      key: "Gender",
-      render: (Gender) => Gender || "Chưa cập nhật",
+      title: "Ngày đặt hàng",
+      dataIndex: "OrderDate",
+      key: "OrderDate",
+      render: (OrderDate) =>
+        OrderDate ? new Date(OrderDate).toLocaleDateString() : "Chưa cập nhật",
     },
     {
-      title: "Email",
-      dataIndex: "Email",
-      key: "Email",
-      render: (Email) => Email || "Chưa cập nhật",
+      title: "Trạng thái đơn hàng",
+      dataIndex: "OrderStatus",
+      key: "OrderStatus",
+      render: (OrderStatus) => OrderStatus || "Chưa cập nhật",
     },
     {
-      title: "Số điện thoại",
-      dataIndex: "PhoneNumber",
-      key: "PhoneNumber",
-      render: (phoneNumber) => phoneNumber || "Chưa cập nhật",
+      title: "Tổng tiền",
+      dataIndex: "TotalAmount",
+      key: "TotalAmount",
+      render: (TotalAmount) =>
+        TotalAmount ? `${TotalAmount} VND` : "Chưa cập nhật",
+    },
+    {
+      title: "Phương thức thanh toán",
+      dataIndex: "PaymentMethodID",
+      key: "PaymentMethodID",
+      render: (PaymentMethodID) => PaymentMethodID || "Chưa cập nhật",
+    },
+    {
+      title: "Mã khách hàng",
+      dataIndex: "CustomerID",
+      key: "CustomerID",
+      render: (CustomerID) => CustomerID || "Chưa cập nhật",
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "PaymentStatus",
+      key: "PaymentStatus",
+      render: (PaymentStatus) =>
+        PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán",
+    },
+    {
+      title: "Ngày thanh toán",
+      dataIndex: "PaymentDate",
+      key: "PaymentDate",
+      render: (PaymentDate) =>
+        PaymentDate ? new Date(PaymentDate).toLocaleDateString() : "Chưa cập nhật",
     },
     {
       title: "Thao tác",
       key: "action",
       render: (text, record) => (
-        <>
-          {record.IsActive ? (
-            <Popconfirm
-              title="Bạn có chắc chắn muốn khóa tài khoản này không?"
-              onConfirm={() => handleLock(record.id)}
-              okText="Có"
-              cancelText="Không"
-            >
-              <Button type="link" className="text-red-600 font-bold mx-1">
-                Khóa tài khoản
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              title="Bạn có chắc chắn muốn mở khóa tài khoản này không?"
-              onConfirm={() => handleUnlock(record.id)}
-              okText="Có"
-              cancelText="Không"
-            >
-              <Button type="link" className="text-red-600 font-bold mx-1">
-                Mở khóa tài khoản
-              </Button>
-            </Popconfirm>
-          )}
-        </>
+        <Button
+          type="link"
+          onClick={() => viewOrderDetails(record.OrderID)}
+        >
+          Xem chi tiết
+        </Button>
       ),
     },
   ];
 
+  const viewOrderDetails = (orderId) => {
+    // Implement the logic to view order details
+    console.log("Xem chi tiết đơn hàng:", orderId);
+  };
+
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-5">Danh sách khách hàng</h1>
+      <h1 className="text-3xl font-bold mb-5">Danh sách đơn hàng</h1>
       <Input
-        placeholder="Tìm kiếm khách hàng..."
+        placeholder="Tìm kiếm đơn hàng..."
         className="mb-4"
         style={{ width: "300px", height: "40px" }}
         value={searchTerm}
@@ -161,14 +129,14 @@ const ViewOrder = () => {
       ) : (
         <Table
           columns={columns}
-          dataSource={filteredCustomers}
+          dataSource={filteredOrders}
           pagination={{
             pageSize: 5,
             showSizeChanger: false,
           }}
         />
       )}
-      <div className="text-sm mt-2">{filteredCustomers.length} khách hàng</div>
+      <div className="text-sm mt-2">{filteredOrders.length} đơn hàng</div>
     </div>
   );
 };

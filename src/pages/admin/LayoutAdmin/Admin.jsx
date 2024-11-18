@@ -8,15 +8,14 @@ import EmployeeSidebar from '../../../components/admin/LayoutAdmin/Sidebar';
 import { Layout } from 'antd';
 import DefaultPageAdmin from './DefaultPageAdmin';
 import ViewOrder from '../subViews/Order/ViewOrder';
+import getEmployeeName from '../../../helper/Admin/getInfoAdmin';
 
 const { Header, Content } = Layout;
 
 const Admin = () => {
     const [activeContent, setActiveContent] = useState('');
-    const employee = JSON.parse(localStorage.getItem('employee'));
     const PositionName = localStorage.getItem('Position');
-    const NameUser = employee?.data?.FullName ? employee.data.FullName : "admin";
-
+    const NameUser = getEmployeeName();
     const handleSectionClick = (sectionName) => {
         setActiveContent(sectionName); 
     };

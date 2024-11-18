@@ -116,21 +116,6 @@ const ViewCustomer = () => {
       key: "action",
       render: (text, record) => (
         <>
-<<<<<<< HEAD
-<<<<<<< HEAD
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa mục này không?"
-            onConfirm={() => handleLock(record.key)}
-            okText="Có"
-            cancelText="Không"
-          >
-            <Button type="link" className="text-red-600 font-bold mx-1">
-              Khóa tài khoản
-            </Button>
-          </Popconfirm>
-=======
-=======
->>>>>>> ee572d9e8f41402cccb0dfefe0336a7ba8ae2eaa
           {record.IsActive ? (
             <Popconfirm
               title="Bạn có chắc chắn muốn khóa tài khoản này không?"
@@ -154,10 +139,6 @@ const ViewCustomer = () => {
               </Button>
             </Popconfirm>
           )}
-<<<<<<< HEAD
->>>>>>> 4099f53978a71c6c5960b85faabc5fb56f77b212
-=======
->>>>>>> ee572d9e8f41402cccb0dfefe0336a7ba8ae2eaa
         </>
       ),
     },

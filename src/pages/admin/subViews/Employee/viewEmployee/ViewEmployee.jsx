@@ -1,7 +1,18 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, Popconfirm, message, Spin, Modal, Form, Radio, Select } from "antd";
+import {
+  Table,
+  Input,
+  Button,
+  Popconfirm,
+  message,
+  Spin,
+  Modal,
+  Form,
+  Radio,
+  Select,
+} from "antd";
 import axios from "axios";
-import { getEmployeeName } from "../../../../../helper/Admin/getInfoAdmin";
+import getEmployeeName from "../../../../../helper/Admin/getInfoAdmin";
 
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);
@@ -12,7 +23,7 @@ const ViewEmployee = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // Modal thêm nhân viên
   const [form] = Form.useForm();
   const [editingCustomer, setEditingCustomer] = useState(null);
-  const [value4, setValue4] = useState('Apple');
+  const [value4, setValue4] = useState("Apple");
   const nameAdmin = getEmployeeName();
 
   // Lọc danh sách nhân viên theo từ khóa tìm kiếm
@@ -33,7 +44,9 @@ const ViewEmployee = () => {
         );
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
-        message.error("Không thể tải danh sách nhân viên. Vui lòng thử lại sau.");
+        message.error(
+          "Không thể tải danh sách nhân viên. Vui lòng thử lại sau."
+        );
       } finally {
         setLoading(false);
       }
@@ -46,7 +59,7 @@ const ViewEmployee = () => {
           `${import.meta.env.VITE_BACKEND_URL}/api/positions`
         );
         // Chuyển đổi dữ liệu thành định dạng cần cho Select
-        const positionOptions = response.data.map(position => ({
+        const positionOptions = response.data.map((position) => ({
           value: position.id,
           label: position.PositionName,
         }));
@@ -64,14 +77,16 @@ const ViewEmployee = () => {
 
   // Hàm tìm tên chức vụ dựa trên PositionID
   const getPositionName = (PositionID) => {
-    const position = positions.find(p => p.id === parseInt(PositionID));
-    return position ? position.PositionName : 'Chưa xác định';
+    const position = positions.find((p) => p.id === parseInt(PositionID));
+    return position ? position.PositionName : "Chưa xác định";
   };
 
   // Hàm xử lý xóa nhân viên
   const handleDelete = async (key) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/delete-employee/${key}`);
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-employee/${key}`
+      );
       setEmployees(employees.filter((employee) => employee.key !== key));
       message.success("Xóa nhân viên thành công.");
     } catch {
@@ -80,11 +95,11 @@ const ViewEmployee = () => {
   };
 
   // Mở modal chỉnh sửa
-  const showEditModal = (employee) => {
-    setEditingCustomer(employee);
-    setIsEditModalVisible(true);
-    form.setFieldsValue(employee);
-  };
+  // const showEditModal = (employee) => {
+  //   setEditingCustomer(employee);
+  //   setIsEditModalVisible(true);
+  //   form.setFieldsValue(employee);
+  // };
 
   // Đóng modal chỉnh sửa
   const handleEditCancel = () => {
@@ -99,7 +114,9 @@ const ViewEmployee = () => {
       const updatedEmployee = form.getFieldsValue();
       setEmployees((prev) =>
         prev.map((employee) =>
-          employee.key === editingCustomer.key ? { ...employee, ...updatedEmployee } : employee
+          employee.key === editingCustomer.key
+            ? { ...employee, ...updatedEmployee }
+            : employee
         )
       );
       message.success("Cập nhật thông tin nhân viên thành công.");
@@ -115,13 +132,13 @@ const ViewEmployee = () => {
   };
 
   const onChange4 = ({ target: { value } }) => {
-    console.log('radio4 checked', value);
+    console.log("radio4 checked", value);
     setValue4(value);
   };
 
   const gender = [
-    { label: 'Nam', value: 'Nam' },
-    { label: 'Nữ', value: 'Nữ' },
+    { label: "Nam", value: "Nam" },
+    { label: "Nữ", value: "Nữ" },
   ];
 
   /*const handleChange = (value) => {
@@ -138,11 +155,17 @@ const ViewEmployee = () => {
   const handleAddSave = async () => {
     try {
       const newEmployee = form.getFieldsValue();
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/add-employee`, {newEmployee, nameAdmin});
-      setEmployees([...employees, { ...newEmployee, key: employees.length + 1 }]);
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-employee`,
+        { newEmployee, nameAdmin }
+      );
+      setEmployees([
+        ...employees,
+        { ...newEmployee, key: employees.length + 1 },
+      ]);
       message.success("Thêm nhân viên thành công.");
       handleAddCancel();
-        } catch {
+    } catch {
       message.error("Không thể thêm nhân viên. Vui lòng thử lại.");
     }
   };
@@ -196,7 +219,10 @@ const ViewEmployee = () => {
             okText="Có"
             cancelText="Không"
           >
-            <Button type="link" className="text-orange-600 font-bold mx-1 bg-orange-100">
+            <Button
+              type="link"
+              className="text-orange-600 font-bold mx-1 bg-orange-100"
+            >
               Khóa
             </Button>
           </Popconfirm>
@@ -225,11 +251,7 @@ const ViewEmployee = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <Button
-        type="primary"
-        onClick={showAddModal}
-        className="ml-10"
-      >
+      <Button type="primary" onClick={showAddModal} className="ml-10">
         Thêm nhân viên
       </Button>
       {loading ? (
@@ -260,21 +282,27 @@ const ViewEmployee = () => {
           <Form.Item
             name="FullName"
             label="Tên nhân viên"
-            rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+            ]}
           >
             <Input placeholder="" />
           </Form.Item>
           <Form.Item
             name="DateOfBirth"
             label="Ngày sinh"
-            rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+            ]}
           >
             <Input placeholder="dd/mm/yyyy" />
           </Form.Item>
           <Form.Item
             name="Gender"
             label="Giới tính"
-            rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+            ]}
           >
             <Radio.Group
               options={gender}
@@ -287,7 +315,9 @@ const ViewEmployee = () => {
           <Form.Item
             name="Address"
             label="Địa chỉ"
-            rules={[{ type: "address", message: "Vui lòng nhập địa chỉ hợp lệ!" }]}
+            rules={[
+              { type: "address", message: "Vui lòng nhập địa chỉ hợp lệ!" },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -315,9 +345,20 @@ const ViewEmployee = () => {
           <Form.Item
             name="Username"
             label="Tên tài khoản"
-            rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+            ]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="Password"
+            label="Mật khẩu"
+            rules={[
+              { required: true, message: "Mật khẩu không được để trống!" },
+            ]}
+          >
+            <Input.Password />
           </Form.Item>
         </Form>
       </Modal>
@@ -333,7 +374,9 @@ const ViewEmployee = () => {
           <Form.Item
             name="FullName"
             label="Tên nhân viên"
-            rules={[{ required: true, message: "Vui lòng nhập tên nhân viên!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+            ]}
           >
             <Input />
           </Form.Item>

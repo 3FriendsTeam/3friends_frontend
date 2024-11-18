@@ -1,6 +1,6 @@
 import { Layout } from 'antd';
 const { Content } = Layout;
-import logo3friend from '../../../assets/admin/logo3friend.png';
+import logo3friend from '../../../assets/admin/3Friends.png';
 
 const DefaultPageAdmin = () => (
     <Content style={{ padding: '20px 50px', backgroundColor: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>

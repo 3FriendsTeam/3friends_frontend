@@ -6,7 +6,7 @@ import { Menu, Layout } from 'antd';
 import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaHeadset } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn, MdAccountCircle } from 'react-icons/md';
 import { FiLogOut } from 'react-icons/fi';
-import logo3friend from '../../../assets/admin/logo3friend.png';
+import logo3friend from '../../../assets/admin/3friends.png';
 const { Sider } = Layout;
 
 const EmployeeSidebar = ({ onSectionClick }) => {
@@ -42,7 +42,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       section: 'orderManagement',
       subItems: [
         { label: 'Đơn hàng mới', section: 'confirmCancel' }, // xác nhận đơn chuyển qua bộ phận kho để đóng gói, hủy đơn
-        { label: 'Danh sách đơn hàng', section: 'orderList' }, // hiển thị danh sách đơn hàng
+        { label: 'Danh sách đơn hàng', section: 'Danh sách đơn hàng' }, // hiển thị danh sách đơn hàng
         { label: 'Khiếu nại đơn hàng', section: 'returnsRefunds' },// danh sách các đơn hàng khiếu nại
       ],
     },
@@ -159,7 +159,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
   return (
     <Sider width={250} style={siderStyle}>
         <div className="flex items-center justify-center h-16 rounded-sm">
-          <img src={logo3friend} alt="Logo" className="h-10 w-auto object-contain" />
+          <img src={logo3friend} alt="Logo" className="h-50 w-auto object-contain" />
         </div>
       <Menu
         theme="dark"

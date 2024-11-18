@@ -20,7 +20,7 @@ const AdminLogin = () => {
       if (result.success == true) {
         setTimeout(() => {
           navigate("/admin");
-        }, 1000);
+        }, 2000);
       } else {
         setError(result.message);
       }

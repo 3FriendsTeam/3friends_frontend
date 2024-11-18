@@ -7,6 +7,7 @@ import ViewPermission from '../subViews/Employee/permission/ViewPermission';
 import EmployeeSidebar from '../../../components/admin/LayoutAdmin/Sidebar';
 import { Layout } from 'antd';
 import DefaultPageAdmin from './DefaultPageAdmin';
+import ViewOrder from '../subViews/Order/ViewOrder';
 
 const { Header, Content } = Layout;
 
@@ -67,6 +68,8 @@ const Admin = () => {
                         <ViewEmployee />
                     ) : activeContent === 'Phân quyền' ? (
                         <ViewPermission />
+                    ) :activeContent === 'Danh sách đơn hàng' ? (
+                        <ViewOrder />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

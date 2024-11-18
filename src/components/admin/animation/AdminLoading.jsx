@@ -6,9 +6,10 @@ const AdminLoading = ({ status }) => {
 
   useEffect(() => {
     if (status) {
+      
       setLoadingStatus(true);
     } else {
-      setLoadingStatus(false);
+      setTimeout(() => {setLoadingStatus(false)}, 2000);
     }
   }, [status]);
 

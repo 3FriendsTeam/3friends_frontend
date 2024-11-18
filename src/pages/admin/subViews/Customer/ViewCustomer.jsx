@@ -46,8 +46,8 @@ const ViewCustomer = () => {
       );
     } catch {
       message.error("vui lòng thử lại sau");
-    } finally{
-        setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
   // Khoá khách hàng
@@ -63,14 +63,14 @@ const ViewCustomer = () => {
     } catch (error) {
       console.error("Lỗi khi khóa tài khoản", error);
       message.error("Không thể khóa tài khoản! Vui lòng thử lại.");
-    } finally{
-        setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
   const handleUnlock = async (key) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-customer`,{ key });
+        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-customer`, { key });
       reloadCustomerList();
       message.success(response.data.message);
     } catch (error) {
@@ -116,8 +116,6 @@ const ViewCustomer = () => {
       key: "action",
       render: (text, record) => (
         <>
-<<<<<<< HEAD
-<<<<<<< HEAD
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa mục này không?"
             onConfirm={() => handleLock(record.key)}
@@ -128,9 +126,6 @@ const ViewCustomer = () => {
               Khóa tài khoản
             </Button>
           </Popconfirm>
-=======
-=======
->>>>>>> ee572d9e8f41402cccb0dfefe0336a7ba8ae2eaa
           {record.IsActive ? (
             <Popconfirm
               title="Bạn có chắc chắn muốn khóa tài khoản này không?"
@@ -154,10 +149,6 @@ const ViewCustomer = () => {
               </Button>
             </Popconfirm>
           )}
-<<<<<<< HEAD
->>>>>>> 4099f53978a71c6c5960b85faabc5fb56f77b212
-=======
->>>>>>> ee572d9e8f41402cccb0dfefe0336a7ba8ae2eaa
         </>
       ),
     },

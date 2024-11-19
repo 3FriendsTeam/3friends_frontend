@@ -46,8 +46,8 @@ const ViewCustomer = () => {
       );
     } catch {
       message.error("vui lòng thử lại sau");
-    } finally{
-        setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
   // Khoá khách hàng
@@ -63,14 +63,14 @@ const ViewCustomer = () => {
     } catch (error) {
       console.error("Lỗi khi khóa tài khoản", error);
       message.error("Không thể khóa tài khoản! Vui lòng thử lại.");
-    } finally{
-        setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
   const handleUnlock = async (key) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-customer`,{ key });
+        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-customer`, { key });
       reloadCustomerList();
       message.success(response.data.message);
     } catch (error) {

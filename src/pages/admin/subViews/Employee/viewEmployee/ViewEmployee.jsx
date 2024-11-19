@@ -69,17 +69,17 @@ const ViewEmployee = () => {
   }, []);
 
   const reloadEmployee = async () => {
-  setLoading(true)
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/employees`)
-    setEmployees(response.data.map((employees, index) => ({ key: index, ...employees })))
-  } catch (error) {
-    console.error("Lỗi khi tải dữ liệu:", error)
-    message.error("Không thể tải danh sách nhân viên. Vui lòng thử lại sau.")
-  } finally {
-    setLoading(false)
+    setLoading(true)
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/employees`)
+      setEmployees(response.data.map((employees, index) => ({ key: index, ...employees })))
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error)
+      message.error("Không thể tải danh sách nhân viên. Vui lòng thử lại sau.")
+    } finally {
+      setLoading(false)
+    }
   }
-}
   // Hàm tìm tên chức vụ dựa trên PositionID
   const getPositionName = (PositionID) => {
     const position = positions.find((p) => p.id === parseInt(PositionID));
@@ -90,7 +90,7 @@ const ViewEmployee = () => {
   const handleDelete = async (key) => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/delete-employee-by-id`,{ data: { key } } 
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-employee-by-id`, { data: { key } }
       );
       reloadEmployee();
       message.success("Xóa nhân viên thành công.");
@@ -111,15 +111,15 @@ const ViewEmployee = () => {
     } catch (error) {
       console.error("Lỗi khi khóa tài khoản", error);
       message.error("Không thể khóa tài khoản! Vui lòng thử lại.");
-    } finally{
-        setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
   const handleUnlock = async (key) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-employee`,{ key });
-        reloadEmployee();
+        `${import.meta.env.VITE_BACKEND_URL}/api/unlock-employee`, { key });
+      reloadEmployee();
       message.success(response.data.message);
     } catch (error) {
       console.error("Lỗi khi mở khóa tài khoản", error);
@@ -212,32 +212,32 @@ const ViewEmployee = () => {
       key: "action",
       render: (text, employees) => (
         <>
-        <>
-        {employees.IsActive ? (
-            <Popconfirm
-              title="Bạn có chắc chắn muốn khóa tài khoản này không?"
-              onConfirm={() => handleLock(employees.id)}
-              okText="Có"
-              cancelText="Không"
-            >
-              <Button type="link" className="text-red-600 font-bold mx-1">
-                Khóa tài khoản
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              title="Bạn có chắc chắn muốn mở khóa tài khoản này không?"
-              onConfirm={() => handleUnlock(employees.id)}
-              okText="Có"
-              cancelText="Không"
-            >
-              <Button type="link" className="text-red-600 font-bold mx-1">
-                Mở khóa tài khoản
-              </Button>
-            </Popconfirm>
-          )}
-        </>
-          
+          <>
+            {employees.IsActive ? (
+              <Popconfirm
+                title="Bạn có chắc chắn muốn khóa tài khoản này không?"
+                onConfirm={() => handleLock(employees.id)}
+                okText="Có"
+                cancelText="Không"
+              >
+                <Button type="link" className="text-red-600 font-bold mx-1">
+                  Khóa tài khoản
+                </Button>
+              </Popconfirm>
+            ) : (
+              <Popconfirm
+                title="Bạn có chắc chắn muốn mở khóa tài khoản này không?"
+                onConfirm={() => handleUnlock(employees.id)}
+                okText="Có"
+                cancelText="Không"
+              >
+                <Button type="link" className="text-red-600 font-bold mx-1">
+                  Mở khóa tài khoản
+                </Button>
+              </Popconfirm>
+            )}
+          </>
+
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa nhân viên này không?"
             onConfirm={() => handleDelete(employees.id)}
@@ -304,7 +304,21 @@ const ViewEmployee = () => {
             name="DateOfBirth"
             label="Ngày sinh"
             rules={[
-              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+              {
+                validator: (_, value) => {
+                  if (!value) {
+                    return Promise.reject(new Error("Vui lòng nhập ngày sinh!"));
+                  }
+
+                  // Kiểm tra định dạng dd/mm/yyyy
+                  const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+                  if (!dateRegex.test(value)) {
+                    return Promise.reject(new Error("Ngày sinh không đúng định dạng dd/mm/yyyy!"));
+                  }
+
+                  return Promise.resolve(); 
+                },
+              },
             ]}
           >
             <Input placeholder="dd/mm/yyyy" />

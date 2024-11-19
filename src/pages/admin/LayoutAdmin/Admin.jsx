@@ -9,6 +9,8 @@ import { Layout } from 'antd';
 import DefaultPageAdmin from './DefaultPageAdmin';
 import ViewOrder from '../subViews/Order/ViewOrder';
 import getEmployeeName from '../../../helper/Admin/getInfoAdmin';
+import ViewPaymentMethod from '../subViews/PaymentMethod/ViewPaymentMethod';
+import ViewCategory from '../subViews/Category/ViewCategory';
 
 const { Header, Content } = Layout;
 
@@ -69,6 +71,10 @@ const Admin = () => {
                         <ViewPermission />
                     ) :activeContent === 'Danh sách đơn hàng' ? (
                         <ViewOrder />
+                    ) :activeContent === 'paymentMethods' ? (
+                        <ViewPaymentMethod />
+                    ) :activeContent === 'productCategories' ? (
+                        <ViewCategory />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

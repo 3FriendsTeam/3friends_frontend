@@ -11,6 +11,10 @@ import ViewOrder from '../subViews/Order/ViewOrder';
 import getEmployeeName from '../../../helper/Admin/getInfoAdmin';
 import ViewPaymentMethod from '../subViews/PaymentMethod/ViewPaymentMethod';
 import ViewCategory from '../subViews/Category/ViewCategory';
+import ViewPromotion from '../subViews/Promotion/ViewPromotion';
+import AccountInfo from '../subViews/AccountInfo/AccountInfo';
+import ViewRevenue from '../subViews/Revenue/ViewRevenue';
+import ViewReturnDetail from '../subViews/ReturnDetail/ViewReturnDetail';
 
 const { Header, Content } = Layout;
 
@@ -75,6 +79,14 @@ const Admin = () => {
                         <ViewPaymentMethod />
                     ) :activeContent === 'productCategories' ? (
                         <ViewCategory />
+                    ) :activeContent === 'promotionPrograms' ? (
+                        <ViewPromotion />
+                    ) :activeContent === 'accountInfo' ? (
+                        <AccountInfo />
+                    ) :activeContent === 'orderReports' ? (
+                        <ViewRevenue />
+                    ) :activeContent === 'returnsRefunds' ? (
+                        <ViewReturnDetail />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

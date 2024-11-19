@@ -79,7 +79,7 @@ const ViewEmployee = () => {
     } finally {
       setLoading(false)
     }
-  }
+  };
   // Hàm tìm tên chức vụ dựa trên PositionID
   const getPositionName = (PositionID) => {
     const position = positions.find((p) => p.id === parseInt(PositionID));

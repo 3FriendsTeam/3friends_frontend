@@ -80,6 +80,7 @@ const ViewOrder = () => {
       title: "Mã đơn hàng",
       dataIndex: "id",
       key: "id",
+      render: (id) => '#'+id,
     },
     {
       title: "Ngày đặt hàng",

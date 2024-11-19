@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
-import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaHeadset } from 'react-icons/fa6';
+import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn, MdAccountCircle } from 'react-icons/md';
 import { FiLogOut } from 'react-icons/fi';
 import logo3friend from '../../../assets/admin/3friends.png';
@@ -54,7 +54,6 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       subItems: [
         { label: 'Danh mục Sản phẩm', section: 'productCategories' },// hiển thị danh mục sản phẩm
         { label: 'Danh sách sản phẩm', section: 'listProduct' },// hiển thị danh sách sản phẩm thêm mới,sửa, xóa
-        { label: 'Đánh giá và Nhận xét', section: 'reviews' },// danh sách đánh giá và nhận xét của khách hàng. tắt hiển thị, xóa
       ],
     },
     
@@ -74,7 +73,6 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       section: 'promotionManagement',
       subItems: [
         { label: 'Chương trình Khuyến mãi', section: 'promotionPrograms' },// danh sách các chương trình khuyến mãi. ngừng Khuyến mãi, sửa tên, giá, số lượng, minValue, maxDiscount, ngày bắt đầu, kết thúc
-        { label: 'Mã giảm giá', section: 'coupons' },
       ],
     },
     {
@@ -113,15 +111,6 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       section: 'reportStatistics',
       subItems: [
         { label: 'Bảng thống kê doanh thu', section: 'orderReports' }, // hiển thị bảng thống kê doanh thu xuất file báo cáo
-      ],
-    },
-    {
-      positionIds: [1,2],
-      label: 'Hỗ trợ Khách hàng',
-      icon: <FaHeadset className="h-6 w-6 mr-2" />,
-      section: 'customerSupport',
-      subItems: [
-        { label: 'Chat Trực tuyến', section: 'onlineChat' },
       ],
     },
     {

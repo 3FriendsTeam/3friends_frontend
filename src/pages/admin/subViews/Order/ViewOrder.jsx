@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, message, Spin } from "antd";
+import { Table, Input, Button, message, Modal } from "antd";
 import axios from "axios";
 
 const ViewOrder = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
 
   // Lọc danh sách đơn hàng theo từ khóa tìm kiếm
   const filteredOrders = orders.filter((order) =>
-    order.OrderID?.toString().includes(searchTerm)
+    order.id?.toString().includes(searchTerm)
   );
 
   // Fetch danh sách đơn hàng
   useEffect(() => {
     const fetchOrderData = async () => {
-      setLoading(true);
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-all-orders`
+          `${import.meta.env.VITE_BACKEND_URL}/api/orders`
         );
         setOrders(
           response.data.map((order, index) => ({ key: index, ...order }))
@@ -28,24 +28,58 @@ const ViewOrder = () => {
         message.error(
           "Không thể tải danh sách đơn hàng. Vui lòng thử lại sau."
         );
-      } finally {
-        setLoading(false);
       }
     };
+
     fetchOrderData();
   }, []);
+
+  const viewOrderDetails = async (orderId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-order-by-id`,
+        {
+          params: { id: orderId },
+        }
+      );
+
+      const data = response.data;
+      const transformedData = {
+        ...data,
+        products: data.OrderProductDetails || [],
+      };
+
+      console.log("Transformed Data:", transformedData);
+
+      setOrderDetails(transformedData);
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết đơn hàng:", error);
+      message.error("Không thể tải chi tiết đơn hàng. Vui lòng thử lại sau.");
+    }
+  };
+
+  // Theo dõi sự thay đổi của orderDetails
+  useEffect(() => {
+    console.log("Updated orderDetails:", orderDetails);
+  }, [orderDetails]);
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setOrderDetails(null);
+  };
 
   const columns = [
     {
       title: "STT",
-      dataIndex: "index",
-      key: "index",
+      dataIndex: "key",
+      key: "key",
       render: (text, record, index) => index + 1,
     },
     {
       title: "Mã đơn hàng",
-      dataIndex: "OrderID",
-      key: "OrderID",
+      dataIndex: "id",
+      key: "id",
     },
     {
       title: "Ngày đặt hàng",
@@ -65,52 +99,18 @@ const ViewOrder = () => {
       dataIndex: "TotalAmount",
       key: "TotalAmount",
       render: (TotalAmount) =>
-        TotalAmount ? `${TotalAmount} VND` : "Chưa cập nhật",
-    },
-    {
-      title: "Phương thức thanh toán",
-      dataIndex: "PaymentMethodID",
-      key: "PaymentMethodID",
-      render: (PaymentMethodID) => PaymentMethodID || "Chưa cập nhật",
-    },
-    {
-      title: "Mã khách hàng",
-      dataIndex: "CustomerID",
-      key: "CustomerID",
-      render: (CustomerID) => CustomerID || "Chưa cập nhật",
-    },
-    {
-      title: "Trạng thái thanh toán",
-      dataIndex: "PaymentStatus",
-      key: "PaymentStatus",
-      render: (PaymentStatus) =>
-        PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán",
-    },
-    {
-      title: "Ngày thanh toán",
-      dataIndex: "PaymentDate",
-      key: "PaymentDate",
-      render: (PaymentDate) =>
-        PaymentDate ? new Date(PaymentDate).toLocaleDateString() : "Chưa cập nhật",
+        TotalAmount ? `${TotalAmount.toLocaleString()} VND` : "Chưa cập nhật",
     },
     {
       title: "Thao tác",
       key: "action",
       render: (text, record) => (
-        <Button
-          type="link"
-          onClick={() => viewOrderDetails(record.OrderID)}
-        >
+        <Button type="link" onClick={() => viewOrderDetails(record.id)}>
           Xem chi tiết
         </Button>
       ),
     },
   ];
-
-  const viewOrderDetails = (orderId) => {
-    // Implement the logic to view order details
-    console.log("Xem chi tiết đơn hàng:", orderId);
-  };
 
   return (
     <div className="container mx-auto">
@@ -122,21 +122,121 @@ const ViewOrder = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      {loading ? (
-        <div className="flex justify-center items-center">
-          <Spin size="large" />
-        </div>
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={filteredOrders}
-          pagination={{
-            pageSize: 5,
-            showSizeChanger: false,
-          }}
-        />
-      )}
+      <Table
+        columns={columns}
+        dataSource={filteredOrders}
+        pagination={{
+          pageSize: 5,
+          showSizeChanger: false,
+        }}
+      />
       <div className="text-sm mt-2">{filteredOrders.length} đơn hàng</div>
+
+      <Modal
+        title="Chi tiết đơn hàng"
+        open={isModalVisible}
+        onCancel={closeModal}
+        footer={[
+          <Button key="close" onClick={closeModal}>
+            Đóng
+          </Button>,
+        ]}
+        width={800} // Đặt chiều rộng modal
+      >
+        {orderDetails ? (
+          <div>
+            {/* Thông tin sản phẩm */}
+            <h3>Chi tiết sản phẩm</h3>
+            <div
+              style={{ borderBottom: "1px solid #ccc", marginBottom: "16px" }}
+            >
+              {orderDetails.OrderProductDetails.map((productDetail, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "12px",
+                  }}
+                >
+                  <div style={{ flex: 2 }}>
+                    <p>
+                      <strong>Tên sản phẩm:</strong>{" "}
+                      {productDetail.Product.ProductName}
+                    </p>
+                    <p>
+                      <strong>Giá niêm yết:</strong>{" "}
+                      {productDetail.Product.ListedPrice.toLocaleString()} VND
+                    </p>
+                    <p>
+                      <strong>Giá khuyến mãi:</strong>{" "}
+                      {productDetail.Product.PromotionalPrice.toLocaleString()}{" "}
+                      VND
+                    </p>
+                    <p>
+                      <strong>Số lượng:</strong> {productDetail.Quantity}
+                    </p>
+                  </div>
+                  <img
+                    src={productDetail.Product.RepresentativeImage}
+                    alt={productDetail.Product.ProductName}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "4px",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Tổng cộng */}
+            <div style={{ marginBottom: "16px" }}>
+              <p>
+                <strong>Tổng cộng:</strong>{" "}
+                {orderDetails.TotalAmount.toLocaleString()} VND
+              </p>
+            </div>
+
+            {/* Thông tin đơn hàng */}
+            <h3>Thông tin đơn hàng</h3>
+            <div style={{ marginBottom: "16px" }}>
+              <p>
+                <strong>Mã đơn hàng: #</strong>
+                {orderDetails.id}
+              </p>
+              <p>
+                <strong>Ngày đặt hàng:</strong>{" "}
+                {new Date(orderDetails.OrderDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Trạng thái:</strong> {orderDetails.OrderStatus}
+              </p>
+              <p>
+                <strong>Phương thức thanh toán:</strong>{" "}
+                {orderDetails.PaymentMethodID === 1
+                  ? "Chuyển khoản"
+                  : "Tiền mặt"}
+              </p>
+              <p>
+                <strong>Trạng thái thanh toán:</strong>{" "}
+                {orderDetails.PaymentStatus
+                  ? "Đã thanh toán"
+                  : "Chưa thanh toán"}
+              </p>
+              {orderDetails.PaymentDate && (
+                <p>
+                  <strong>Ngày thanh toán:</strong>{" "}
+                  {new Date(orderDetails.PaymentDate).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p>Không có dữ liệu để hiển thị.</p>
+        )}
+      </Modal>
     </div>
   );
 };

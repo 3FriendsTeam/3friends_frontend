@@ -16,6 +16,8 @@ import AccountInfo from '../subViews/AccountInfo/AccountInfo';
 import ViewRevenue from '../subViews/Revenue/ViewRevenue';
 import ViewReturnDetail from '../subViews/ReturnDetail/ViewReturnDetail';
 import ViewNewOrder from '../subViews/Order/ViewNewOrder';
+import ViewLowStockProduct from '../subViews/Product/lowStockProduct/ViewLowStockProduct';
+import ViewPackingOrder from '../subViews/Order/ViewPackingOrder';
 
 const { Header, Content } = Layout;
 
@@ -90,6 +92,10 @@ const Admin = () => {
                         <ViewRevenue />
                     ) :activeContent === 'returnsRefunds' ? (
                         <ViewReturnDetail />
+                    ) :activeContent === 'lowStockProduct' ? (
+                        <ViewLowStockProduct />
+                    ) :activeContent === 'packingOrders' ? (
+                        <ViewPackingOrder />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

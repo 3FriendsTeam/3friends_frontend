@@ -120,7 +120,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <MdAssignmentTurnedIn className="h-6 w-6 mr-2" />,
       section: 'OrderManagement',
       subItems: [
-        { label: 'Danh sách đơn hàng xử lý', section: 'accountInfo3' }, // hiển thị danh sách các đơn hàng cần đóng gói. nếu hết hàng thì hủy đơn
+        { label: 'Danh sách đơn hàng xử lý', section: 'packingOrders' }, // hiển thị danh sách các đơn hàng cần đóng gói. nếu hết hàng thì hủy đơn
       ],
     },
     {
@@ -129,7 +129,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <FaBoxOpen className="h-6 w-6 mr-2" />,
       section: 'WareHouseManagement',
       subItems: [
-        { label: 'Sản phẩm sắp hết hàng', section: 'accountInfo2' }, // hiển thị danh sách sản phẩm sắp hết hàng <10 sản phẩm xuất file báo cáo
+        { label: 'Sản phẩm sắp hết hàng', section: 'lowStockProduct' }, // hiển thị danh sách sản phẩm sắp hết hàng <10 sản phẩm xuất file báo cáo
         { label: 'Nhập hàng', section: 'accountInfo1' }, // nhập hàng, xử lý theo excel nhập hàng
       ],
     },

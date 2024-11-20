@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Table, Input, Button, Popconfirm, message, Modal, Form, Spin, Descriptions, DatePicker } from "antd";
 import axios from "axios";
-import getEmployeeName from "../../../../helper/Admin/getInfoAdmin";
+import { getEmployeeName } from "../../../../helper/Admin/getInfoAdmin";
+
 const ViewPromotion = () => {
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -117,8 +118,9 @@ const ViewPromotion = () => {
         try {
             await axios.delete(
                 `${import.meta.env.VITE_BACKEND_URL}/api/delete-promotion`, 
-                 { id } 
+                { params: { id } }
             );
+            console.log("đã thực hiện xóa");
             setPromotions((prev) => prev.filter((promotion) => promotion.id !== id));
             message.success("Xóa khuyến mãi thành công.");
         } catch (error) {
@@ -153,7 +155,7 @@ const ViewPromotion = () => {
             title: "Số lượng",
             dataIndex: "Quantity",
             key: "Quantity",
-            render: (quantity) => quantity || "Chưa cập nhật",
+            render: (quantity) => quantity === 0 ? "Đã hết" : quantity || "Chưa cập nhật",
         },
         {
             title: "Ngày bắt đầu",
@@ -166,8 +168,13 @@ const ViewPromotion = () => {
             title: "Ngày kết thúc",
             dataIndex: "EndDate",
             key: "EndDate",
-            render: (EndDate) =>
-                EndDate ? new Date(EndDate).toLocaleDateString() : "Chưa cập nhật",
+            render: (EndDate) => {
+                const endDate = new Date(EndDate);
+                const now = new Date();
+                return endDate < now
+                    ? "Đã kết thúc"
+                    : endDate ? endDate.toLocaleDateString() : "Chưa cập nhật";
+            },
         },
         {
             title: "Thao tác",

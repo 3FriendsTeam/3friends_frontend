@@ -12,21 +12,28 @@ const AccountInfo = () => {
     const [passwordForm] = Form.useForm();
     const [editForm] = Form.useForm();
 
+    // Lấy dữ liệu nhân viên
     useEffect(() => {
         try {
             const loggedInEmployee = getEmployeeLogin();
             if (loggedInEmployee) {
-                setEmployee(loggedInEmployee);
+                setEmployee(loggedInEmployee.data);
                 const position = getPositionName() || "Vị trí không xác định";
                 setPositionName(position);
-                editForm.setFieldsValue(loggedInEmployee);
             } else {
                 console.warn("Không tìm thấy dữ liệu nhân viên");
             }
-        } catch  {
+        } catch {
             message.error("Không tìm thấy dữ liệu nhân viên.");
         }
     }, []);
+
+    // Cập nhật giá trị form khi employee hoặc editForm thay đổi
+    useEffect(() => {
+        if (employee) {
+            editForm.setFieldsValue(employee);
+        }
+    }, [employee, editForm]);
 
     const showPasswordModal = () => setIsPasswordModalVisible(true);
     const handlePasswordCancel = () => setIsPasswordModalVisible(false);
@@ -63,7 +70,7 @@ const AccountInfo = () => {
                 message.error('Không thể đổi mật khẩu. Vui lòng thử lại!');
             }
             console.error(error);
-        }   
+        }
     };
 
     const handleEditSubmit = async () => {
@@ -71,7 +78,6 @@ const AccountInfo = () => {
             message.error('Không thể xác định người dùng đang đăng nhập.');
             return;
         }
-
         try {
             const values = editForm.getFieldsValue();
             const response = await axios.put(

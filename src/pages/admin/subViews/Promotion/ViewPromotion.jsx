@@ -1,19 +1,22 @@
 import { useState, useEffect } from "react";
 import { Table, Input, Button, Popconfirm, message, Modal, Form, Spin, Descriptions, DatePicker } from "antd";
 import axios from "axios";
-import getEmployeeName from "../../../../helper/Admin/getInfoAdmin";
+import { getEmployeeName } from "../../../../helper/Admin/getInfoAdmin";
+import moment from "moment";
+
 const ViewPromotion = () => {
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [setIsEditModalVisible] = useState(false);
     const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [addForm] = Form.useForm();
-    const [setEditingPromotion] = useState(null);
     const [viewingPromotion, setViewingPromotion] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const nameAdmin = getEmployeeName();
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [editingPromotion, setEditingPromotion] = useState(null);
+
 
     // Fetch danh sách khuyến mãi
     useEffect(() => {
@@ -67,7 +70,11 @@ const ViewPromotion = () => {
     const showEditModal = (promotion) => {
         setEditingPromotion(promotion);
         setIsEditModalVisible(true);
-        form.setFieldsValue(promotion);
+        form.setFieldsValue({
+            ...promotion,
+            StartDate: moment(promotion.StartDate),
+            EndDate: moment(promotion.EndDate),
+        });
     };
 
     // Đóng modal chỉnh sửa
@@ -75,6 +82,31 @@ const ViewPromotion = () => {
         setEditingPromotion(null);
         setIsEditModalVisible(false);
         form.resetFields();
+    };
+
+    // Xử lý cập nhật khuyến mãi
+    const handleEditPromotion = async () => {
+        try {
+            const values = await form.validateFields();
+            await axios.put(
+                `${import.meta.env.VITE_BACKEND_URL}/api/update-promotion?id=${editingPromotion.id}`,
+                {
+                    ...values,
+                    StartDate: values.StartDate.format("YYYY-MM-DD"),
+                    EndDate: values.EndDate.format("YYYY-MM-DD"),
+                    nameAdmin,
+                }
+            );
+            message.success("Cập nhật khuyến mãi thành công!");
+            setIsEditModalVisible(false);
+            form.resetFields();
+            setEditingPromotion(null);
+            // Cập nhật danh sách khuyến mãi
+            reloadPromotions();
+        } catch (error) {
+            console.error("Lỗi khi cập nhật khuyến mãi:", error);
+            message.error("Không thể cập nhật khuyến mãi. Vui lòng thử lại.");
+        }
     };
 
     // Mở modal thêm khuyến mãi
@@ -116,8 +148,8 @@ const ViewPromotion = () => {
         console.log("Deleting promotion with id:", id); // Log để kiểm tra id
         try {
             await axios.delete(
-                `${import.meta.env.VITE_BACKEND_URL}/api/delete-promotion`, 
-                 { id } 
+                `${import.meta.env.VITE_BACKEND_URL}/api/delete-promotion`,
+                { id }
             );
             setPromotions((prev) => prev.filter((promotion) => promotion.id !== id));
             message.success("Xóa khuyến mãi thành công.");
@@ -357,6 +389,100 @@ const ViewPromotion = () => {
                         </Button>
                         <Button type="primary" onClick={handleAddPromotion}>
                             Thêm
+                        </Button>
+                    </div>
+                </Form>
+            </Modal>
+
+            {/* Modal sửa khuyến mãi */}
+            <Modal
+                title="Sửa Khuyến Mãi"
+                centered
+                visible={isEditModalVisible}
+                onCancel={handleEditCancel}
+                footer={null}
+                width={700}
+            >
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        name="PromotionName"
+                        label="Tên khuyến mãi"
+                        rules={[{ required: true, message: "Vui lòng nhập tên khuyến mãi!" }]}
+                    >
+                        <Input placeholder="Nhập tên khuyến mãi" />
+                    </Form.Item>
+                    <Form.Item
+                        name="DiscountValue"
+                        label="Giá trị giảm (%)"
+                        rules={[{ required: true, message: "Vui lòng nhập giá trị giảm!" }]}
+                    >
+                        <Input type="number" placeholder="Nhập giá trị giảm" />
+                    </Form.Item>
+                    <Form.Item
+                        name="Code"
+                        label="Mã khuyến mãi"
+                        rules={[{ required: true, message: "Vui lòng nhập mã khuyến mãi!" }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        name="Quantity"
+                        label="Số lượng"
+                        rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+                    >
+                        <Input type="number" placeholder="Nhập số lượng" />
+                    </Form.Item>
+                    <Form.Item
+                        name="MinValue"
+                        label="Giá trị tối thiểu (VND)"
+                        rules={[
+                            { required: true, message: "Vui lòng nhập giá trị tối thiểu!" },
+                        ]}
+                    >
+                        <Input type="number" placeholder="Nhập giá trị tối thiểu" />
+                    </Form.Item>
+                    <Form.Item
+                        name="MaxDiscount"
+                        label="Giảm giá tối đa (VND)"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Vui lòng nhập giá trị giảm giá tối đa!",
+                            },
+                        ]}
+                    >
+                        <Input type="number" placeholder="Nhập giá trị giảm giá tối đa" />
+                    </Form.Item>
+                    <Form.Item
+                        name="StartDate"
+                        label="Ngày bắt đầu"
+                        rules={[
+                            { required: true, message: "Vui lòng chọn ngày bắt đầu!" },
+                        ]}
+                    >
+                        <DatePicker
+                            style={{ width: "100%" }}
+                            placeholder="Chọn ngày bắt đầu"
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        name="EndDate"
+                        label="Ngày kết thúc"
+                        rules={[
+                            { required: true, message: "Vui lòng chọn ngày kết thúc!" },
+                        ]}
+                    >
+                        <DatePicker
+                            style={{ width: "100%" }}
+                            placeholder="Chọn ngày kết thúc"
+                        />
+                    </Form.Item>
+                    <div style={{ textAlign: "right" }}>
+                        <Button onClick={handleEditCancel} style={{ marginRight: 8 }}>
+                            Hủy
+                        </Button>
+                        <Button type="primary" onClick={handleEditPromotion}>
+                            Lưu
                         </Button>
                     </div>
                 </Form>

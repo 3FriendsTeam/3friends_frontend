@@ -14,10 +14,14 @@ const Home = () => {
       <Category />
       <Animation />
       <AdvertisingImage />
-      <BestSellingPhone />
-      <BestSellingPhone />
-      <BestSellingPhone />
-      <BestSellingPhone />
+      <BestSellingPhone categoryId="1" />
+      <BestSellingPhone categoryId="2" />
+      <BestSellingPhone categoryId="3" />
+      <BestSellingPhone categoryId="4" />
+      <BestSellingPhone categoryId="5" />
+      <BestSellingPhone categoryId="6" />
+      <BestSellingPhone categoryId="7" />
+      <BestSellingPhone categoryId="8" />
       <Footer />
     </div>
   );

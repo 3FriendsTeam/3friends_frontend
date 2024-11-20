@@ -5,7 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
 import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext";
-import Loading from "../../../components/Client/loading";
+import Loading from "../../../components/Client/Loading";
 
 const CustomerLogin = () => {
   const navigate = useNavigate();

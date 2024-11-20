@@ -8,7 +8,7 @@ import EmployeeSidebar from '../../../components/admin/LayoutAdmin/Sidebar';
 import { Layout } from 'antd';
 import DefaultPageAdmin from './DefaultPageAdmin';
 import ViewOrder from '../subViews/Order/ViewOrder';
-import {getEmployeeName,  getPositionName } from '../../../helper/Admin/getInfoAdmin';
+import {getEmployeeName,  getPositionName } from '../../../helper/getInfoAdmin';
 import ViewPaymentMethod from '../subViews/PaymentMethod/ViewPaymentMethod';
 import ViewCategory from '../subViews/Category/ViewCategory';
 import ViewPromotion from '../subViews/Promotion/ViewPromotion';

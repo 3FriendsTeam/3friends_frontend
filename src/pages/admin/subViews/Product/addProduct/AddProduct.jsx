@@ -127,13 +127,13 @@ const AddProduct = () => {
                         rows="6" // Tăng chiều cao bằng cách tăng số dòng
                         ></textarea>
 
-                        <label className="block text-sm font-medium">Thời gian bảo hành</label>
+                        <label className="block text-sm font-medium">chọn loại bảo hành</label>
                         <select 
                             value={warrantyPeriod} 
                             onChange={(e) => setWarrantyPeriod(e.target.value)} 
                             className="w-full border p-2 mb-2"
                         >
-                            <option>-- Chọn thời gian bảo hành --</option>
+                            
                         </select>
 
                         <label className="block text-sm font-medium">Màu sắc</label>

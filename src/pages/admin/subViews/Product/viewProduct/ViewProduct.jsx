@@ -14,11 +14,15 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { storage } from "../../../../../config/firebaseConfig";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getEmployeeName } from "../../../../../helper/getInfoAdmin";
 
 const ViewProduct = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [manufacturers, setManufacturers] = useState([]);
+  const [warrantyPolicies, setWarrantyPolicies ] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -28,12 +32,25 @@ const ViewProduct = () => {
   const [colorInput, setColorInput] = useState("");
   const [colors, setColors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [representativeImageFile, setRepresentativeImageFile] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const nameEmployee = getEmployeeName()
   // Lọc danh sách sản phẩm theo từ khóa tìm kiếm
   const filteredProducts = products.filter((product) =>
     product.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+ const reloadProductList = async () => {
+  setLoading(true);
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/products`);
+    setProducts(response.data.map((product) => ({ key: product.id, ...product })));
+  } catch (error) {
+    console.error("Lỗi khi tải dữ liệu:", error);
+    message.error("Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.");
+  } finally {
+    setLoading(false);
+  }
+};
   // Fetch danh sách sản phẩm, loại sản phẩm và nhà sản xuất
   useEffect(() => {
     const fetchProductData = async () => {
@@ -82,10 +99,24 @@ const ViewProduct = () => {
         );
       }
     };
+    const fetcWarrantyPoliciesData = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/warranty-policies`
+        );
+        setWarrantyPolicies(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        message.error(
+          "Không thể tải danh sách nhà sản xuất. Vui lòng thử lại sau."
+        );
+      }
+    };
 
     fetchManufacturerData();
     fetchCategoryData();
     fetchProductData();
+    fetcWarrantyPoliciesData();
   }, []);
 
   // Hàm tìm tên loai sp dựa trên CategoryID
@@ -192,24 +223,45 @@ const ViewProduct = () => {
 
   const handleCreateProduct = async () => {
     try {
+      setLoading(true);
+      // Tải ảnh đại diện lên Firebase
+      let representativeImageUrl = "";
+      if (representativeImageFile) {
+        const repImageRef = ref(storage, `images/${Date.now()}_${representativeImageFile.name}`);
+        await uploadBytes(repImageRef, representativeImageFile);
+        representativeImageUrl = await getDownloadURL(repImageRef);
+      }
+  
+      // Tải ảnh minh họa lên Firebase
+      const galleryUrls = [];
+      for (let i = 0; i < galleryFiles.length; i++) {
+        const file = galleryFiles[i];
+        const galleryImageRef = ref(storage, `images/${Date.now()}_${file.name}`);
+        await uploadBytes(galleryImageRef, file);
+        const url = await getDownloadURL(galleryImageRef);
+        galleryUrls.push(url);
+      }
+  
+      // Lấy dữ liệu từ form và thêm URL ảnh
       const newProduct = {
         ...form.getFieldsValue(),
         colors,
         specifications,
+        RepresentativeImage: representativeImageUrl,
+        Gallery: galleryUrls,
       };
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/products`,
-        newProduct
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-product`,
+        {newProduct, nameEmployee}
       );
-
-      setProducts((prev) => [
-        ...prev,
-        { key: response.data.id, ...response.data },
-      ]);
-      message.success("Thêm sản phẩm thành công!");
       handleAddCancel();
-    } catch {
+      reloadProductList();
+      message.success("Thêm sản phẩm thành công!");
+    } catch (error) {
+      console.error("Lỗi khi thêm sản phẩm:", error);
       message.error("Không thể thêm sản phẩm. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -229,7 +281,7 @@ const ViewProduct = () => {
           <img
             src={RepresentativeImage}
             alt="Ảnh đại diện"
-            style={{ width: 50, height: 50 }}
+            className="w-12 h-12 object-cover rounded"
           />
         ) : (
           "Chưa có ảnh"
@@ -258,8 +310,7 @@ const ViewProduct = () => {
       title: "Loại sản phẩm",
       dataIndex: "CategoryID",
       key: "CategoryID",
-      render: (CategoryID) =>
-        getCategoryName(CategoryID) || "Chưa cập nhật",
+      render: (CategoryID) => getCategoryName(CategoryID) || "Chưa cập nhật",
     },
     {
       title: "Giá (VND)",
@@ -408,7 +459,10 @@ const ViewProduct = () => {
                 >
                   <Select placeholder="Chọn hãng sản xuất">
                     {manufacturers.map((manufacturer) => (
-                      <Select.Option key={manufacturer.id} value={manufacturer.id}>
+                      <Select.Option
+                        key={manufacturer.id}
+                        value={manufacturer.id}
+                      >
                         {manufacturer.ManufacturerName}
                       </Select.Option>
                     ))}
@@ -458,7 +512,9 @@ const ViewProduct = () => {
                       const basePrice = form.getFieldValue("ListedPrice") || 0;
                       const promotionalPrice =
                         basePrice - (basePrice * e.target.value) / 100;
-                      form.setFieldsValue({ PromotionalPrice: promotionalPrice });
+                      form.setFieldsValue({
+                        PromotionalPrice: promotionalPrice,
+                      });
                     }}
                   />
                 </Form.Item>
@@ -496,8 +552,11 @@ const ViewProduct = () => {
                   ]}
                 >
                   <Select placeholder="Chọn loại bảo hành">
-                    <Select.Option value="1">12 tháng</Select.Option>
-                    <Select.Option value="2">24 tháng</Select.Option>
+                    {warrantyPolicies.map((warrantyPolicies) => (
+                      <Select.Option key={warrantyPolicies.id} value={warrantyPolicies.id}>
+                        {warrantyPolicies.WarrantyConditions}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
 
@@ -559,16 +618,12 @@ const ViewProduct = () => {
                 name="image"
                 listType="picture-card"
                 maxCount={1}
-                action={`${import.meta.env.VITE_BACKEND_URL}/api/upload-image`}
-                onChange={(info) => {
-                  if (info.file.status === "done") {
-                    form.setFieldsValue({
-                      RepresentativeImage: info.file.response.url,
-                    });
-                    message.success("Tải ảnh lên thành công!");
-                  } else if (info.file.status === "error") {
-                    message.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
-                  }
+                beforeUpload={(file) => {
+                  setRepresentativeImageFile(file);
+                  return false; // Ngăn chặn upload tự động
+                }}
+                onRemove={() => {
+                  setRepresentativeImageFile(null);
                 }}
               >
                 <div>
@@ -587,19 +642,16 @@ const ViewProduct = () => {
             >
               <Upload
                 name="images"
-                action={`${import.meta.env.VITE_BACKEND_URL}/api/upload-images`}
                 listType="picture-card"
                 multiple
-                onChange={(info) => {
-                  if (info.file.status === "done") {
-                    const urls = info.fileList.map(
-                      (file) => file.response.url
-                    );
-                    form.setFieldsValue({ Gallery: urls });
-                    message.success("Tải ảnh lên thành công!");
-                  } else if (info.file.status === "error") {
-                    message.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
-                  }
+                beforeUpload={(file) => {
+                  setGalleryFiles((prev) => [...prev, file]);
+                  return false; // Ngăn chặn upload tự động
+                }}
+                onRemove={(file) => {
+                  setGalleryFiles((prev) =>
+                    prev.filter((item) => item.uid !== file.uid)
+                  );
                 }}
               >
                 <div>
@@ -674,18 +726,13 @@ const ViewProduct = () => {
           <Form.Item
             name="ListedPrice"
             label="Giá niêm yết (VND)"
-            rules={[
-              { required: true, message: "Vui lòng nhập giá niêm yết!" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng nhập giá niêm yết!" }]}
           >
             <Input type="number" placeholder="Nhập giá niêm yết" />
           </Form.Item>
 
           {/* Giá khuyến mãi */}
-          <Form.Item
-            name="PromotionalPrice"
-            label="Giá khuyến mãi (VND)"
-          >
+          <Form.Item name="PromotionalPrice" label="Giá khuyến mãi (VND)">
             <Input type="number" placeholder="Nhập giá khuyến mãi (nếu có)" />
           </Form.Item>
 
@@ -693,9 +740,7 @@ const ViewProduct = () => {
           <Form.Item
             name="Stock"
             label="Số lượng tồn kho"
-            rules={[
-              { required: true, message: "Vui lòng nhập số lượng!" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
           >
             <Input type="number" placeholder="Nhập số lượng sản phẩm" />
           </Form.Item>
@@ -783,9 +828,7 @@ const ViewProduct = () => {
           <Form.Item
             name="ManufacturerID"
             label="Nhà sản xuất"
-            rules={[
-              { required: true, message: "Vui lòng chọn nhà sản xuất!" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng chọn nhà sản xuất!" }]}
           >
             <Select loading={loading} placeholder="Chọn nhà sản xuất">
               {manufacturers.map((manufacturer) => (
@@ -802,10 +845,7 @@ const ViewProduct = () => {
           </Form.Item>
 
           {/* Chính sách bảo hành */}
-          <Form.Item
-            name="WarrantyPolicyID"
-            label="Chính sách bảo hành"
-          >
+          <Form.Item name="WarrantyPolicyID" label="Chính sách bảo hành">
             <Select placeholder="Chọn chính sách bảo hành">
               <Select.Option value="1">12 tháng</Select.Option>
               <Select.Option value="2">24 tháng</Select.Option>
@@ -858,10 +898,7 @@ const ViewProduct = () => {
 
           {/* Thông số sản phẩm */}
           <h3 className="text-lg font-bold mt-5 mb-3">Thông số sản phẩm</h3>
-          <Space
-            style={{ display: "flex", marginBottom: 8 }}
-            align="baseline"
-          >
+          <Space style={{ display: "flex", marginBottom: 8 }} align="baseline">
             <Form.Item name="specName" label="Tên thông số">
               <Input placeholder="Nhập tên thông số" />
             </Form.Item>

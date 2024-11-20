@@ -87,8 +87,9 @@ const AccountInfo = () => {
             if (response.status === 200) {
                 message.success('Cập nhật thông tin thành công!');
                 setIsEditModalVisible(false);
-                const updatedEmployee = { ...employee, ...values };
+                const updatedEmployee = { ...employee, values };
                 localStorage.setItem('employee', JSON.stringify(updatedEmployee));
+                console.log(updatedEmployee);
                 setEmployee(updatedEmployee);
             }
         } catch (error) {

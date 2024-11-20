@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Table, Input, Button, message, Modal, Popconfirm } from "antd";
 import axios from "axios";
 
-const ViewPackingOrder = () => {
+const ViewShippingOrder = () => {
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -12,7 +12,7 @@ const ViewPackingOrder = () => {
     const fetchOrderData = async () => {
         try {
             const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/packing-orders`
+                `${import.meta.env.VITE_BACKEND_URL}/api/shiping-orders`
             );
             setOrders(
                 response.data.map((order, index) => ({
@@ -70,33 +70,33 @@ const ViewPackingOrder = () => {
     };
 
     // Xử lý xác nhận đơn hàng
-    const handleConfirmPacking = async (id) => {
+    const handleConfirmShipping = async (id) => {
         try {
           await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${id}`,
-            { OrderStatus: "Đang đóng hàng" } 
+            { OrderStatus: "Đang giao" } 
         );
-          message.success("Đơn hàng đã được xác nhận thành công.");
+          message.success("Đơn hàng đã được xác nhận giao hàng.");
           setIsModalVisible(false);
           fetchOrderData();
         } catch (error) {
-          console.error("Lỗi khi xác nhận đơn hàng:",  error);
-          message.error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
+          console.error("Lỗi khi xác nhận giao hàng:",  error);
+          message.error("Không thể xác nhận giao hàng. Vui lòng thử lại sau.");
         }
       };
 
-    const handleCompletePacking = async (id) => {
+    const handleCompleteShipping = async (id) => {
         try {
           await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${id}`,
-            { OrderStatus: "Chờ giao hàng" } 
+            { OrderStatus: "Đã hoàn thành" } 
         );
-          message.success("Đơn hàng đã được đóng thành công.");
+          message.success("Đơn hàng đã được giao thành công.");
           setIsModalVisible(false);
           fetchOrderData();
         } catch (error) {
-          console.error("Lỗi khi xác nhận đơn hàng:",  error);
-          message.error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
+          console.error("Lỗi khi xác nhận giao thành công:",  error);
+          message.error("Không thể xác nhận giao thành công. Vui lòng thử lại sau.");
         }
       };
 
@@ -175,26 +175,26 @@ const ViewPackingOrder = () => {
             key: "action",
             render: (text, record) => (
                 <>
-                    {record.OrderStatus === "Đã xác nhận" ? (
+                    {record.OrderStatus === "Chờ giao hàng" ? (
                         <Popconfirm
-                            title="Bạn có chắc chắn muốn xác nhận đóng hàng không?"
-                            onConfirm={() => handleConfirmPacking(record.id)}
+                            title="Bạn có chắc chắn muốn xác nhận giao hàng không?"
+                            onConfirm={() => handleConfirmShipping(record.id)}
                             okText="Có"
                             cancelText="Không"
                         >
-                            <Button type="link" className="text-orange-500 font-bold mx-1">
-                                Xác nhận đóng hàng
+                            <Button type="link" className="text-orange-600 font-bold mx-1">
+                                Xác nhận giao hàng
                             </Button>
                         </Popconfirm>
                     ) : (
                         <Popconfirm
-                            title="Bạn có chắc chắn muốn xác nhận đóng hàng xong không?"
-                            onConfirm={() => handleCompletePacking(record.id)}
+                            title="Bạn có chắc chắn muốn xác nhận giao hàng thành công không?"
+                            onConfirm={() => handleCompleteShipping(record.id)}
                             okText="Có"
                             cancelText="Không"
                         >
                             <Button type="link" className="text-blue-600 font-bold mx-1">
-                                Xác nhận đóng hàng xong
+                                Xác nhận giao hàng xong
                             </Button>
                         </Popconfirm>
                     )}
@@ -205,7 +205,7 @@ const ViewPackingOrder = () => {
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-3xl font-bold mb-5">Đơn hàng mới</h1>
+            <h1 className="text-3xl font-bold mb-5">Đơn hàng chờ được giao</h1>
             <Input
                 placeholder="Tìm kiếm đơn hàng theo mã đơn hoặc tên khách hàng..."
                 className="mb-4"
@@ -282,4 +282,4 @@ const ViewPackingOrder = () => {
     );
 };
 
-export default ViewPackingOrder;
+export default ViewShippingOrder;

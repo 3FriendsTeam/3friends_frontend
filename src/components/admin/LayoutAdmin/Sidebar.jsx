@@ -119,7 +119,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <MdAssignmentTurnedIn className="h-6 w-6 mr-2" />,
       section: 'OrderManagement',
       subItems: [
-        { label: 'Danh sách đơn hàng xử lý', section: 'accountInfo3' }, // hiển thị danh sách các đơn hàng cần đóng gói. nếu hết hàng thì hủy đơn
+        { label: 'Danh sách đơn hàng xử lý', section: 'packingOrders' }, // hiển thị danh sách các đơn hàng cần đóng gói. nếu hết hàng thì hủy đơn
       ],
     },
     {

@@ -148,7 +148,7 @@ const ViewPromotion = () => {
         try {
             await axios.delete(
                 `${import.meta.env.VITE_BACKEND_URL}/api/delete-promotion`, 
-                 { id } 
+                { params: { id } }
             );
             console.log("đã thực hiện xóa");
             setPromotions((prev) => prev.filter((promotion) => promotion.id !== id));

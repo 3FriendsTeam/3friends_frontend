@@ -29,7 +29,7 @@ function CustomerInformation() {
       </div>
       <div className="flex justify-between ml-[173px] bg-[#F2F2F2] mt-4">
 
-        <div className="w-[19%] p-5 bg-white shadow-md rounded h-full max-h-[calc(100vh+30px)]">
+        <div className="w-[19%] p-5 bg-white shadow-md rounded-lg h-full max-h-[calc(100vh+30px)]">
           <nav className="space-y-5 text-[#4a4a4a] ">
           <a
               href="#"

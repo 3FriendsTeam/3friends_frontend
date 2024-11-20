@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../../components/Client/Header";
 import Footer from "../../../components/Client/Footer";
+import Loading from "../../../components/Client/Loading";
 
 const getImagePath = (imageName) => {
   if (!imageName) return "";
@@ -20,21 +21,22 @@ const CatalogSearch = () => {
   const [sortType, setSortType] = useState("relevant");
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProducts =  () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/products`
-        );
-        setProducts(response.data);
+        setTimeout(async () => {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/products`
+          );
+          setProducts(response.data);
+          setLoading(false);
+        },300);
       } catch (err) {
         setError("Lỗi khi lấy dữ liệu sản phẩm.");
         console.error(err);
-      } finally {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
   const filteredProducts = useMemo(() => {
@@ -62,14 +64,23 @@ const CatalogSearch = () => {
     }
     return filteredProducts;
   }, [sortType, filteredProducts]);
-  
 
   return (
     <div className="bg-white">
+      {loading && (
+        <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-70 z-10">
+          <div className="relative -translate-y-[140px]">
+            <Loading  status={loading} />
+          </div>
+        </div>
+      )}
       <Header />
       <div className="bg-white w-full">
         <h2 className="text-center text-lg text-gray-500 my-2">
-        Tìm thấy <span className="font-semibold">{filteredProducts.length}</span> sản phẩm với từ khóa <span className="font-semibold">&quot;{query}&quot;</span>
+          Tìm thấy{" "}
+          <span className="font-semibold">{filteredProducts.length}</span> sản
+          phẩm với từ khóa{" "}
+          <span className="font-semibold">&quot;{query}&quot;</span>
         </h2>
 
         <div className="flex justify-start items-center ml-[183px] mb-4">
@@ -107,7 +118,6 @@ const CatalogSearch = () => {
         </div>
 
         <div className="ml-[183px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-3">
-          {loading && <p>Đang tải sản phẩm...</p>}
           {error && <p className="text-red-500">{error}</p>}
           {sortedProducts.length > 0 ? (
             sortedProducts.map((product, index) => (

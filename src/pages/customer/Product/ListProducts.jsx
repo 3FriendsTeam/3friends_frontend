@@ -6,7 +6,7 @@ import NavigationBar from "../../../pages/customer/Animations/NavigationBar";
 import Animation from "../../../pages/customer/Animations/Animation";
 import ProductClassification from "./ProductClassification";
 import { path } from "../../../utils/constant";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const getImagePath = (imageName) => {
   if (!imageName) return "";
@@ -15,12 +15,19 @@ const getImagePath = (imageName) => {
 const ListProducts = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const categoryId = queryParams.get("categoryId");
+
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/products`
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id-category`,
+          {
+            params: { id: categoryId }, 
+          }
         );
         setProducts(response.data);
       } catch (error) {
@@ -28,10 +35,12 @@ const ListProducts = () => {
       }
     };
 
-    fetchProducts();
-  }, []);
-  const handleProductClick = () => {
-    navigate(path.PRODUCTSDETAILS);
+    if (categoryId) {
+      fetchProducts(); 
+    }
+  }, [categoryId]);
+  const handleProductClick = (productId) => {
+    navigate(`${path.PRODUCTSDETAILS}/${productId}`);
   };
 
   return (
@@ -47,7 +56,7 @@ const ListProducts = () => {
           {products.map((product, index) => (
             <div
               key={index}
-              onClick={handleProductClick}
+              onClick={() => handleProductClick(product.id)}
               className="w-full sm:w-1/2 lg:w-[19%] p-4 ml-[7px] flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
             >
               <img

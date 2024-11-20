@@ -114,7 +114,7 @@ const FeaturedProducts = () => {
           </div>
 
           {/* Tên sản phẩm và giá */}
-          <div className="absolute bottom-[-18px] text-black text-center hidden lg:block">
+          <div className="absolute bottom-[-70px] text-black text-center hidden lg:block">
             <div className="flex justify-center flex-wrap ">
               {imageNames.map((name, index) => (
                 <div

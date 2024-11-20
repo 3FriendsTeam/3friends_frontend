@@ -6,11 +6,40 @@ import icons from "../../../utils/icons";
 import ctsp1 from "../../../assets/client/ctsp1.jpeg";
 import ProductsDescribe from "./ProductsDescribe";
 import { CartContext } from "../ShoppingCart/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { path } from "../../../utils/constant";
+import axios from "axios";
+
+const getImagePath = (imageName) => {
+  if (!imageName) return "";
+  return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
+};
 
 const ProductDetails = () => {
+  const { productId } = useParams();
+  const [product, setProduct] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id`,
+          {
+            params: { id: productId }, 
+          }
+        );
+        setProduct(response.data);
+      } catch (error) {
+        console.error("Error fetching product details:", error);
+        setProduct(null); 
+      }
+    };
+
+    if (productId) fetchProductDetails();  
+  }, [productId]);
+
+  
   const products = [
     {
       name: "Samsung Galaxy Z 12GB 256GB",
@@ -61,11 +90,10 @@ const ProductDetails = () => {
   ];
 
   const colors = [
-    { name: "Hồng", imgSrc: ctsp1 },
     { name: "Xanh", imgSrc: ctsp1 },
     { name: "Đen", imgSrc: ctsp1 },
   ];
-  const images = ["https://placehold.co/333x350?text=Image+1"];
+ 
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { addToCart } = useContext(CartContext);
@@ -97,15 +125,21 @@ const ProductDetails = () => {
     }
   };
   
-  
-  
-
   const toggleDetails = () => {
     setIsExpanded(!isExpanded);
   };
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (!product) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p>Loading...</p>
+      </div>
+    ); 
+  }
+
   return (
     <div className="flex flex-wrap flex-row w-full ">
       <div className="w-[1536px]">
@@ -119,7 +153,7 @@ const ProductDetails = () => {
           <div className="h-[700px] w-[585px] ">
             <div className="flex flex-col p-4  h-full">
               <div className="font-bold text-xl">
-                Samsung Galaxy Z Fold6 5G 12GB 256GB
+                {product.ProductName}
               </div>
               <div className="flex  mt-1">
                 {[...Array(5)].map((_, i) => (
@@ -130,7 +164,7 @@ const ProductDetails = () => {
                 <span className="text-gray-500 ml-4">7 đánh giá</span>
               </div>
               <p className="text-red-500 text-xl font-bold mt-2">
-                25.990.000 ₫
+                {product.Price} 25.990.000 ₫
               </p>
               <p className="text-[14px] text-gray-500 mt-2">
                 Đã bao gồm thuế VAT
@@ -154,14 +188,13 @@ const ProductDetails = () => {
                   <icons.IoIosArrowDropleftCircle className="text-gray-400 text-3xl " />
                 </button>
                 <div className="flex mt-6 justify-center">
-                  {images.map((src, index) => (
                     <img
-                      key={index}
-                      src={src}
-                      alt={`${index + 1}`}
-                      className=""
+                      src={product.RepresentativeImage
+                    ? getImagePath(product.RepresentativeImage)
+                    : ""}
+                      alt=""
+                      className="rounded-lg object-cover w-[333px] h-[333px]"
                     />
-                  ))}
                 </div>
                 <button
                   onClick={() => {}}

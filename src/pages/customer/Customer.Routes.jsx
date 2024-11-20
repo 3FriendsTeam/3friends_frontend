@@ -10,7 +10,7 @@ const CustomerRoutes = () => (
                 <Route path={path.HOMEPAGE} element={<HomePage />} />
                 <Route path={path.LISTPRODUCTS} element={<ListProducts />} />
                 <Route path={path.LOOKORDERS} element={<LookOrders />} />
-                <Route path={path.PRODUCTSDETAILS} element={<ProductDetails />} />
+                <Route path={`${path.PRODUCTSDETAILS}/:productId`} element={<ProductDetails />} />
                 <Route path={path.SHOPPINGCART} element={<ShoppingCart />} />
                 <Route path={path.CUSTOMERREGISTER} element={<CustomerRegister />} />
                 <Route path={path.CUSTOMERLOGIN} element={<CustomerLogin />} />

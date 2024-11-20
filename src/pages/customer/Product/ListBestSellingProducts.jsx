@@ -3,13 +3,14 @@ import axios from "axios";
 import icons from "../../../utils/icons";
 import { useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant";
+import PropTypes from "prop-types";
 
 const getImagePath = (imageName) => {
   if (!imageName) return "";
   return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
 };
 
-const ListBestSellingProducts = () => {
+const ListBestSellingProducts = ({ categoryId }) => {
   const [products, setProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -19,7 +20,10 @@ const ListBestSellingProducts = () => {
     const fetchProducts = async () => {
       try {
         const productResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/products`
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id-category`,
+          {
+            params: { id: categoryId },
+          }
         );
 
         const warrantyResponse = await axios.get(
@@ -40,13 +44,14 @@ const ListBestSellingProducts = () => {
       }
     };
 
-    fetchProducts();
-  }, []);
-  const handleProductClick = () => {
-    navigate(path.PRODUCTSDETAILS);
+    if (categoryId)  fetchProducts();
+  }, [categoryId]);
+  const handleProductClick = (productId) => {
+    navigate(`${path.PRODUCTSDETAILS}/${productId}`);
   };
 
   useEffect(() => {
+
     const updateVisibleProducts = () => {
       setVisibleProducts((prevProducts) => {
         const nextProduct = products[currentIndex % products.length];
@@ -92,7 +97,7 @@ const ListBestSellingProducts = () => {
         {visibleProducts.map((product, index) => (
           <div
             key={index}
-            onClick={() => handleProductClick()}
+            onClick={() => handleProductClick(product.id)}
             className="w-full sm:w-1/2 lg:w-[19%] p-4 flex flex-col items-start border border-gray-300 rounded-md shadow-sm bg-white transition-transform duration-300 hover:scale-105 hover:shadow-xl  relative"
           >
             {product.warrantyImg && (
@@ -139,5 +144,7 @@ const ListBestSellingProducts = () => {
     </div>
   );
 };
-
+ListBestSellingProducts.propTypes = {
+  categoryId: PropTypes.string.isRequired,
+};
 export default ListBestSellingProducts;

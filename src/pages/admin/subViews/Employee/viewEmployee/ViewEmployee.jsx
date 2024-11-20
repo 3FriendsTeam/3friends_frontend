@@ -12,7 +12,7 @@ import {
   Select,
 } from "antd";
 import axios from "axios";
-import { getEmployeeName } from "../../../../../helper/Admin/getInfoAdmin";
+import { getEmployeeName } from "../../../../../helper/getInfoAdmin";
 
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);

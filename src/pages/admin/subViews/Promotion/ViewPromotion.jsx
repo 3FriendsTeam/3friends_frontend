@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, Input, Button, Popconfirm, message, Modal, Form, Spin, Descriptions, DatePicker } from "antd";
 import axios from "axios";
-import {getEmployeeName} from "../../../../helper/Admin/getInfoAdmin";
+import {getEmployeeName} from "../../../../helper/getInfoAdmin";
 import moment from "moment";
 const ViewPromotion = () => {
     const [promotions, setPromotions] = useState([]);

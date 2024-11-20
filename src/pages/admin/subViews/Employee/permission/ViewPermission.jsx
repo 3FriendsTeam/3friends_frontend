@@ -1,59 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Table, Spin, notification } from 'antd';
+import axios from 'axios';
 
 const ViewPermission = () => {
-    //const [permissions, setPermissions] = useState([
-    const [permissions] = useState([
-        {
-            id: 1,
-            name: 'Admin',
+    // State to hold permissions data and loading status
+    const [permissions, setPermissions] = useState([]);
+    const [loading, setLoading] = useState(true);
 
+    // Fetch permissions from API
+    useEffect(() => {
+        const fetchPermissions = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/positions`);
+                setPermissions(response.data);
+            } catch (error) {
+                notification.error({
+                    message: 'Error',
+                    description: error.message,
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPermissions();
+    }, []);
+
+    // Define columns for Ant Design Table
+    const columns = [
+        {
+            title: 'Tên quyền',
+            dataIndex: 'PositionName',
+            key: 'PositionName',
         },
         {
-            id: 2,
-            name: 'Quản lí',
-
+            title: 'Số lượng tài khoản',
+            dataIndex: 'employeeCount',
+            key: 'employeeCount',
         },
-        {
-            id: 3,
-            name: 'Nhân viên',
-
-        },
-        {
-            id: 4,
-            name: 'Nhân viên giao hàng',
-
-        },
-        {
-            id: 5,
-            name: 'Nhân viên kho',
-
-        },
-    ]);
+    ];
 
     return (
         <div className="container mx-auto">
             <h1 className="text-3xl font-bold mb-5">Danh sách quyền</h1>
-
-            <div className="overflow-x-auto">
-                <table className="text-left min-w-full bg-white border border-gray-300">
-                    <thead>
-                        <tr>
-                            <th className="py-2 px-4 border text-xl">Tên quyền</th>
-                            <th className="py-2 px-4 border text-xl">Số lượng tài khoản</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {permissions.map((permission) => (
-                            <tr key={permission.id} className=" hover:bg-gray-100">
-                                <td className="py-2 px-4 border">{permission.name}</td>
-                                <td className="py-2 px-4 border">{ }</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <Spin spinning={loading}>
+                <Table
+                    columns={columns}
+                    dataSource={permissions}
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                />
+            </Spin>
         </div>
     );
 };
 
 export default ViewPermission;
+

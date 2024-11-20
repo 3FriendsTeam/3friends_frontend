@@ -53,7 +53,8 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       section: 'productManagement',
       subItems: [
         { label: 'Danh mục Sản phẩm', section: 'productCategories' },// hiển thị danh mục sản phẩm
-        { label: 'Danh sách sản phẩm', section: 'listProduct' },// hiển thị danh sách sản phẩm thêm mới,sửa, xóa
+        { label: 'Danh sách sản phẩm', section: 'listProduct' },
+        { label: 'layout', section: 'addProduct' }// hiển thị danh sách sản phẩm thêm mới,sửa, xóa
       ],
     },
     

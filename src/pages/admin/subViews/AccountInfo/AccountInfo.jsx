@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Modal, Form, Input, message, Select } from 'antd';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
-import { getEmployeeLogin, getPositionName } from '../../../../helper/Admin/getInfoAdmin';
+import { getEmployeeLogin, getPositionName } from '../../../../helper/getInfoAdmin';
 
 const AccountInfo = () => {
     const [employee, setEmployee] = useState(null);

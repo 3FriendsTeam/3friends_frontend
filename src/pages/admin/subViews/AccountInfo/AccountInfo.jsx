@@ -87,10 +87,9 @@ const AccountInfo = () => {
             if (response.status === 200) {
                 message.success('Cập nhật thông tin thành công!');
                 setIsEditModalVisible(false);
-                const updatedEmployee = { ...employee, values };
-                localStorage.setItem('employee', JSON.stringify(updatedEmployee));
-                console.log(updatedEmployee);
-                setEmployee(updatedEmployee);
+                const newEmployee = { ...employee, ...values };
+                setEmployee(newEmployee);
+                localStorage.setItem('employee', JSON.stringify(newEmployee));
             }
         } catch (error) {
             message.error('Không thể cập nhật thông tin. Vui lòng thử lại!');

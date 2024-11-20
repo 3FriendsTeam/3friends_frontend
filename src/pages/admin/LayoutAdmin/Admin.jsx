@@ -8,19 +8,20 @@ import EmployeeSidebar from '../../../components/admin/LayoutAdmin/Sidebar';
 import { Layout } from 'antd';
 import DefaultPageAdmin from './DefaultPageAdmin';
 import ViewOrder from '../subViews/Order/ViewOrder';
-import getEmployeeName from '../../../helper/Admin/getInfoAdmin';
+import {getEmployeeName,  getPositionName } from '../../../helper/Admin/getInfoAdmin';
 import ViewPaymentMethod from '../subViews/PaymentMethod/ViewPaymentMethod';
 import ViewCategory from '../subViews/Category/ViewCategory';
 import ViewPromotion from '../subViews/Promotion/ViewPromotion';
 import AccountInfo from '../subViews/AccountInfo/AccountInfo';
 import ViewRevenue from '../subViews/Revenue/ViewRevenue';
 import ViewReturnDetail from '../subViews/ReturnDetail/ViewReturnDetail';
+import ViewNewOrder from '../subViews/Order/ViewNewOrder';
 
 const { Header, Content } = Layout;
 
 const Admin = () => {
     const [activeContent, setActiveContent] = useState('');
-    const PositionName = localStorage.getItem('Position');
+    const PositionName = getPositionName();
     const NameUser = getEmployeeName();
     const handleSectionClick = (sectionName) => {
         setActiveContent(sectionName); 
@@ -69,7 +70,9 @@ const Admin = () => {
                         <ViewProduct />
                     ) : activeContent === 'Danh sách khách hàng' ? (
                         <ViewCustomer />
-                    ) : activeContent === 'adminAccounts' ? (
+                    ) : activeContent === 'Danh sách khách hàng mới' ? (
+                        <ViewNewOrder />
+                    ): activeContent === 'adminAccounts' ? (
                         <ViewEmployee />
                     ) : activeContent === 'roles' ? (
                         <ViewPermission />

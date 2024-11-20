@@ -1,58 +1,39 @@
 import { useState, useEffect } from 'react';
-import { Modal, Form, Input, message } from 'antd';
+import { Modal, Form, Input, message, Select } from 'antd';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
-
-// Hàm lấy thông tin nhân viên từ localStorage
-const getLoggedInEmployee = () => {
-    const employeeData = localStorage.getItem('employee');
-    if (employeeData) {
-        const employee = JSON.parse(employeeData);
-        return employee?.data || null;
-    }
-    return null;
-};
-
-// Hàm lấy tên chức vụ từ PositionID
-const getPositionName = async (PositionID) => {
-    try {
-        const response = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/api/positions`
-        );
-        const position = response.data.find(
-            (p) => p.id === parseInt(PositionID, 10)
-        );
-        return position ? position.PositionName : 'Chưa xác định';
-    } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu chức vụ:', error);
-        return 'Chưa xác định';
-    }
-};
+import { getEmployeeLogin, getPositionName } from '../../../../helper/Admin/getInfoAdmin';
 
 const AccountInfo = () => {
     const [employee, setEmployee] = useState(null);
     const [positionName, setPositionName] = useState('');
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [passwordForm] = Form.useForm();
+    const [editForm] = Form.useForm();
 
-    // Lấy thông tin nhân viên và tên chức vụ
     useEffect(() => {
-        const loggedInEmployee = getLoggedInEmployee();
-        if (loggedInEmployee) {
-            setEmployee(loggedInEmployee);
-            if (loggedInEmployee.PositionID) {
-                getPositionName(loggedInEmployee.PositionID).then((name) =>
-                    setPositionName(name)
-                );
+        try {
+            const loggedInEmployee = getEmployeeLogin();
+            if (loggedInEmployee) {
+                setEmployee(loggedInEmployee);
+                const position = getPositionName() || "Vị trí không xác định";
+                setPositionName(position);
+                editForm.setFieldsValue(loggedInEmployee);
+            } else {
+                console.warn("Không tìm thấy dữ liệu nhân viên");
             }
+        } catch  {
+            message.error("Không tìm thấy dữ liệu nhân viên.");
         }
     }, []);
 
-    // Hiển thị modal đổi mật khẩu
-    const showModal = () => setIsModalVisible(true);
-    const handleCancel = () => setIsModalVisible(false);
+    const showPasswordModal = () => setIsPasswordModalVisible(true);
+    const handlePasswordCancel = () => setIsPasswordModalVisible(false);
 
-    // Xử lý đổi mật khẩu
+    const showEditModal = () => setIsEditModalVisible(true);
+    const handleEditCancel = () => setIsEditModalVisible(false);
+
     const handlePasswordChange = async (values) => {
         if (!employee || !employee.id) {
             message.error('Không thể xác định người dùng đang đăng nhập.');
@@ -70,7 +51,7 @@ const AccountInfo = () => {
             );
             if (response.status === 200) {
                 message.success('Đổi mật khẩu thành công!');
-                setIsModalVisible(false);
+                setIsPasswordModalVisible(false);
                 passwordForm.resetFields();
             }
         } catch (error) {
@@ -81,6 +62,31 @@ const AccountInfo = () => {
             } else {
                 message.error('Không thể đổi mật khẩu. Vui lòng thử lại!');
             }
+            console.error(error);
+        }   
+    };
+
+    const handleEditSubmit = async () => {
+        if (!employee || !employee.id) {
+            message.error('Không thể xác định người dùng đang đăng nhập.');
+            return;
+        }
+
+        try {
+            const values = editForm.getFieldsValue();
+            const response = await axios.put(
+                `${import.meta.env.VITE_BACKEND_URL}/api/update-employee`,
+                { id: employee.id, values }
+            );
+            if (response.status === 200) {
+                message.success('Cập nhật thông tin thành công!');
+                setIsEditModalVisible(false);
+                const updatedEmployee = { ...employee, ...values };
+                localStorage.setItem('employee', JSON.stringify(updatedEmployee));
+                setEmployee(updatedEmployee);
+            }
+        } catch (error) {
+            message.error('Không thể cập nhật thông tin. Vui lòng thử lại!');
             console.error(error);
         }
     };
@@ -125,20 +131,26 @@ const AccountInfo = () => {
                     {employee.IsActive ? 'Hoạt động' : 'Ngưng hoạt động'}
                 </p>
             </div>
-            <div className="mt-6 text-right">
+            <div className="mt-6 flex justify-end space-x-4">
                 <button
-                    onClick={showModal}
+                    onClick={showEditModal}
+                    className="px-6 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
+                >
+                    Chỉnh sửa thông tin
+                </button>
+                <button
+                    onClick={showPasswordModal}
                     className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition"
                 >
                     Đổi mật khẩu
                 </button>
             </div>
 
-            {/* Modal đổi mật khẩu */}
+            {/* Modal Đổi Mật Khẩu */}
             <Modal
                 title={<span className="text-lg font-semibold">Đổi mật khẩu</span>}
-                visible={isModalVisible}
-                onCancel={handleCancel}
+                open={isPasswordModalVisible}
+                onCancel={handlePasswordCancel}
                 footer={null}
                 className="rounded-lg"
             >
@@ -189,6 +201,77 @@ const AccountInfo = () => {
                             className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition"
                         >
                             Cập nhật mật khẩu
+                        </button>
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Modal Chỉnh Sửa Thông Tin */}
+            <Modal
+                title={<span className="text-lg font-semibold">Chỉnh sửa thông tin</span>}
+                open={isEditModalVisible}
+                onCancel={handleEditCancel}
+                footer={null}
+                className="rounded-lg"
+            >
+                <Form
+                    form={editForm}
+                    layout="vertical"
+                    onFinish={handleEditSubmit}
+                    className="space-y-4"
+                >
+                    <Form.Item
+                        label={<span className="font-medium">Họ và tên</span>}
+                        name="FullName"
+                        rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
+                    >
+                        <Input className="rounded-lg" />
+                    </Form.Item>
+                    <Form.Item
+                        label={<span className="font-medium">Ngày sinh</span>}
+                        name="DateOfBirth"
+                    >
+                        <Input type="date" className="rounded-lg" />
+                    </Form.Item>
+                    <Form.Item
+                        label={<span className="font-medium">Giới tính</span>}
+                        name="Gender"
+                    >
+                        <Select className="rounded-lg">
+                            <Select.Option value="Nam">Nam</Select.Option>
+                            <Select.Option value="Nữ">Nữ</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        label={<span className="font-medium">Địa chỉ</span>}
+                        name="Address"
+                    >
+                        <Input className="rounded-lg" />
+                    </Form.Item>
+                    <Form.Item
+                        label={<span className="font-medium">Email</span>}
+                        name="Email"
+                        rules={[
+                            { type: 'email', message: 'Email không hợp lệ!' },
+                        ]}
+                    >
+                        <Input className="rounded-lg" />
+                    </Form.Item>
+                    <Form.Item
+                        label={<span className="font-medium">Số điện thoại</span>}
+                        name="PhoneNumber"
+                        rules={[
+                            { pattern: /^[0-9]+$/, message: 'Số điện thoại không hợp lệ!' },
+                        ]}
+                    >
+                        <Input className="rounded-lg" />
+                    </Form.Item>
+                    <Form.Item>
+                        <button
+                            type="submit"
+                            className="w-full px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
+                        >
+                            Cập nhật thông tin
                         </button>
                     </Form.Item>
                 </Form>

@@ -1,51 +1,129 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, message, Spin } from "antd";
+import { Table, Input, Button, message, Modal } from "antd";
 import axios from "axios";
 
-const ViewOrder = () => {
+const ViewNewOrder = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
 
-  // Lọc danh sách đơn hàng theo từ khóa tìm kiếm
-  const filteredOrders = orders.filter((order) =>
-    order.OrderID?.toString().includes(searchTerm)
-  );
+  // Hàm lấy danh sách đơn hàng cần xử lí
+  const fetchOrderData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/new-orders`
+      );
+      setOrders(
+        response.data.map((order, index) => ({
+          key: index,
+          ...order,
+          CustomerName: order.Customer?.CustomerName || "Chưa cập nhật",
+        }))
+      );
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
+      message.error(
+        "Không thể tải danh sách đơn hàng. Vui lòng thử lại sau."
+      );
+    }
+  };
 
-  // Fetch danh sách đơn hàng
   useEffect(() => {
-    const fetchOrderData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-all-orders`
-        );
-        setOrders(
-          response.data.map((order, index) => ({ key: index, ...order }))
-        );
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
-        message.error(
-          "Không thể tải danh sách đơn hàng. Vui lòng thử lại sau."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrderData();
   }, []);
+
+  // Lọc danh sách đơn hàng theo từ khóa tìm kiếm (mã đơn hàng hoặc tên khách hàng)
+  const filteredOrders = orders.filter((order) =>
+    order.id?.toString().includes(searchTerm) ||
+    order.CustomerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const viewOrderDetails = async (orderId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-order-by-id`,
+        {
+          params: { id: orderId },
+        }
+      );
+
+      const data = response.data;
+      const transformedData = {
+        ...data,
+        products: data.OrderProductDetails || [],
+        CustomerName: data.Customer?.CustomerName || "Chưa cập nhật",
+      };
+
+      setOrderDetails(transformedData);
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết đơn hàng:", error);
+      message.error("Không thể tải chi tiết đơn hàng. Vui lòng thử lại sau.");
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setOrderDetails(null);
+  };
+
+  // Xử lý xác nhận đơn hàng
+  const handleConfirmOrder = async () => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${orderDetails.id}`,
+        { OrderStatus: "Đã xác nhận" } 
+    );
+      message.success("Đơn hàng đã được xác nhận thành công.");
+      setOrderDetails({
+        ...orderDetails,
+        OrderStatus: 'Đã xác nhận',
+      });
+      setIsModalVisible(false);
+      fetchOrderData();
+    } catch (error) {
+      console.error("Lỗi khi xác nhận đơn hàng:", error);
+      message.error("Không thể xác nhận đơn hàng. Vui lòng thử lại sau.");
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${orderDetails.id}`,
+        { OrderStatus: "Hủy đơn hàng" } 
+    );
+
+      message.success("Đơn hàng đã được hủy thành công.");
+      setOrderDetails({
+        ...orderDetails,
+        OrderStatus: 'Đã hủy',
+      });
+      setIsModalVisible(false);
+      fetchOrderData();
+    } catch (error) {
+      console.error("Lỗi khi hủy đơn hàng:", error);
+      message.error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
+    }
+  };
 
   const columns = [
     {
       title: "STT",
-      dataIndex: "index",
-      key: "index",
+      dataIndex: "key",
+      key: "key",
       render: (text, record, index) => index + 1,
     },
     {
       title: "Mã đơn hàng",
-      dataIndex: "OrderID",
-      key: "OrderID",
+      dataIndex: "id",
+      key: "id",
+      render: (id, record) => (
+        <Button type="link" onClick={() => viewOrderDetails(record.id)}>
+          #{id}
+        </Button>
+      ),
     },
     {
       title: "Ngày đặt hàng",
@@ -53,6 +131,19 @@ const ViewOrder = () => {
       key: "OrderDate",
       render: (OrderDate) =>
         OrderDate ? new Date(OrderDate).toLocaleDateString() : "Chưa cập nhật",
+    },
+    {
+      title: "Khách hàng",
+      dataIndex: "CustomerName",
+      key: "CustomerName",
+      render: (CustomerName) => CustomerName || "Chưa cập nhật",
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "PaymentStatus",
+      key: "PaymentStatus",
+      render: (PaymentStatus) =>
+        PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán",
     },
     {
       title: "Trạng thái đơn hàng",
@@ -65,80 +156,150 @@ const ViewOrder = () => {
       dataIndex: "TotalAmount",
       key: "TotalAmount",
       render: (TotalAmount) =>
-        TotalAmount ? `${TotalAmount} VND` : "Chưa cập nhật",
-    },
-    {
-      title: "Phương thức thanh toán",
-      dataIndex: "PaymentMethodID",
-      key: "PaymentMethodID",
-      render: (PaymentMethodID) => PaymentMethodID || "Chưa cập nhật",
-    },
-    {
-      title: "Mã khách hàng",
-      dataIndex: "CustomerID",
-      key: "CustomerID",
-      render: (CustomerID) => CustomerID || "Chưa cập nhật",
-    },
-    {
-      title: "Trạng thái thanh toán",
-      dataIndex: "PaymentStatus",
-      key: "PaymentStatus",
-      render: (PaymentStatus) =>
-        PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán",
-    },
-    {
-      title: "Ngày thanh toán",
-      dataIndex: "PaymentDate",
-      key: "PaymentDate",
-      render: (PaymentDate) =>
-        PaymentDate ? new Date(PaymentDate).toLocaleDateString() : "Chưa cập nhật",
-    },
-    {
-      title: "Thao tác",
-      key: "action",
-      render: (text, record) => (
-        <Button
-          type="link"
-          onClick={() => viewOrderDetails(record.OrderID)}
-        >
-          Xem chi tiết
-        </Button>
-      ),
+        TotalAmount ? `${TotalAmount.toLocaleString()} VND` : "Chưa cập nhật",
     },
   ];
 
-  const viewOrderDetails = (orderId) => {
-    // Implement the logic to view order details
-    console.log("Xem chi tiết đơn hàng:", orderId);
-  };
-
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-5">Danh sách đơn hàng</h1>
+      <h1 className="text-3xl font-bold mb-5">Đơn hàng mới</h1>
       <Input
-        placeholder="Tìm kiếm đơn hàng..."
+        placeholder="Tìm kiếm đơn hàng theo mã đơn hoặc tên khách hàng..."
         className="mb-4"
         style={{ width: "300px", height: "40px" }}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      {loading ? (
-        <div className="flex justify-center items-center">
-          <Spin size="large" />
-        </div>
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={filteredOrders}
-          pagination={{
-            pageSize: 5,
-            showSizeChanger: false,
-          }}
-        />
-      )}
+      <Table
+        columns={columns}
+        dataSource={filteredOrders}
+        pagination={{
+          pageSize: 5,
+          showSizeChanger: false,
+        }}
+      />
       <div className="text-sm mt-2">{filteredOrders.length} đơn hàng</div>
+
+      <Modal
+        title="Chi tiết đơn hàng"
+        open={isModalVisible}
+        onCancel={closeModal}
+        footer={[
+          orderDetails?.OrderStatus !== 'Đã xác nhận' && (
+            <Button key="confirm" type="primary" onClick={handleConfirmOrder} >
+              Xác nhận đơn hàng
+            </Button>
+          ),
+          orderDetails?.OrderStatus !== 'Đã hủy' && (
+            <Button key="cancel" danger onClick={handleCancelOrder}>
+              Hủy đơn hàng
+            </Button>
+          ),
+          <Button key="close" onClick={closeModal}>
+            Đóng
+          </Button>,
+        ]}
+        width={800}
+      >
+        {orderDetails ? (
+          <div>
+            {/* Thông tin sản phẩm */}
+            <h3>Chi tiết sản phẩm</h3>
+            <div
+              style={{ borderBottom: "1px solid #ccc", marginBottom: "16px" }}
+            >
+              {orderDetails.OrderProductDetails.map((productDetail, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "12px",
+                  }}
+                >
+                  <div style={{ flex: 2 }}>
+                    <p>
+                      <strong>Tên sản phẩm:</strong>{" "}
+                      {productDetail.Product.ProductName}
+                    </p>
+                    <p>
+                      <strong>Giá niêm yết:</strong>{" "}
+                      {productDetail.Product.ListedPrice.toLocaleString()} VND
+                    </p>
+                    <p>
+                      <strong>Giá khuyến mãi:</strong>{" "}
+                      {productDetail.Product.PromotionalPrice.toLocaleString()}{" "}
+                      VND
+                    </p>
+                    <p>
+                      <strong>Số lượng:</strong> {productDetail.Quantity}
+                    </p>
+                  </div>
+                  <img
+                    src={productDetail.Product.RepresentativeImage}
+                    alt={productDetail.Product.ProductName}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "4px",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Tổng cộng */}
+            <div style={{ marginBottom: "16px" }}>
+              <p>
+                <strong>Tổng cộng:</strong>{" "}
+                {orderDetails.TotalAmount.toLocaleString()} VND
+              </p>
+            </div>
+
+            {/* Thông tin đơn hàng */}
+            <h3>Thông tin đơn hàng</h3>
+            <div style={{ marginBottom: "16px" }}>
+              <p>
+                <strong>Mã đơn hàng: #</strong>
+                {orderDetails.id}
+              </p>
+              <p>
+                <strong>Khách hàng:</strong> {orderDetails.CustomerName}
+              </p>
+              <p>
+                <strong>Ngày đặt hàng:</strong>{" "}
+                {new Date(orderDetails.OrderDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Trạng thái đơn hàng:</strong> {orderDetails.OrderStatus}
+              </p>
+              <p>
+                <strong>Phương thức thanh toán:</strong>{" "}
+                {orderDetails.PaymentMethodID === 1
+                  ? "Chuyển khoản"
+                  : "Tiền mặt"}
+              </p>
+              <p>
+                <strong>Trạng thái thanh toán:</strong>{" "}
+                {orderDetails.PaymentStatus
+                  ? "Đã thanh toán"
+                  : "Chưa thanh toán"}
+              </p>
+              {orderDetails.PaymentDate && (
+                <p>
+                  <strong>Ngày thanh toán:</strong>{" "}
+                  {new Date(orderDetails.PaymentDate).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p>Không có dữ liệu để hiển thị.</p>
+        )}
+      </Modal>
     </div>
   );
 };
 
-export default ViewOrder;
+export default ViewNewOrder;

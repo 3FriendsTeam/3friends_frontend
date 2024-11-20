@@ -12,7 +12,7 @@ import {
   Select,
 } from "antd";
 import axios from "axios";
-import getEmployeeName from "../../../../../helper/Admin/getInfoAdmin";
+import { getEmployeeName } from "../../../../../helper/Admin/getInfoAdmin";
 
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);
@@ -22,7 +22,7 @@ const ViewEmployee = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // Modal thêm nhân viên
   const [form] = Form.useForm();
   const [value4, setValue4] = useState("Apple");
-  const nameAdmin = getEmployeeName();
+  const nameAdmin = getEmployeeName()
 
   // Lọc danh sách nhân viên theo từ khóa tìm kiếm
   const filteredEmployees = employees.filter((employees) =>

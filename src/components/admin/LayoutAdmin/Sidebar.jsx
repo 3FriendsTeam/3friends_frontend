@@ -41,7 +41,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <MdAssignmentTurnedIn className="h-6 w-6 mr-2" />,
       section: 'orderManagement',
       subItems: [
-        { label: 'Đơn hàng mới', section: 'confirmCancel' }, // xác nhận đơn chuyển qua bộ phận kho để đóng gói, hủy đơn
+        { label: 'Đơn hàng mới', section: 'Danh sách khách hàng mới' }, // xác nhận đơn chuyển qua bộ phận kho để đóng gói, hủy đơn
         { label: 'Danh sách đơn hàng', section: 'Danh sách đơn hàng' }, // hiển thị danh sách đơn hàng
         { label: 'Khiếu nại đơn hàng', section: 'returnsRefunds' },// danh sách các đơn hàng khiếu nại
       ],
@@ -138,8 +138,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <MdAccountCircle className="h-6 w-6 mr-2" />,
       section: 'accountSettings',
       subItems: [
-        { label: 'Thông tin tài khoản', section: 'accountInfo' },
-        { label: 'Đổi mật khẩu', section: 'accountChangePassword' },
+        { label: 'Thông tin tài khoản', section: 'accountInfo' }
       ],
     },
 

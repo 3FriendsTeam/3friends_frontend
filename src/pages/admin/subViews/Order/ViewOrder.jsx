@@ -2,37 +2,44 @@ import { useState, useEffect } from "react";
 import { Table, Input, Button, message, Modal } from "antd";
 import axios from "axios";
 
-const ViewOrder = () => {
+const ViewNewOrder = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
 
-  // Lọc danh sách đơn hàng theo từ khóa tìm kiếm
-  const filteredOrders = orders.filter((order) =>
-    order.id?.toString().includes(searchTerm)
-  );
+  // Hàm lấy danh sách đơn hàng
+  const fetchOrderData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/orders`
+      );
 
-  // Fetch danh sách đơn hàng
+      // Giả sử API trả về dữ liệu khách hàng trong đơn hàng
+      setOrders(
+        response.data.map((order, index) => ({
+          key: index,
+          ...order,
+          CustomerName: order.Customer?.CustomerName || "Chưa cập nhật",
+        }))
+      );
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
+      message.error(
+        "Không thể tải danh sách đơn hàng. Vui lòng thử lại sau."
+      );
+    }
+  };
+
   useEffect(() => {
-    const fetchOrderData = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/orders`
-        );
-        setOrders(
-          response.data.map((order, index) => ({ key: index, ...order }))
-        );
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
-        message.error(
-          "Không thể tải danh sách đơn hàng. Vui lòng thử lại sau."
-        );
-      }
-    };
-
     fetchOrderData();
   }, []);
+
+  // Lọc danh sách đơn hàng theo từ khóa tìm kiếm (mã đơn hàng hoặc tên khách hàng)
+  const filteredOrders = orders.filter((order) =>
+    order.id?.toString().includes(searchTerm) ||
+    order.CustomerName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const viewOrderDetails = async (orderId) => {
     try {
@@ -47,9 +54,8 @@ const ViewOrder = () => {
       const transformedData = {
         ...data,
         products: data.OrderProductDetails || [],
+        CustomerName: data.Customer?.CustomerName || "Chưa cập nhật",
       };
-
-      console.log("Transformed Data:", transformedData);
 
       setOrderDetails(transformedData);
       setIsModalVisible(true);
@@ -59,15 +65,11 @@ const ViewOrder = () => {
     }
   };
 
-  // Theo dõi sự thay đổi của orderDetails
-  useEffect(() => {
-    console.log("Updated orderDetails:", orderDetails);
-  }, [orderDetails]);
-
   const closeModal = () => {
     setIsModalVisible(false);
     setOrderDetails(null);
   };
+
 
   const columns = [
     {
@@ -80,7 +82,11 @@ const ViewOrder = () => {
       title: "Mã đơn hàng",
       dataIndex: "id",
       key: "id",
-      render: (id) => '#'+id,
+      render: (id, record) => (
+        <Button type="link" onClick={() => viewOrderDetails(record.id)}>
+          #{id}
+        </Button>
+      ),
     },
     {
       title: "Ngày đặt hàng",
@@ -88,6 +94,19 @@ const ViewOrder = () => {
       key: "OrderDate",
       render: (OrderDate) =>
         OrderDate ? new Date(OrderDate).toLocaleDateString() : "Chưa cập nhật",
+    },
+    {
+      title: "Khách hàng",
+      dataIndex: "CustomerName",
+      key: "CustomerName",
+      render: (CustomerName) => CustomerName || "Chưa cập nhật",
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "PaymentStatus",
+      key: "PaymentStatus",
+      render: (PaymentStatus) =>
+        PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán",
     },
     {
       title: "Trạng thái đơn hàng",
@@ -102,22 +121,13 @@ const ViewOrder = () => {
       render: (TotalAmount) =>
         TotalAmount ? `${TotalAmount.toLocaleString()} VND` : "Chưa cập nhật",
     },
-    {
-      title: "Thao tác",
-      key: "action",
-      render: (text, record) => (
-        <Button type="link" onClick={() => viewOrderDetails(record.id)}>
-          Xem chi tiết
-        </Button>
-      ),
-    },
   ];
 
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold mb-5">Danh sách đơn hàng</h1>
       <Input
-        placeholder="Tìm kiếm đơn hàng..."
+        placeholder="Tìm kiếm đơn hàng theo mã đơn hoặc tên khách hàng..."
         className="mb-4"
         style={{ width: "300px", height: "40px" }}
         value={searchTerm}
@@ -142,7 +152,7 @@ const ViewOrder = () => {
             Đóng
           </Button>,
         ]}
-        width={800} // Đặt chiều rộng modal
+        width={800}
       >
         {orderDetails ? (
           <div>
@@ -208,11 +218,14 @@ const ViewOrder = () => {
                 {orderDetails.id}
               </p>
               <p>
+                <strong>Khách hàng:</strong> {orderDetails.CustomerName}
+              </p>
+              <p>
                 <strong>Ngày đặt hàng:</strong>{" "}
                 {new Date(orderDetails.OrderDate).toLocaleDateString()}
               </p>
               <p>
-                <strong>Trạng thái:</strong> {orderDetails.OrderStatus}
+                <strong>Trạng thái đơn hàng:</strong> {orderDetails.OrderStatus}
               </p>
               <p>
                 <strong>Phương thức thanh toán:</strong>{" "}
@@ -242,4 +255,4 @@ const ViewOrder = () => {
   );
 };
 
-export default ViewOrder;
+export default ViewNewOrder;

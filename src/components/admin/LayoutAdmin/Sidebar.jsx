@@ -91,7 +91,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <FaTruck className="h-6 w-6 mr-2" />,
       section: 'shippingManagement',
       subItems: [
-        { label: 'Đơn hàng đang chờ được giao', section: 'shippingMethods' },// hiển thị danh sách đơn hàng đang chờ được giao
+        { label: 'Đơn hàng đang chờ được giao', section: 'shippingOrder' },// hiển thị danh sách đơn hàng đang chờ được giao
         { label: 'Đơn hàng đã hoàn thành', section: 'tracking' }, // hiển thị danh sách đơn hàng đã hoàn thành mà nhân viên đang giao
       ],
     },

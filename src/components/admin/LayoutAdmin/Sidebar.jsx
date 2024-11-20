@@ -128,7 +128,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <FaBoxOpen className="h-6 w-6 mr-2" />,
       section: 'WareHouseManagement',
       subItems: [
-        { label: 'Sản phẩm sắp hết hàng', section: 'accountInfo2' }, // hiển thị danh sách sản phẩm sắp hết hàng <10 sản phẩm xuất file báo cáo
+        { label: 'Sản phẩm sắp hết hàng', section: 'lowStockProduct' }, // hiển thị danh sách sản phẩm sắp hết hàng <10 sản phẩm xuất file báo cáo
         { label: 'Nhập hàng', section: 'accountInfo1' }, // nhập hàng, xử lý theo excel nhập hàng
       ],
     },

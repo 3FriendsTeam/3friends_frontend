@@ -224,6 +224,7 @@ const ViewProduct = () => {
   const handleCreateProduct = async () => {
     try {
       setLoading(true);
+      setIsAddModalVisible(false);
       // Tải ảnh đại diện lên Firebase
       let representativeImageUrl = "";
       if (representativeImageFile) {
@@ -390,7 +391,7 @@ const ViewProduct = () => {
   ];
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-5">Danh sách sản phẩm</h1>
+      <h1 className="text-3xl font-bold mb-5">Danh sách sản phẩm kinh doanh</h1>
       <Input
         placeholder="Tìm kiếm sản phẩm..."
         className="mb-4"

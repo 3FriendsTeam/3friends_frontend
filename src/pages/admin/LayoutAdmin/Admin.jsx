@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import AddProduct from '../subViews/Product/addProduct/AddProduct';
 import ViewProduct from '../subViews/Product/viewProduct/ViewProduct';
 import ViewCustomer from '../subViews/Customer/ViewCustomer';
 import ViewEmployee from '../subViews/Employee/viewEmployee/ViewEmployee';
@@ -19,6 +18,7 @@ import ViewNewOrder from '../subViews/Order/ViewNewOrder';
 import ViewLowStockProduct from '../subViews/Product/lowStockProduct/ViewLowStockProduct';
 import ViewPackingOrder from '../subViews/Order/ViewPackingOrder';
 import ViewShippingOrder from '../subViews/Order/ViewShippingOrder';
+import ViewDiscontinuedProducts from '../subViews/Product/viewProduct/ViewDiscontinuedProducts';
 
 const { Header, Content } = Layout;
 
@@ -67,10 +67,10 @@ const Admin = () => {
                         background: '#f0f2f5',
                     }}
                 >
-                    {activeContent === 'addProduct' ? (
-                        <AddProduct />
-                    ) : activeContent === 'listProduct' ? (
+                    { activeContent === 'listProduct' ? (
                         <ViewProduct />
+                    ) : activeContent === 'Danh sách các sản phẩm ngưng bán' ? (
+                        <ViewDiscontinuedProducts />
                     ) : activeContent === 'Danh sách khách hàng' ? (
                         <ViewCustomer />
                     ) : activeContent === 'Danh sách khách hàng mới' ? (

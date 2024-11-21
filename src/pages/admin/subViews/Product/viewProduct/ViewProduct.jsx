@@ -22,7 +22,7 @@ const ViewProduct = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [manufacturers, setManufacturers] = useState([]);
-  const [warrantyPolicies, setWarrantyPolicies ] = useState([]);
+  const [warrantyPolicies, setWarrantyPolicies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -34,23 +34,32 @@ const ViewProduct = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [representativeImageFile, setRepresentativeImageFile] = useState(null);
   const [galleryFiles, setGalleryFiles] = useState([]);
-  const nameEmployee = getEmployeeName()
+  const [representativeImageList, setRepresentativeImageList] = useState([]);
+  const [galleryFileList, setGalleryFileList] = useState([]);
+  const nameEmployee = getEmployeeName();
+
   // Lọc danh sách sản phẩm theo từ khóa tìm kiếm
   const filteredProducts = products.filter((product) =>
     product.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
   );
- const reloadProductList = async () => {
-  setLoading(true);
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/products`);
-    setProducts(response.data.map((product) => ({ key: product.id, ...product })));
-  } catch (error) {
-    console.error("Lỗi khi tải dữ liệu:", error);
-    message.error("Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.");
-  } finally {
-    setLoading(false);
-  }
-};
+
+  const reloadProductList = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/products`
+      );
+      setProducts(
+        response.data.map((product) => ({ key: product.id, ...product }))
+      );
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
+      message.error("Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch danh sách sản phẩm, loại sản phẩm và nhà sản xuất
   useEffect(() => {
     const fetchProductData = async () => {
@@ -99,7 +108,7 @@ const ViewProduct = () => {
         );
       }
     };
-    const fetcWarrantyPoliciesData = async () => {
+    const fetchWarrantyPoliciesData = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/warranty-policies`
@@ -108,7 +117,7 @@ const ViewProduct = () => {
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
         message.error(
-          "Không thể tải danh sách nhà sản xuất. Vui lòng thử lại sau."
+          "Không thể tải danh sách chính sách bảo hành. Vui lòng thử lại sau."
         );
       }
     };
@@ -116,10 +125,10 @@ const ViewProduct = () => {
     fetchManufacturerData();
     fetchCategoryData();
     fetchProductData();
-    fetcWarrantyPoliciesData();
+    fetchWarrantyPoliciesData();
   }, []);
 
-  // Hàm tìm tên loai sp dựa trên CategoryID
+  // Hàm tìm tên loại sản phẩm dựa trên CategoryID
   const getCategoryName = (CategoryID) => {
     const category = categories.find((p) => p.id === parseInt(CategoryID));
     return category ? category.CategoryName : "Chưa xác định";
@@ -137,7 +146,10 @@ const ViewProduct = () => {
   const handleDelete = async (key) => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/products/${key}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-product`,
+        {
+          params: { key },
+        }
       );
       setProducts(products.filter((product) => product.key !== key));
       message.success("Xóa sản phẩm thành công.");
@@ -146,11 +158,82 @@ const ViewProduct = () => {
     }
   };
 
-  // Mở modal chỉnh sửa
-  const showEditModal = (product) => {
-    setEditingProduct(product);
-    setIsEditModalVisible(true);
-    form.setFieldsValue(product);
+  // Mở modal chỉnh sửa và gọi API lấy chi tiết sản phẩm
+  const showEditModal = async (product) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id`,
+        {
+          params: { id: product.id }
+        }
+      );
+      const productDetails = response.data;
+      form.setFieldsValue({
+        ProductName: productDetails.ProductName,
+        ManufacturerID: productDetails.ManufacturerID,
+        CategoryID: productDetails.CategoryID,
+        ListedPrice: productDetails.ListedPrice,
+        Promotion: productDetails.Promotion || 0,
+        PromotionalPrice: productDetails.PromotionalPrice,
+        Origin: productDetails.CountryOfOrigin.CountryName, 
+        Description: productDetails.Description,
+        WarrantyPolicyID: productDetails.WarrantyPolicyID,
+      });
+
+      setEditingProduct(productDetails);
+
+      // Map colors
+      setColors(
+        productDetails.Colors
+          ? productDetails.Colors.map((color) => color.ColorName)
+          : []
+      );
+
+      // Map specifications
+      setSpecifications(
+        productDetails.ProductAttributeDetails
+          ? productDetails.ProductAttributeDetails.map((attr) => ({
+              key: attr.id,
+              name: attr.AttributeName || attr.AttributeID, // Nếu có AttributeName
+              value: attr.AttributeValue,
+            }))
+          : []
+      );
+
+      // Set images
+      setRepresentativeImageList([
+        {
+          uid: "-1",
+          name: "RepresentativeImage",
+          status: "done",
+          url: productDetails.RepresentativeImage,
+        },
+      ]);
+
+      setGalleryFileList(
+        productDetails.Images
+          ? productDetails.Images.map((image, index) => ({
+              uid: index.toString(),
+              name: `GalleryImage${index}`,
+              status: "done",
+              url: image.FilePath,
+            }))
+          : []
+      );
+
+      // Reset files
+      setRepresentativeImageFile(null);
+      setGalleryFiles([]);
+      setColorInput("");
+
+      setIsEditModalVisible(true);
+    } catch (error) {
+      console.error("Lỗi khi lấy chi tiết sản phẩm:", error);
+      message.error("Không thể tải chi tiết sản phẩm. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Đóng modal chỉnh sửa
@@ -158,13 +241,25 @@ const ViewProduct = () => {
     setEditingProduct(null);
     setIsEditModalVisible(false);
     form.resetFields();
+    setColors([]);
+    setSpecifications([]);
+    setRepresentativeImageList([]);
+    setGalleryFileList([]);
+    setRepresentativeImageFile(null);
+    setGalleryFiles([]);
   };
+
   // Hàm mở modal thêm sản phẩm
   const showAddModal = () => {
     setIsAddModalVisible(true);
     form.resetFields();
     setColors([]);
     setSpecifications([]);
+    setRepresentativeImageFile(null);
+    setGalleryFiles([]);
+    setRepresentativeImageList([]);
+    setGalleryFileList([]);
+    setColorInput("");
   };
 
   // Hàm đóng modal thêm sản phẩm
@@ -173,6 +268,10 @@ const ViewProduct = () => {
     form.resetFields();
     setColors([]);
     setSpecifications([]);
+    setRepresentativeImageFile(null);
+    setGalleryFiles([]);
+    setRepresentativeImageList([]);
+    setGalleryFileList([]);
   };
 
   const handleRemoveColor = (index) => {
@@ -194,26 +293,92 @@ const ViewProduct = () => {
   // Lưu chỉnh sửa sản phẩm
   const handleEditSave = async () => {
     try {
+      setLoading(true);
+      const formData = form.getFieldsValue();
+      let representativeImageUrl = editingProduct.RepresentativeImage;
+      if (representativeImageFile) {
+        // Upload new representative image
+        const repImageRef = ref(
+          storage,
+          `images/${Date.now()}_${representativeImageFile.name}`
+        );
+        await uploadBytes(repImageRef, representativeImageFile);
+        representativeImageUrl = await getDownloadURL(repImageRef);
+      }
+
+      // Handle gallery images
+      let galleryUrls = editingProduct.Images
+        ? editingProduct.Images.map((img) => img.FilePath)
+        : [];
+
+      // Check for removed images
+      const removedGalleryUrls = galleryFileList
+        .filter((file) => file.status === "removed" && !file.originFileObj)
+        .map((file) => file.url);
+
+      galleryUrls = galleryUrls.filter(
+        (url) => !removedGalleryUrls.includes(url)
+      );
+
+      // Upload new gallery images
+      if (galleryFiles.length > 0) {
+        for (let i = 0; i < galleryFiles.length; i++) {
+          const file = galleryFiles[i];
+          const galleryImageRef = ref(
+            storage,
+            `images/${Date.now()}_${file.name}`
+          );
+          await uploadBytes(galleryImageRef, file);
+          const url = await getDownloadURL(galleryImageRef);
+          galleryUrls.push(url);
+        }
+      }
+
+      // Map specifications to API format
+      const productAttributes = specifications.map((spec) => ({
+        id: spec.key,
+        AttributeName: spec.name,
+        AttributeValue: spec.value,
+      }));
+
+      // Prepare colors
+      const productColors = colors.map((colorName, index) => ({
+        id: editingProduct.Colors && editingProduct.Colors[index]
+          ? editingProduct.Colors[index].id
+          : null,
+        ColorName: colorName,
+      }));
+
       const updatedProduct = {
-        ...form.getFieldsValue(),
-        colors,
-        specifications,
+        ...formData,
+        Colors: productColors,
+        ProductAttributeDetails: productAttributes,
+        RepresentativeImage: representativeImageUrl,
+        Images: galleryUrls.map((url, index) => ({
+          id: editingProduct.Images && editingProduct.Images[index]
+            ? editingProduct.Images[index].id
+            : null,
+          FilePath: url,
+          ThuTu: index + 1,
+        })),
       };
+      console.log(updatedProduct,nameEmployee);
       await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/products/${editingProduct.id}`,
-        updatedProduct
+        `${import.meta.env.VITE_BACKEND_URL}/api/update-product?id=${editingProduct.id}`,
+        {
+          updatedProduct,
+          nameEmployee,
+        }
       );
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.key === editingProduct.key
-            ? { ...product, ...updatedProduct }
-            : product
-        )
-      );
+      
       message.success("Cập nhật thông tin sản phẩm thành công.");
       handleEditCancel();
-    } catch {
+      reloadProductList();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật sản phẩm:", error);
       message.error("Không thể cập nhật sản phẩm. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -228,32 +393,52 @@ const ViewProduct = () => {
       // Tải ảnh đại diện lên Firebase
       let representativeImageUrl = "";
       if (representativeImageFile) {
-        const repImageRef = ref(storage, `images/${Date.now()}_${representativeImageFile.name}`);
+        const repImageRef = ref(
+          storage,
+          `images/${Date.now()}_${representativeImageFile.name}`
+        );
         await uploadBytes(repImageRef, representativeImageFile);
         representativeImageUrl = await getDownloadURL(repImageRef);
       }
-  
+
       // Tải ảnh minh họa lên Firebase
       const galleryUrls = [];
       for (let i = 0; i < galleryFiles.length; i++) {
         const file = galleryFiles[i];
-        const galleryImageRef = ref(storage, `images/${Date.now()}_${file.name}`);
+        const galleryImageRef = ref(
+          storage,
+          `images/${Date.now()}_${file.name}`
+        );
         await uploadBytes(galleryImageRef, file);
         const url = await getDownloadURL(galleryImageRef);
         galleryUrls.push(url);
       }
-  
+
+      // Map specifications to API format
+      const productAttributes = specifications.map((spec) => ({
+        AttributeName: spec.name,
+        AttributeValue: spec.value,
+      }));
+
+      // Prepare colors
+      const productColors = colors.map((colorName) => ({
+        ColorName: colorName,
+      }));
+
       // Lấy dữ liệu từ form và thêm URL ảnh
       const newProduct = {
         ...form.getFieldsValue(),
-        colors,
-        specifications,
+        Colors: productColors,
+        ProductAttributeDetails: productAttributes,
         RepresentativeImage: representativeImageUrl,
-        Gallery: galleryUrls,
+        Images: galleryUrls.map((url, index) => ({
+          FilePath: url,
+          ThuTu: index + 1,
+        })),
       };
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-product`,
-        {newProduct, nameEmployee}
+        { newProduct, nameEmployee }
       );
       handleAddCancel();
       reloadProductList();
@@ -389,9 +574,29 @@ const ViewProduct = () => {
       ),
     },
   ];
+
+  const handleRepresentativeImageChange = ({ fileList }) => {
+    setRepresentativeImageList(fileList);
+    if (fileList.length > 0 && fileList[0].originFileObj) {
+      setRepresentativeImageFile(fileList[0].originFileObj);
+    } else if (fileList.length === 0) {
+      setRepresentativeImageFile(null);
+    }
+  };
+
+  const handleGalleryChange = ({ fileList }) => {
+    setGalleryFileList(fileList);
+    const newGalleryFiles = fileList
+      .filter((file) => file.originFileObj)
+      .map((file) => file.originFileObj);
+    setGalleryFiles(newGalleryFiles);
+  };
+
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-5">Danh sách sản phẩm kinh doanh</h1>
+      <h1 className="text-3xl font-bold mb-5">
+        Danh sách sản phẩm kinh doanh
+      </h1>
       <Input
         placeholder="Tìm kiếm sản phẩm..."
         className="mb-4"
@@ -399,8 +604,8 @@ const ViewProduct = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <Button type="primary" className="mb-4" onClick={showAddModal}>
-        Thêm sản phẩm
+      <Button type="primary" onClick={showAddModal} className="ml-10">
+        + Thêm sản phẩm
       </Button>
       {loading ? (
         <div className="flex justify-center items-center">
@@ -416,6 +621,8 @@ const ViewProduct = () => {
           }}
         />
       )}
+      {/* Modal thêm sản phẩm */}
+
       {/* Modal thêm sản phẩm */}
       <Modal
         title="Thêm sản phẩm"
@@ -698,226 +905,271 @@ const ViewProduct = () => {
 
       {/* Modal sửa thông tin sản phẩm */}
       <Modal
-        title="Sửa thông tin sản phẩm"
-        centered
+        title="Sửa sản phẩm"
         open={isEditModalVisible}
-        onOk={form.submit}
         onCancel={handleEditCancel}
+        footer={null}
+        centered
         width={700}
-        footer={[
-          <Button key="back" onClick={handleEditCancel}>
-            Hủy
-          </Button>,
-          <Button key="submit" type="primary" onClick={form.submit}>
-            Lưu
-          </Button>,
-        ]}
       >
-        <Form form={form} layout="vertical" onFinish={handleEditSave}>
-          {/* Tên sản phẩm */}
-          <Form.Item
-            name="ProductName"
-            label="Tên sản phẩm"
-            rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
+        <div className="container mx-auto p-6">
+          <h1 className="text-blue-800 text-3xl font-bold mb-5 flex justify-center">
+            Sửa thông tin sản phẩm
+          </h1>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleEditSave}
+            initialValues={{
+              promotion: 0,
+              promotionalPrice: 0,
+            }}
           >
-            <Input placeholder="Nhập tên sản phẩm" />
-          </Form.Item>
+            <div className="grid grid-cols-2 gap-4">
+              {/* Cột trái */}
+              <div>
+                <Form.Item
+                  name="ProductName"
+                  label="Tên sản phẩm"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập tên sản phẩm!" },
+                  ]}
+                >
+                  <Input placeholder="Nhập tên sản phẩm" />
+                </Form.Item>
 
-          {/* Giá niêm yết */}
-          <Form.Item
-            name="ListedPrice"
-            label="Giá niêm yết (VND)"
-            rules={[{ required: true, message: "Vui lòng nhập giá niêm yết!" }]}
-          >
-            <Input type="number" placeholder="Nhập giá niêm yết" />
-          </Form.Item>
+                <Form.Item
+                  name="ManufacturerID"
+                  label="Hãng sản xuất"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn hãng sản xuất!" },
+                  ]}
+                >
+                  <Select placeholder="Chọn hãng sản xuất">
+                    {manufacturers.map((manufacturer) => (
+                      <Select.Option
+                        key={manufacturer.id}
+                        value={manufacturer.id}
+                      >
+                        {manufacturer.ManufacturerName}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
 
-          {/* Giá khuyến mãi */}
-          <Form.Item name="PromotionalPrice" label="Giá khuyến mãi (VND)">
-            <Input type="number" placeholder="Nhập giá khuyến mãi (nếu có)" />
-          </Form.Item>
+                <Form.Item
+                  name="CategoryID"
+                  label="Loại sản phẩm"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn loại sản phẩm!" },
+                  ]}
+                >
+                  <Select placeholder="Chọn loại sản phẩm">
+                    {categories.map((category) => (
+                      <Select.Option key={category.id} value={category.id}>
+                        {category.CategoryName}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
 
-          {/* Số lượng */}
-          <Form.Item
-            name="Stock"
-            label="Số lượng tồn kho"
-            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
-          >
-            <Input type="number" placeholder="Nhập số lượng sản phẩm" />
-          </Form.Item>
+                <Form.Item
+                  name="ListedPrice"
+                  label="Giá gốc (VND)"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập giá gốc!" },
+                  ]}
+                >
+                  <Input type="number" placeholder="Nhập giá gốc" />
+                </Form.Item>
 
-          {/* Trạng thái */}
-          <Form.Item
-            name="Status"
-            label="Trạng thái"
-            rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}
-          >
-            <Select placeholder="Chọn trạng thái">
-              <Select.Option value="1">Hoạt động</Select.Option>
-              <Select.Option value="0">Ngừng hoạt động</Select.Option>
-            </Select>
-          </Form.Item>
+                <Form.Item
+                  name="Promotion"
+                  label="Khuyến mãi (%)"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập phần trăm khuyến mãi!",
+                    },
+                  ]}
+                >
+                  <Input
+                    type="number"
+                    placeholder="Nhập phần trăm khuyến mãi"
+                    onChange={(e) => {
+                      const basePrice = form.getFieldValue("ListedPrice") || 0;
+                      const promotionalPrice =
+                        basePrice - (basePrice * e.target.value) / 100;
+                      form.setFieldsValue({
+                        PromotionalPrice: promotionalPrice,
+                      });
+                    }}
+                  />
+                </Form.Item>
 
-          {/* Ảnh đại diện */}
-          <Form.Item
-            name="RepresentativeImage"
-            label="Ảnh đại diện"
-            rules={[
-              { required: true, message: "Vui lòng tải lên ảnh đại diện!" },
-            ]}
-          >
-            <Upload
-              name="image"
-              listType="picture-card"
-              action={`${import.meta.env.VITE_BACKEND_URL}/api/upload-image`}
-              maxCount={1}
-              onChange={(info) => {
-                if (info.file.status === "done") {
-                  form.setFieldsValue({
-                    RepresentativeImage: info.file.response.url,
-                  });
-                  message.success("Tải ảnh lên thành công!");
-                } else if (info.file.status === "error") {
-                  message.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
-                }
-              }}
+                <Form.Item
+                  name="PromotionalPrice"
+                  label="Giá khuyến mãi (VND)"
+                >
+                  <Input type="number" disabled />
+                </Form.Item>
+              </div>
+
+              {/* Cột phải */}
+              <div>
+                <Form.Item
+                  name="Origin"
+                  label="Xuất xứ"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn xuất xứ!" },
+                  ]}
+                >
+                  <Input placeholder="Nhập xuất xứ" />
+                </Form.Item>
+
+                <Form.Item
+                  name="Description"
+                  label="Mô tả sản phẩm"
+                  rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+                >
+                  <Input.TextArea rows={6} placeholder="Nhập mô tả chi tiết" />
+                </Form.Item>
+
+                <Form.Item
+                  name="WarrantyPolicyID"
+                  label="Chọn loại bảo hành"
+                  rules={[
+                    { required: true, message: "Vui lòng chọn loại bảo hành!" },
+                  ]}
+                >
+                  <Select placeholder="Chọn loại bảo hành">
+                    {warrantyPolicies.map((policy) => (
+                      <Select.Option key={policy.id} value={policy.id}>
+                        {policy.WarrantyConditions}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+
+                <Form.Item label="Màu sắc">
+                  <Space
+                    style={{ display: "flex", marginBottom: 8 }}
+                    align="baseline"
+                  >
+                    <Input
+                      placeholder="Nhập màu (VD: Đỏ, Xanh...)"
+                      value={colorInput}
+                      onChange={(e) => setColorInput(e.target.value)}
+                    />
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() => handleAddColor()}
+                    >
+                      Thêm màu
+                    </Button>
+                  </Space>
+
+                  {/* Danh sách màu đã thêm */}
+                  <ul>
+                    {colors.map((color, index) => (
+                      <li
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span>{color}</span>
+                        <Button
+                          type="link"
+                          danger
+                          onClick={() => handleRemoveColor(index)}
+                        >
+                          Xóa
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </Form.Item>
+              </div>
+            </div>
+
+            {/* Chọn ảnh sản phẩm */}
+            <h3 className="text-lg font-bold mt-5 mb-3">Chọn ảnh sản phẩm</h3>
+            <Form.Item
+              name="RepresentativeImage"
+              label="Ảnh đại diện"
             >
-              {form.getFieldValue("RepresentativeImage") ? (
-                <img
-                  src={form.getFieldValue("RepresentativeImage")}
-                  alt="Ảnh đại diện"
-                  style={{ width: "100%" }}
-                />
-              ) : (
+              <Upload
+                name="image"
+                listType="picture-card"
+                maxCount={1}
+                fileList={representativeImageList}
+                onChange={handleRepresentativeImageChange}
+                beforeUpload={() => false} // Ngăn chặn upload tự động
+              >
+                {representativeImageList.length >= 1 ? null : (
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>Tải lên</div>
+                  </div>
+                )}
+              </Upload>
+            </Form.Item>
+
+            <Form.Item
+              name="Gallery"
+              label="Ảnh minh họa"
+            >
+              <Upload
+                name="images"
+                listType="picture-card"
+                multiple
+                fileList={galleryFileList}
+                onChange={handleGalleryChange}
+                beforeUpload={() => false} // Ngăn chặn upload tự động
+              >
                 <div>
                   <PlusOutlined />
                   <div style={{ marginTop: 8 }}>Tải lên</div>
                 </div>
-              )}
-            </Upload>
-          </Form.Item>
+              </Upload>
+            </Form.Item>
 
-          {/* Mô tả */}
-          <Form.Item
-            name="Description"
-            label="Mô tả sản phẩm"
-            rules={[
-              { required: true, message: "Vui lòng nhập mô tả sản phẩm!" },
-            ]}
-          >
-            <Input.TextArea rows={4} placeholder="Nhập mô tả chi tiết" />
-          </Form.Item>
-
-          {/* Loại sản phẩm */}
-          <Form.Item
-            name="CategoryID"
-            label="Loại sản phẩm"
-            rules={[
-              { required: true, message: "Vui lòng chọn loại sản phẩm!" },
-            ]}
-          >
-            <Select loading={loading} placeholder="Chọn loại sản phẩm">
-              {categories.map((category) => (
-                <Select.Option key={category.id} value={category.id}>
-                  {category.CategoryName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          {/* Nhà sản xuất */}
-          <Form.Item
-            name="ManufacturerID"
-            label="Nhà sản xuất"
-            rules={[{ required: true, message: "Vui lòng chọn nhà sản xuất!" }]}
-          >
-            <Select loading={loading} placeholder="Chọn nhà sản xuất">
-              {manufacturers.map((manufacturer) => (
-                <Select.Option key={manufacturer.id} value={manufacturer.id}>
-                  {manufacturer.ManufacturerName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          {/* Quốc gia sản xuất */}
-          <Form.Item name="Origin" label="Xuất xứ">
-            <Input placeholder="Nhập quốc gia sản xuất (nếu có)" />
-          </Form.Item>
-
-          {/* Chính sách bảo hành */}
-          <Form.Item name="WarrantyPolicyID" label="Chính sách bảo hành">
-            <Select placeholder="Chọn chính sách bảo hành">
-              <Select.Option value="1">12 tháng</Select.Option>
-              <Select.Option value="2">24 tháng</Select.Option>
-            </Select>
-          </Form.Item>
-
-          {/* Màu sắc */}
-          <Form.Item label="Màu sắc">
+            {/* Thông số sản phẩm */}
+            <h3 className="text-lg font-bold mt-5 mb-3">Thông số sản phẩm</h3>
             <Space
               style={{ display: "flex", marginBottom: 8 }}
               align="baseline"
             >
-              <Input
-                placeholder="Nhập màu (VD: Đỏ, Xanh...)"
-                value={colorInput}
-                onChange={(e) => setColorInput(e.target.value)}
-              />
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => handleAddColor()}
-              >
-                Thêm màu
+              <Form.Item name="specName" label="Tên thông số">
+                <Input placeholder="Nhập tên thông số" />
+              </Form.Item>
+              <Form.Item name="specValue" label="Giá trị">
+                <Input placeholder="Nhập giá trị" />
+              </Form.Item>
+              <Button type="primary" onClick={handleAddSpecification}>
+                Thêm thông số
               </Button>
             </Space>
+            <Table
+              columns={columnsSpecifications}
+              dataSource={specifications}
+              pagination={false}
+              bordered
+              rowKey="key"
+            />
 
-            {/* Danh sách màu đã thêm */}
-            <ul>
-              {colors.map((color, index) => (
-                <li
-                  key={index}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <span>{color}</span>
-                  <Button
-                    type="link"
-                    danger
-                    onClick={() => handleRemoveColor(index)}
-                  >
-                    Xóa
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </Form.Item>
-
-          {/* Thông số sản phẩm */}
-          <h3 className="text-lg font-bold mt-5 mb-3">Thông số sản phẩm</h3>
-          <Space style={{ display: "flex", marginBottom: 8 }} align="baseline">
-            <Form.Item name="specName" label="Tên thông số">
-              <Input placeholder="Nhập tên thông số" />
-            </Form.Item>
-            <Form.Item name="specValue" label="Giá trị">
-              <Input placeholder="Nhập giá trị" />
-            </Form.Item>
-            <Button type="primary" onClick={handleAddSpecification}>
-              Thêm thông số
-            </Button>
-          </Space>
-          <Table
-            columns={columnsSpecifications}
-            dataSource={specifications}
-            pagination={false}
-            bordered
-            rowKey="key"
-          />
-        </Form>
+            {/* Nút Lưu */}
+            <div className="flex justify-center mt-5">
+              <Button type="primary" htmlType="submit">
+                Lưu thay đổi
+              </Button>
+            </div>
+          </Form>
+        </div>
       </Modal>
     </div>
   );

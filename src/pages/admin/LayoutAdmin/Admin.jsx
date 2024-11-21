@@ -99,6 +99,8 @@ const Admin = () => {
                         <ViewPackingOrder />
                     ) :activeContent === 'shippingOrder' ? (
                         <ViewShippingOrder />
+                    ) :activeContent === 'completeOrder' ? (
+                        <ViewCompleteOrder />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

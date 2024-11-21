@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { Table, Input, Button, message, Modal } from "antd";
 import axios from "axios";
 
-const ViewShippingOrder = () => {
+const ViewCompleteOrder = () => {
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
 
-    // Hàm lấy danh sách đơn hàng chờ giao
+    // Hàm lấy danh sách đơn hàng đã hoàn thành
     const fetchOrderData = async () => {
         try {
             const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/shiping-orders`
+                `${import.meta.env.VITE_BACKEND_URL}/api/get-complete-orders`
             );
             setOrders(
                 response.data.map((order, index) => ({
@@ -69,58 +69,6 @@ const ViewShippingOrder = () => {
         setOrderDetails(null);
     };
 
-    // Xử lý xác nhận giao hàng
-    const handleConfirmShipping = async (id) => {
-        try {
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${id}`,
-                { OrderStatus: "Đang giao" }
-            );
-            message.success("Đơn hàng đã được xác nhận giao hàng.");
-            setIsModalVisible(false);
-            fetchOrderData();
-        } catch (error) {
-            console.error("Lỗi khi xác nhận giao hàng:", error);
-            message.error("Không thể xác nhận giao hàng. Vui lòng thử lại sau.");
-        }
-    };
-
-    // Xử lý hoàn tất giao hàng
-    const handleCompleteShipping = async (id) => {
-        try {
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${id}`,
-                { OrderStatus: "Đã hoàn thành" }
-            );
-            message.success("Đơn hàng đã được giao thành công.");
-            setIsModalVisible(false);
-            fetchOrderData();
-        } catch (error) {
-            console.error("Lỗi khi xác nhận giao thành công:", error);
-            message.error("Không thể xác nhận giao thành công. Vui lòng thử lại sau.");
-        }
-    };
-
-    // Xử lý hủy đơn hàng
-    const handleCancelOrder = async () => {
-        try {
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${orderDetails.id}`,
-                { OrderStatus: "Hủy đơn hàng" }
-            );
-            message.success("Đơn hàng đã được hủy thành công.");
-            setOrderDetails({
-                ...orderDetails,
-                OrderStatus: "Đã hủy",
-            });
-            setIsModalVisible(false);
-            fetchOrderData();
-        } catch (error) {
-            console.error("Lỗi khi hủy đơn hàng:", error);
-            message.error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
-        }
-    };
-
     const columns = [
         {
             title: "STT",
@@ -175,7 +123,7 @@ const ViewShippingOrder = () => {
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-3xl font-bold mb-5">Đơn hàng chờ được giao</h1>
+            <h1 className="text-3xl font-bold mb-5">Đơn hàng đã hoàn thành</h1>
             <Input
                 placeholder="Tìm kiếm đơn hàng theo mã đơn hoặc tên khách hàng..."
                 className="mb-4"
@@ -198,84 +146,69 @@ const ViewShippingOrder = () => {
                 open={isModalVisible}
                 onCancel={closeModal}
                 footer={[
-                    orderDetails?.OrderStatus !== "Đã hủy" && (
-                        <Button key="cancel" danger onClick={handleCancelOrder}>
-                            Hủy đơn hàng
-                        </Button>
-                    ),
-                    orderDetails?.OrderStatus === "Chờ giao hàng" && (
-                        <Button
-                            key="confirm-shipping"
-                            type="primary"
-                            onClick={() => handleConfirmShipping(orderDetails.id)}
-                        >
-                            Xác nhận giao hàng
-                        </Button>
-                    ),
-                    orderDetails?.OrderStatus === "Đang giao" && (
-                        <Button
-                            key="complete-shipping"
-                            type="primary"
-                            onClick={() => handleCompleteShipping(orderDetails.id)}
-                        >
-                            Xác nhận giao hàng xong
-                        </Button>
-                    ),
                     <Button key="close" onClick={closeModal}>
                         Đóng
                     </Button>,
                 ]}
-                width={1000}
+                width={800}
             >
                 {orderDetails ? (
                     <div>
-                        {/* Tổng Cộng */}
-                        <div style={{ marginTop: "16px", fontWeight: "bold" }}>
+                        <h3>Thông tin đơn hàng</h3>
+                        <p>
+                            <strong>Mã đơn hàng:</strong> #{orderDetails.id}
+                        </p>
+                        <p>
+                            <strong>Khách hàng:</strong> {orderDetails.CustomerName}
+                        </p>
+                        <p>
+                            <strong>Ngày đặt hàng:</strong>{" "}
+                            {new Date(orderDetails.OrderDate).toLocaleDateString()}
+                        </p>
+                        <p>
+                            <strong>Trạng thái đơn hàng:</strong> {orderDetails.OrderStatus}
+                        </p>
+                        <p>
+                            <strong>Phương thức thanh toán:</strong>{" "}
+                            {orderDetails.PaymentMethodID === 1 ? "Chuyển khoản" : "Tiền mặt"}
+                        </p>
+                        <p>
+                            <strong>Trạng thái thanh toán:</strong>{" "}
+                            {orderDetails.PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
+                        </p>
+                        {orderDetails.PaymentDate && (
                             <p>
-                                Tổng tiền đơn hàng:{" "}
-                                {orderDetails.TotalAmount?.toLocaleString()} VND
+                                <strong>Ngày thanh toán:</strong>{" "}
+                                {new Date(orderDetails.PaymentDate).toLocaleDateString()}
                             </p>
-                        </div>
-
-                        {/* Thông Tin Đơn Hàng */}
-                        <h3 style={{ marginTop: "16px" }}>Thông tin đơn hàng</h3>
-                        <div>
-                            <p>
-                                <strong>Mã đơn hàng:</strong> #{orderDetails.id}
-                            </p>
-                            <p>
-                                <strong>Khách hàng:</strong> {orderDetails.CustomerName}
-                            </p>
-                            <p>
-                                <strong>Ngày đặt hàng:</strong>{" "}
-                                {new Date(orderDetails.OrderDate).toLocaleDateString()}
-                            </p>
-                            <p>
-                                <strong>Trạng thái đơn hàng:</strong> {orderDetails.OrderStatus}
-                            </p>
-                            <p>
-                                <strong>Phương thức thanh toán:</strong>{" "}
-                                {orderDetails.PaymentMethodID === 1 ? "Chuyển khoản" : "Tiền mặt"}
-                            </p>
-                            <p>
-                                <strong>Trạng thái thanh toán:</strong>{" "}
-                                {orderDetails.PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
-                            </p>
-                            {orderDetails.PaymentDate && (
+                        )}
+                        <p>
+                            <strong>Tổng tiền:</strong>{" "}
+                            {orderDetails.TotalAmount?.toLocaleString()} VND
+                        </p>
+                        {/* <h3 style={{ marginTop: "16px" }}>Chi tiết sản phẩm</h3>
+                        {orderDetails.OrderProductDetails.map((product, index) => (
+                            <div key={index} style={{ marginBottom: "12px" }}>
                                 <p>
-                                    <strong>Ngày thanh toán:</strong>{" "}
-                                    {new Date(orderDetails.PaymentDate).toLocaleDateString()}
+                                    <strong>Tên sản phẩm:</strong> {product.Product?.ProductName || "Không có tên"}
                                 </p>
-                            )}
-                        </div>
+                                <p>
+                                    <strong>Giá:</strong>{" "}
+                                    {product.Product?.PromotionalPrice?.toLocaleString() || "N/A"} VND
+                                </p>
+                                <p>
+                                    <strong>Số lượng:</strong> {product.Quantity || 0}
+                                </p>
+                                <hr style={{ margin: "12px 0" }} />
+                            </div>
+                        ))} */}
                     </div>
                 ) : (
                     <p>Không có dữ liệu để hiển thị.</p>
                 )}
             </Modal>
-
         </div>
     );
 };
 
-export default ViewShippingOrder;
+export default ViewCompleteOrder;

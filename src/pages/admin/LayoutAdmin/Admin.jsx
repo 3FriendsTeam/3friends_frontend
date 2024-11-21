@@ -20,6 +20,7 @@ import ViewPackingOrder from '../subViews/Order/ViewPackingOrder';
 import ViewShippingOrder from '../subViews/Order/ViewShippingOrder';
 import ViewDiscontinuedProducts from '../subViews/Product/viewProduct/ViewDiscontinuedProducts';
 import ViewCompleteOrder from '../subViews/Order/ViewCompleteOrder';
+
 const { Header, Content } = Layout;
 
 const Admin = () => {

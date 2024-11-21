@@ -19,6 +19,7 @@ import ViewNewOrder from '../subViews/Order/ViewNewOrder';
 import ViewLowStockProduct from '../subViews/Product/lowStockProduct/ViewLowStockProduct';
 import ViewPackingOrder from '../subViews/Order/ViewPackingOrder';
 import ViewShippingOrder from '../subViews/Order/ViewShippingOrder';
+import ViewCompleteOrder from '../subViews/Order/ViewCompleteOrder';
 
 const { Header, Content } = Layout;
 
@@ -99,6 +100,8 @@ const Admin = () => {
                         <ViewPackingOrder />
                     ) :activeContent === 'shippingOrder' ? (
                         <ViewShippingOrder />
+                    ) :activeContent === 'completeOrder' ? (
+                        <ViewCompleteOrder />
                     ) : activeContent ? (
                         <div>
                             <h1 className="text-xl font-bold">{activeContent}</h1>

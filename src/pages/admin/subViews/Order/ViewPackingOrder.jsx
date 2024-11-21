@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, message, Modal, Popconfirm } from "antd";
+import { Table, Input, Button, message, Modal } from "antd";
 import axios from "axios";
 
 const ViewPackingOrder = () => {
@@ -8,7 +8,7 @@ const ViewPackingOrder = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
 
-    // Hàm lấy danh sách đơn hàng cần xử lí
+    // Hàm lấy danh sách đơn hàng cần xử lý
     const fetchOrderData = async () => {
         try {
             const response = await axios.get(
@@ -29,6 +29,8 @@ const ViewPackingOrder = () => {
         }
     };
 
+
+
     useEffect(() => {
         fetchOrderData();
     }, []);
@@ -38,7 +40,6 @@ const ViewPackingOrder = () => {
         order.id?.toString().includes(searchTerm) ||
         order.CustomerName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
 
     const viewOrderDetails = async (orderId) => {
         try {
@@ -52,7 +53,9 @@ const ViewPackingOrder = () => {
             const data = response.data;
             const transformedData = {
                 ...data,
-                products: data.OrderProductDetails || [],
+                OrderProductDetails: Array.isArray(data.OrderProductDetails)
+                    ? data.OrderProductDetails
+                    : Object.values(data.OrderProductDetails || {}),
                 CustomerName: data.Customer?.CustomerName || "Chưa cập nhật",
             };
 
@@ -69,7 +72,6 @@ const ViewPackingOrder = () => {
         setOrderDetails(null);
     };
 
-    // Xử lý xác nhận đơn hàng
     const handleConfirmPacking = async (id) => {
         try {
           await axios.post(
@@ -170,42 +172,11 @@ const ViewPackingOrder = () => {
             render: (TotalAmount) =>
                 TotalAmount ? `${TotalAmount.toLocaleString()} VND` : "Chưa cập nhật",
         },
-        {
-            title: "Thao tác",
-            key: "action",
-            render: (text, record) => (
-                <>
-                    {record.OrderStatus === "Đã xác nhận" ? (
-                        <Popconfirm
-                            title="Bạn có chắc chắn muốn xác nhận đóng hàng không?"
-                            onConfirm={() => handleConfirmPacking(record.id)}
-                            okText="Có"
-                            cancelText="Không"
-                        >
-                            <Button type="link" className="text-orange-500 font-bold mx-1">
-                                Xác nhận đóng hàng
-                            </Button>
-                        </Popconfirm>
-                    ) : (
-                        <Popconfirm
-                            title="Bạn có chắc chắn muốn xác nhận đóng hàng xong không?"
-                            onConfirm={() => handleCompletePacking(record.id)}
-                            okText="Có"
-                            cancelText="Không"
-                        >
-                            <Button type="link" className="text-blue-600 font-bold mx-1">
-                                Xác nhận đóng hàng xong
-                            </Button>
-                        </Popconfirm>
-                    )}
-                </>
-            ),
-        },
     ];
 
     return (
         <div className="container mx-auto">
-            <h1 className="text-3xl font-bold mb-5">Đơn hàng mới</h1>
+            <h1 className="text-3xl font-bold mb-5">Đơn hàng đang đóng gói</h1>
             <Input
                 placeholder="Tìm kiếm đơn hàng theo mã đơn hoặc tên khách hàng..."
                 className="mb-4"
@@ -228,56 +199,83 @@ const ViewPackingOrder = () => {
                 open={isModalVisible}
                 onCancel={closeModal}
                 footer={[
-                    orderDetails?.OrderStatus !== 'Đã hủy' && (
-                        <Button key="cancel" danger onClick={handleCancelOrder}>
+                    orderDetails?.OrderStatus !== "Đã hủy" && (
+                        <Button key="cancel" danger onClick={() => handleCancelOrder(orderDetails.id)}>
                             Hủy đơn hàng
+                        </Button>
+                    ),
+                    orderDetails?.OrderStatus === "Đã xác nhận" && (
+                        <Button
+                            key="confirm-packing"
+                            type="primary"
+                            onClick={() => handleConfirmPacking(orderDetails.id)}
+                        >
+                            Xác nhận đóng hàng
+                        </Button>
+                    ),
+                    orderDetails?.OrderStatus === "Đang đóng hàng" && (
+                        <Button
+                            key="complete-packing"
+                            type="primary"
+                            onClick={() => handleCompletePacking(orderDetails.id)}
+                        >
+                            Hoàn tất đóng hàng
                         </Button>
                     ),
                     <Button key="close" onClick={closeModal}>
                         Đóng
                     </Button>,
                 ]}
-                width={800}
+                width={1000}
             >
-                {orderDetails?.OrderProductDetails && orderDetails.OrderProductDetails.length > 0 ? (
-                    orderDetails.OrderProductDetails.map((productDetail, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                marginBottom: "12px",
-                            }}
-                        >
-                            <div style={{ flex: 2 }}>
-                                <p>
-                                    <strong>Tên sản phẩm:</strong>{" "}
-                                    {productDetail.Product?.ProductName || "Không có tên"}
-                                </p>
-                                <p>
-                                    <strong>Giá niêm yết:</strong>{" "}
-                                    {productDetail.Product?.ListedPrice?.toLocaleString() || "N/A"} VND
-                                </p>
-                                <p>
-                                    <strong>Số lượng:</strong> {productDetail.Quantity || 0}
-                                </p>
-                            </div>
-                            <img
-                                src={productDetail.Product?.RepresentativeImage || ""}
-                                alt={productDetail.Product?.ProductName || "Không có hình ảnh"}
-                                style={{
-                                    width: "80px",
-                                    height: "80px",
-                                    borderRadius: "4px",
-                                }}
-                            />
+                {orderDetails ? (
+                    <div>
+                        {/* Tổng cộng */}
+                        <div style={{ marginTop: "16px", fontWeight: "bold" }}>
+                            <p>
+                                Tổng tiền đơn hàng:{" "}
+                                {orderDetails.TotalAmount?.toLocaleString() || "0"} VND
+                            </p>
                         </div>
-                    ))
+
+                        {/* Thông tin đơn hàng */}
+                        <h3 style={{ marginTop: "16px" }}>Thông tin đơn hàng</h3>
+                        <div>
+                            <p>
+                                <strong>Mã đơn hàng:</strong> #{orderDetails.id}
+                            </p>
+                            <p>
+                                <strong>Khách hàng:</strong> {orderDetails.CustomerName}
+                            </p>
+                            <p>
+                                <strong>Ngày đặt hàng:</strong>{" "}
+                                {new Date(orderDetails.OrderDate).toLocaleDateString()}
+                            </p>
+                            <p>
+                                <strong>Trạng thái đơn hàng:</strong> {orderDetails.OrderStatus}
+                            </p>
+                            <p>
+                                <strong>Phương thức thanh toán:</strong>{" "}
+                                {orderDetails.PaymentMethodID === 1 ? "Chuyển khoản" : "Tiền mặt"}
+                            </p>
+                            <p>
+                                <strong>Trạng thái thanh toán:</strong>{" "}
+                                {orderDetails.PaymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
+                            </p>
+                            {orderDetails.PaymentDate && (
+                                <p>
+                                    <strong>Ngày thanh toán:</strong>{" "}
+                                    {new Date(orderDetails.PaymentDate).toLocaleDateString()}
+                                </p>
+                            )}
+                        </div>
+                    </div>
                 ) : (
-                    <p>Không có thông tin sản phẩm trong đơn hàng.</p>
+                    <p>Không có dữ liệu để hiển thị.</p>
                 )}
             </Modal>
+
+
         </div>
     );
 };

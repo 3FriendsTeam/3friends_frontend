@@ -176,6 +176,26 @@ const ViewEmployee = () => {
     }
   };
 
+  const handleResetPassword = async (employee) => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/reset-password`,
+        { id: employee.id }
+      );
+      message.success(
+        `Mật khẩu của nhân viên ${employee.FullName} đã được cấp lại thành công.`
+      );
+    } catch (error) {
+      console.error("Lỗi khi cấp lại mật khẩu:", error);
+      if (error.response && error.response.status === 404) {
+        message.error("Không tìm thấy nhân viên. Vui lòng kiểm tra lại.");
+      } else {
+        message.error("Không thể cấp lại mật khẩu. Vui lòng thử lại sau.");
+      }
+    }
+  };
+
+
   const columns = [
     {
       title: "STT",
@@ -219,31 +239,40 @@ const ViewEmployee = () => {
       key: "action",
       render: (text, employees) => (
         <>
-          <>
-            {employees.IsActive ? (
-              <Popconfirm
-                title="Bạn có chắc chắn muốn khóa tài khoản này không?"
-                onConfirm={() => handleLock(employees.id)}
-                okText="Có"
-                cancelText="Không"
-              >
-                <Button type="link" className="text-red-600 font-bold mx-1">
-                  Khóa tài khoản
-                </Button>
-              </Popconfirm>
-            ) : (
-              <Popconfirm
-                title="Bạn có chắc chắn muốn mở khóa tài khoản này không?"
-                onConfirm={() => handleUnlock(employees.id)}
-                okText="Có"
-                cancelText="Không"
-              >
-                <Button type="link" className="text-red-600 font-bold mx-1">
-                  Mở khóa tài khoản
-                </Button>
-              </Popconfirm>
-            )}
-          </>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn cấp lại mật khẩu cho nhân viên này không?"
+            onConfirm={() => handleResetPassword(employees)}
+            okText="Có"
+            cancelText="Không"
+          >
+            <Button type="link" className="text-blue-600 font-bold mx-1">
+              Cấp lại mật khẩu
+            </Button>
+          </Popconfirm>
+
+          {employees.IsActive ? (
+            <Popconfirm
+              title="Bạn có chắc chắn muốn khóa tài khoản này không?"
+              onConfirm={() => handleLock(employees.id)}
+              okText="Có"
+              cancelText="Không"
+            >
+              <Button type="link" className="text-red-600 font-bold mx-1">
+                Khóa tài khoản
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="Bạn có chắc chắn muốn mở khóa tài khoản này không?"
+              onConfirm={() => handleUnlock(employees.id)}
+              okText="Có"
+              cancelText="Không"
+            >
+              <Button type="link" className="text-red-600 font-bold mx-1">
+                Mở khóa tài khoản
+              </Button>
+            </Popconfirm>
+          )}
 
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa nhân viên này không?"
@@ -258,6 +287,7 @@ const ViewEmployee = () => {
         </>
       ),
     },
+
   ];
 
   return (

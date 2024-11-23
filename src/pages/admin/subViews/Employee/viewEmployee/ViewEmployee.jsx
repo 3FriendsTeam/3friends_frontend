@@ -13,7 +13,8 @@ import {
   DatePicker,
 } from "antd";
 import axios from "axios";
-import { getEmployeeName, validateAge } from "../../../../../helper/getInfoAdmin";
+import { getEmployeeName } from "../../../../../helper/getInfoAdmin";
+import { validateAge } from "../../../../../helper/dateHelper";
 
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);

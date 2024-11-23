@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
-import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine } from 'react-icons/fa6';
+import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaWarehouse  } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn, MdAccountCircle } from 'react-icons/md';
 import { FiLogOut } from 'react-icons/fi';
 import logo3friend from '../../../assets/admin/3friends.png';
@@ -44,6 +44,15 @@ const EmployeeSidebar = ({ onSectionClick }) => {
         { label: 'Đơn hàng mới', section: 'Danh sách khách hàng mới' }, // xác nhận đơn chuyển qua bộ phận kho để đóng gói, hủy đơn
         { label: 'Danh sách đơn hàng', section: 'Danh sách đơn hàng' }, // hiển thị danh sách đơn hàng
         { label: 'Khiếu nại đơn hàng', section: 'returnsRefunds' },// danh sách các đơn hàng khiếu nại
+      ],
+    },
+    {
+      positionIds: [1, 2],
+      label: 'Quản lý Nhà cung cấp',
+      icon: <FaWarehouse  className="h-6 w-6 mr-2" />,
+      section: 'supplierManagement',
+      subItems: [
+        { label: 'Danh sách Nhà cung cấp', section: 'listSupplier' },
       ],
     },
     {

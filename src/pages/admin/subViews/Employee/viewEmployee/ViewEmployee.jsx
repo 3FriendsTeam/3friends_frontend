@@ -10,6 +10,7 @@ import {
   Form,
   Radio,
   Select,
+  DatePicker,
 } from "antd";
 import axios from "axios";
 import { getEmployeeName } from "../../../../../helper/getInfoAdmin";
@@ -156,7 +157,12 @@ const ViewEmployee = () => {
   // Lưu thêm nhân viên
   const handleAddSave = async () => {
     try {
-      const newEmployee = form.getFieldsValue();
+      const values = form.getFieldsValue();
+      const newEmployee = {
+        ...values,
+        DateOfBirth: values.DateOfBirth ? values.DateOfBirth.toISOString() : null, // Chuyển đổi DatePicker thành ISO string
+      };
+
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-employee`,
         { newEmployee, nameAdmin }
@@ -307,22 +313,35 @@ const ViewEmployee = () => {
               {
                 validator: (_, value) => {
                   if (!value) {
-                    return Promise.reject(new Error("Vui lòng nhập ngày sinh!"));
+                    return Promise.reject(new Error("Vui lòng chọn ngày sinh!"));
                   }
 
-                  // Kiểm tra định dạng dd/mm/yyyy
-                  const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
-                  if (!dateRegex.test(value)) {
-                    return Promise.reject(new Error("Ngày sinh không đúng định dạng dd/mm/yyyy!"));
-                  }
+                  const currentDate = new Date();
+                  const selectedDate = value.toDate(); // Chuyển moment thành Date object
+                  const age = currentDate.getFullYear() - selectedDate.getFullYear();
 
-                  return Promise.resolve(); 
+                  if (
+                    age > 16 ||
+                    (age === 16 &&
+                      currentDate >= new Date(selectedDate.setFullYear(selectedDate.getFullYear() + 16)))
+                  ) {
+                    return Promise.resolve();
+                  } else {
+                    return Promise.reject(new Error("Nhân viên phải trên 16 tuổi!"));
+                  }
                 },
               },
             ]}
           >
-            <Input placeholder="dd/mm/yyyy" />
+            <DatePicker
+              style={{ width: "100%" }}
+              format="DD/MM/YYYY"
+              placeholder="Chọn ngày sinh"
+            />
           </Form.Item>
+
+
+
           <Form.Item
             name="Gender"
             label="Giới tính"

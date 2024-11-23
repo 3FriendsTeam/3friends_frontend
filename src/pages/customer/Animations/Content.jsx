@@ -1,5 +1,7 @@
+import { useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
 import logo2 from "../../../assets/client/logo2.png";
-import { useState, useEffect, useCallback, useMemo } from "react";
 import icons from "../../../utils/icons";
 import a1 from "../../../assets/client/a1.png";
 import a2 from "../../../assets/client/a2.png";
@@ -11,117 +13,106 @@ import h3 from "../../../assets/client/h3.jpg";
 import l1 from "../../../assets/client/l1.jpg";
 import l2 from "../../../assets/client/l2.jpg";
 import l3 from "../../../assets/client/l3.png";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const FeaturedProducts = () => {
+  const images = [l1, l2, l3, a4];
+  const images1 = [h1, h2, h3];
+  const images2 = [a1, a2, a3];
+
   const imageNames = [
     "Xiaomi 14T Series",
     "Tecno Pova 6 Neo",
     "ViVo Y18s (6+128GB)",
     "Reno12 Series 5G",
   ];
-
   const prices = [
     "Ưu Đãi Đến 5.5 Triệu",
     "Giá Chỉ 3.990.000đ",
     "Giá Chỉ 4.190.000đ",
     "Giá chỉ từ 9.490.000đ",
   ];
-
-  const images = useMemo(() => [l1, l2, l3, a4], []);
-  const images1 = useMemo(() => [h1, h2, h3], []);
-  const images2 = useMemo(() => [a1, a2, a3], []);
-
-  // State cho từng bộ ảnh
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentIndex1, setCurrentIndex1] = useState(0);
-  const [currentIndex2, setCurrentIndex2] = useState(0);
+  const swiperRef = useRef(null);
+  const swiperRef1 = useRef(null);
+  const swiperRef2 = useRef(null);
 
-  const navigateImage = useCallback((setIndex, images, direction) => {
-    setIndex((prevIndex) => {
-      const newIndex =
-        direction === "next"
-          ? (prevIndex + 1) % images.length
-          : (prevIndex - 1 + images.length) % images.length;
-      return newIndex;
-    });
-  }, []);
+  const prevMain = () => swiperRef.current && swiperRef.current.slidePrev();
+  const nextMain = () => swiperRef.current && swiperRef.current.slideNext();
 
-  // Sử dụng hàm navigateImage cho từng bộ ảnh
-  const nextImg = () => navigateImage(setCurrentIndex, images, "next");
-  const prevImg = () => navigateImage(setCurrentIndex, images, "prev");
+  const prevSub1 = () => swiperRef1.current && swiperRef1.current.slidePrev();
+  const nextSub1 = () => swiperRef1.current && swiperRef1.current.slideNext();
 
-  const nextImg1 = () => navigateImage(setCurrentIndex1, images1, "next");
-  const prevImg1 = () => navigateImage(setCurrentIndex1, images1, "prev");
+  const prevSub2 = () => swiperRef2.current && swiperRef2.current.slidePrev();
+  const nextSub2 = () => swiperRef2.current && swiperRef2.current.slideNext();
 
-  const nextImg2 = () => navigateImage(setCurrentIndex2, images2, "next");
-  const prevImg2 = () => navigateImage(setCurrentIndex2, images2, "prev");
-
-  const useImageSlider = (setIndex, images, intervalTime) => {
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setIndex((prevIndex) => (prevIndex + 1) % images.length);
-      }, intervalTime);
-      return () => clearInterval(interval);
-    }, [setIndex, images, intervalTime]);
+  const goToSlide = (index) => {
+    if (swiperRef.current) {
+      swiperRef.current.slideToLoop(index); 
+      setCurrentIndex(index);
+    }
   };
-
-  // Sử dụng hàm useImageSlider cho từng bộ ảnh
-  useImageSlider(setCurrentIndex, images, 3500);
-  useImageSlider(setCurrentIndex1, images1, 5000);
-  useImageSlider(setCurrentIndex2, images2, 5000);
 
   return (
     <div className="bg-[#F2F2F2]">
-      {/* Hình ảnh nền */}
       <div className="hidden md:flex justify-center mx-auto">
         <img
           src={logo2}
           alt=""
-          className="rounded-bl-3xl rounded-br-3xl  max-w-[1736px] w-full h-auto"
+          className="rounded-bl-3xl rounded-br-3xl max-w-[1736px] w-full h-auto"
         />
       </div>
 
-      {/* Nội dung chính */}
       <div className="container mx-auto px-4 lg:px-[160px] -mt-[110px] bg-transparent">
         <div className="p-6 rounded-lg flex flex-col lg:flex-row gap-4">
-          {/* Hình ảnh chính */}
           <div className="relative overflow-hidden w-full lg:w-[770px] lg:h-[330px] group">
             <button
-              onClick={prevImg}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              onClick={prevMain}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
             >
-              <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl" />
+              <icons.IoIosArrowDropleft className="text-white text-3xl" />
             </button>
-            <div
-              className="flex transition-transform duration-700 ease-in-out "
-              style={{ transform: `translateX(${-currentIndex * 100}%)` }}
+
+            <Swiper
+              modules={[ Autoplay]}
+              loop={true}
+              onSwiper={(swiper) => (swiperRef.current = swiper)}
+              onSlideChange={(swiper) => setCurrentIndex(swiper.realIndex)} 
+              autoplay={{
+                delay: 4000,
+                disableOnInteraction: false,
+              }}
+              className="w-full h-full"
             >
               {images.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-auto lg:w-[770px] lg:h-[330px] rounded-lg flex-shrink-0"
-                />
+                <SwiperSlide key={index}>
+                  <img
+                    src={image}
+                    alt={`Slide ${index + 1}`}
+                    className="w-full h-auto lg:w-[770px] lg:h-[330px] rounded-lg"
+                  />
+                </SwiperSlide>
               ))}
-            </div>
+            </Swiper>
+
             <button
-              onClick={nextImg}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              onClick={nextMain}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
             >
-              <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
+              <icons.IoIosArrowDropright className="text-white text-3xl" />
             </button>
           </div>
 
-          {/* Tên sản phẩm và giá */}
           <div className="absolute bottom-[-70px] text-black text-center hidden lg:block">
-            <div className="flex justify-center flex-wrap ">
+            <div className="flex justify-center flex-wrap">
               {imageNames.map((name, index) => (
                 <div
                   key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`bg-white p-4  w-[150px] lg:w-[190px] text-center cursor-pointer ${
-                    index === currentIndex ? "border-b-4 border-red-500" : ""
+                  onClick={() => goToSlide(index)}
+                  className={`bg-white p-4 w-[150px] lg:w-[190px] text-center cursor-pointer ${
+                    index === currentIndex ? "border-b-4 border-[#f00]" : ""
                   }`}
                 >
                   <h3 className="text-sm font-medium">{name}</h3>
@@ -131,61 +122,78 @@ const FeaturedProducts = () => {
             </div>
           </div>
 
-          {/* Các ảnh phụ */}
           <div className="flex flex-col justify-center items-center gap-6 lg:gap-5">
-            <div className="relative overflow-hidden w-full lg:w-[390px] lg:h-[190px] group lg:flex hidden">
+            <div className="relative overflow-hidden w-full lg:w-[390px] lg:h-[190px] group">
               <button
-                onClick={prevImg1}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                onClick={prevSub1}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
               >
-                <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl" />
+                <icons.IoIosArrowDropleft className="text-white text-3xl" />
               </button>
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(${-currentIndex1 * 100}%)` }}
+
+              <Swiper
+                modules={[ Autoplay]}
+                loop={true}
+                autoplay={{
+                  delay: 5000,
+                  disableOnInteraction: false,
+                }}
+                onSwiper={(swiper) => (swiperRef1.current = swiper)}
+                className="w-full h-full"
               >
                 {images1.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full h-auto rounded-lg flex-shrink-0"
-                  />
+                  <SwiperSlide key={index}>
+                    <img
+                      src={image}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
+
               <button
-                onClick={nextImg1}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                onClick={nextSub1}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
               >
-                <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
+                <icons.IoIosArrowDropright className="text-white text-3xl" />
               </button>
             </div>
 
-            <div className="relative overflow-hidden w-full lg:w-[390px] lg:h-[190px] group lg:flex hidden">
+            <div className="relative overflow-hidden w-full lg:w-[390px] lg:h-[190px] group">
               <button
-                onClick={prevImg2}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                onClick={prevSub2}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
               >
-                <icons.IoIosArrowDropleftCircle className="text-gray-200 text-4xl" />
+                <icons.IoIosArrowDropleft className="text-white text-3xl" />
               </button>
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(${-currentIndex2 * 100}%)` }}
+
+              <Swiper
+                modules={[ Autoplay]}
+                loop={true}
+                autoplay={{
+                  delay: 5000,
+                  disableOnInteraction: false,
+                }}
+                onSwiper={(swiper) => (swiperRef2.current = swiper)}
+                className="w-full h-full"
               >
                 {images2.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full h-auto rounded-lg flex-shrink-0"
-                  />
+                  <SwiperSlide key={index}>
+                    <img
+                      src={image}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
+
               <button
-                onClick={nextImg2}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                onClick={nextSub2}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
               >
-                <icons.IoIosArrowDroprightCircle className="text-gray-200 text-4xl" />
+                <icons.IoIosArrowDropright className="text-white text-3xl" />
               </button>
             </div>
           </div>

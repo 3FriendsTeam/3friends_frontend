@@ -1,36 +1,14 @@
+import { useEffect } from "react";
+import api from "../../../middlewares/tokenMiddleware";
 
 
 const PurchaseHistory = () => {
-  const orders = [
-    {
-      id: 1,
-      name: "Xiaomi 14T Pro - Xám",
-      price: "17.990.000đ",
-      status: "Đã hủy",
-      date: "14/11/2024 00:21",
-      actions: ["Xem chi tiết"],
-      image: "https://via.placeholder.com/150", // Replace with actual image URL
-    },
-    {
-      id: 2,
-      name: "Xiaomi 11T Pro-Xám",
-      price: "11.990.000đ",
-      status: "Đã hủy",
-      date: "08/04/2022 20:25",
-      actions: ["Xem chi tiết"],
-      image: "https://via.placeholder.com/150", // Replace with actual image URL
-    },
-    {
-      id: 3,
-      name: "Xiaomi 11T Pro-Xám",
-      price: "11.990.000đ",
-      status: "Đã giao hàng",
-      additionalStatus: "Đã xuất VAT",
-      date: "08/04/2022 19:54",
-      actions: ["Xem hóa đơn", "Xem chi tiết"],
-      image: "https://via.placeholder.com/150", // Replace with actual image URL
-    },
-  ];
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+  useEffect(async () => {
+    const response = await api.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/get-orders-by-id-customer`
+  );
+  }, []);
 
   return (
     <div className="p-6 bg-gray-100">

@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useEffect, useState,useRef  } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import icons from "../../../utils/icons";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +52,7 @@ const ListBestSellingProducts = ({ categoryId }) => {
   };
 
   const nextSlide = () => {
-    swiperRef.current?.slideNext(); 
+    swiperRef.current?.slideNext();
   };
 
   const prevSlide = () => {
@@ -124,7 +124,7 @@ const ListBestSellingProducts = ({ categoryId }) => {
                 </p>
 
                 <p
-                  className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200"
+                  className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2"
                   style={{ minHeight: "50px" }}
                 >
                   {product.Description || "No promotion available"}

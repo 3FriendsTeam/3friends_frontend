@@ -183,11 +183,11 @@ const ViewDeliveryReceipt = () => {
           Array.isArray(data.data.DeliveryReceiptDetails)
             ? data.data.DeliveryReceiptDetails.map((prod) => ({
                 ...prod,
-                ProductName: prod.Product ? prod.Product.ProductName : '',
+                ProductName: prod.Product ? prod.Product.ProductName : "",
                 UnitPrice: prod.UnitPrice,
                 Quantity: prod.Quantity,
+                Notes: prod.Notes,
                 TotalPrice: (prod.UnitPrice || 0) * (prod.Quantity || 0),
-                
               }))
             : []
         );
@@ -244,15 +244,19 @@ const ViewDeliveryReceipt = () => {
         UnitPrice: product.UnitPrice,
       })),
       TotalPrice: totalPrice,
-      EmployeeID : employee.data.id
-
+      EmployeeID: employee.data.id,
     };
 
     try {
       if (editingReceipt) {
         await axios.put(
-          `${import.meta.env.VITE_BACKEND_URL}/api/delivery-receipts/${editingReceipt.ReceiptID}`,
-          requestData
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-delivery-receipt`,
+          {
+            DeliveryDate: requestData.DeliveryDate,
+            Notes: requestData.Notes,
+            Details: requestData.Details,
+          },
+          { params: { id: editingReceipt.id } }
         );
         message.success("Receipt updated successfully!");
       } else {
@@ -442,9 +446,7 @@ const ViewDeliveryReceipt = () => {
           <Form.Item
             name="SupplierID"
             label="Nhà cung cấp"
-            rules={[
-              { required: true, message: "Vui lòng chọn nhà cung cấp!" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng chọn nhà cung cấp!" }]}
           >
             <Select
               placeholder="Chọn nhà cung cấp"
@@ -453,10 +455,7 @@ const ViewDeliveryReceipt = () => {
               optionFilterProp="children"
             >
               {suppliers.map((supplier) => (
-                <Option
-                  key={supplier.SupplierID}
-                  value={supplier.SupplierID}
-                >
+                <Option key={supplier.SupplierID} value={supplier.SupplierID}>
                   {supplier.SupplierName}
                 </Option>
               ))}
@@ -488,10 +487,7 @@ const ViewDeliveryReceipt = () => {
               optionFilterProp="children"
             >
               {products.map((product) => (
-                <Option
-                  key={product.ProductID}
-                  value={product.ProductID}
-                >
+                <Option key={product.ProductID} value={product.ProductID}>
                   #{product.ProductID} - {product.ProductName}
                 </Option>
               ))}

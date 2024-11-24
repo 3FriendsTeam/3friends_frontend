@@ -186,12 +186,12 @@ const LookOrders = () => {
                         <div className="flex items-center">
                           <Image
                             width={80}
-                            src={`http://localhost:3001/images/${productDetail.Product.RepresentativeImage}`}
+                            src={productDetail.Product.RepresentativeImage}
                             alt={productDetail.Product.ProductName}
-                            className="mr-4"
+
                           />
-                          <div>
-                            <p>
+                          <div className='ml-5'>
+                            <p >
                               <strong>{productDetail.Product.ProductName}</strong>
                             </p>
                             <p>

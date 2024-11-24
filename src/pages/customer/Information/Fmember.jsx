@@ -7,7 +7,6 @@ import FmenberHome from "./FmemberHome";
 import icons from "../../../utils/icons";
 import PurchaseHistory from "./PurchaseHistory";
 import HistoryReturnProduct from "./HistoryReturnProduct";
-import FmemberHome from "./FmemberHome";
 function CustomerInformation() {
   const [activeComponent, setActiveComponent] = useState("home");
   const [showLogoutModal, setShowLogoutModal] = useState(false);

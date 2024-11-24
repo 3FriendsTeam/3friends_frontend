@@ -85,7 +85,7 @@ const PurchaseHistory = () => {
     try {
       await api.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${orderId}`,
-        { OrderStatus: "Hủy đơn hàng" } 
+        { OrderStatus: "Đã hủy" } 
     );
     fetchPurchaseHistory();
       message.success("Đơn hàng đã được hủy thành công.");

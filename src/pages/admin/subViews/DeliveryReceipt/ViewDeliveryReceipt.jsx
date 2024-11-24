@@ -171,24 +171,28 @@ const ViewDeliveryReceipt = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-delivery-receipt`,
-          { params: { ReceiptID: record.ReceiptID } }
+          `${import.meta.env.VITE_BACKEND_URL}/api//get-delivery-receipt-by-id`,
+          { params: { id: record.id } }
         );
-        setEditingReceipt(data);
+        setEditingReceipt(data.data);
         form.setFieldsValue({
-          ...data,
-          DeliveryDate: moment(data.DeliveryDate),
+          ...data.data,
+          DeliveryDate: moment(data.data.DeliveryDate),
         });
         setSelectedProducts(
-          Array.isArray(data.Products)
-            ? data.Products.map((prod) => ({
+          Array.isArray(data.data.DeliveryReceiptDetails)
+            ? data.data.DeliveryReceiptDetails.map((prod) => ({
                 ...prod,
+                ProductName: prod.Product ? prod.Product.ProductName : '',
+                UnitPrice: prod.UnitPrice,
+                Quantity: prod.Quantity,
                 TotalPrice: (prod.UnitPrice || 0) * (prod.Quantity || 0),
+                
               }))
             : []
         );
         // Fetch supplier details and products
-        fetchProductsBySupplier(data.SupplierID);
+        fetchProductsBySupplier(data.data.SupplierID);
       } catch (error) {
         console.error(error);
         message.error("Error fetching receipt details!");
@@ -289,7 +293,7 @@ const ViewDeliveryReceipt = () => {
 
   // Columns for receipts table
   const columns = [
-    { title: "ID", dataIndex: "ReceiptID", key: "ReceiptID" },
+    { title: "ID", dataIndex: "id", key: "id" },
     {
       title: "Ngày nhập hàng",
       dataIndex: "DeliveryDate",

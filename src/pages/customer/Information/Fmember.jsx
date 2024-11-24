@@ -6,6 +6,7 @@ import { path } from "../../../utils/constant";
 import FmenberHome from "./FmemberHome";
 import icons from "../../../utils/icons";
 import PurchaseHistory from "./PurchaseHistory";
+import HistoryReturnProduct from "./HistoryReturnProduct";
 import FmemberHome from "./FmemberHome";
 function CustomerInformation() {
   const [activeComponent, setActiveComponent] = useState("home");
@@ -67,58 +68,15 @@ function CustomerInformation() {
             <a
               href="#"
               className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
-                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+                activeComponent === "historyReturnProduct" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
               }`}
-              onClick={() => setActiveComponent("history")}
+              onClick={() => setActiveComponent("historyReturnProduct")}
             >
               <span className="flex items-center gap-3">
-                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
+                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử trả hàng
               </span>
             </a>
-            <a
-              href="#"
-              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
-                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
-              }`}
-              onClick={() => setActiveComponent("history")}
-            >
-              <span className="flex items-center gap-3">
-                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
-              </span>
-            </a>
-            <a
-              href="#"
-              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
-                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
-              }`}
-              onClick={() => setActiveComponent("history")}
-            >
-              <span className="flex items-center gap-3">
-                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
-              </span>
-            </a>
-            <a
-              href="#"
-              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
-                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
-              }`}
-              onClick={() => setActiveComponent("history")}
-            >
-              <span className="flex items-center gap-3">
-                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
-              </span>
-            </a>
-            <a
-              href="#"
-              className={`flex items-center space-x-2 font-semibold  px-3 py-2 rounded ${
-                activeComponent === "" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
-              }`}
-              onClick={() => setActiveComponent("history")}
-            >
-              <span className="flex items-center gap-3">
-                <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử mua hàng
-              </span>
-            </a>
+            
            
             <NavLink
               to="#"
@@ -136,6 +94,7 @@ function CustomerInformation() {
         <div className="flex-1 p-5">
           {activeComponent === "home" && <FmenberHome />}
           {activeComponent === "profile" && <UserProfile />}
+          {activeComponent === "historyReturnProduct" && <HistoryReturnProduct />}
           {activeComponent === "history" && (
             <div>
               <FmemberHome />

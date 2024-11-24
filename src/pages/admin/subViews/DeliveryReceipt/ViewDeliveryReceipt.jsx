@@ -8,6 +8,7 @@ import {
   DatePicker,
   Select,
   message,
+  Tag,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -26,6 +27,7 @@ const ViewDeliveryReceipt = () => {
   const [editingReceipt, setEditingReceipt] = useState(null);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [supplierDetails, setSupplierDetails] = useState(null); // Selected supplier details
+  const [supplierMap, setSupplierMap] = useState({});
   const employee = getEmployeeLogin();
   const [form] = Form.useForm();
 
@@ -51,7 +53,18 @@ const ViewDeliveryReceipt = () => {
       const { data } = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/suppliers`
       );
-      setSuppliers(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        setSuppliers(data);
+        // Tạo đối tượng ánh xạ SupplierID -> SupplierName
+        const map = {};
+        data.forEach((supplier) => {
+          map[supplier.SupplierID] = supplier.SupplierName;
+        });
+        setSupplierMap(map);
+      } else {
+        setSuppliers([]);
+        setSupplierMap({});
+      }
     } catch (error) {
       console.error(error);
       message.error("Error fetching suppliers!");
@@ -276,17 +289,36 @@ const ViewDeliveryReceipt = () => {
     }
   };
 
-  // Delete delivery receipt
-  const handleDelete = async (id) => {
+  const handleCompleteDeliveryreceipt = async (id) => {
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/delivery-receipts/${id}`
+      await axios.put(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/update-status-delivery-receipt`,
+        { status: "Hoàn thành" },
+        { params: { id } }
       );
-      setReceipts(receipts.filter((item) => item.ReceiptID !== id));
-      message.success("Receipt deleted successfully!");
+      fetchReceipts();
+      message.success("Receipt completed successfully!");
     } catch (error) {
       console.error(error);
-      message.error("Error deleting receipt!");
+      message.error("Error completing receipt!");
+    }
+  };
+  const handleCancelDeliveryreceipt = async (id) => {
+    try {
+      await axios.put(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/update-status-delivery-receipt`,
+        { status: "Hủy đơn" },
+        { params: { id } }
+      );
+      fetchReceipts();
+      message.success("Receipt cancel successfully!");
+    } catch (error) {
+      console.error(error);
+      message.error("Error cancel receipt!");
     }
   };
 
@@ -305,7 +337,12 @@ const ViewDeliveryReceipt = () => {
       render: (date) => moment(date).format("YYYY-MM-DD"),
     },
     { title: "Ghi chú", dataIndex: "Notes", key: "Notes" },
-    { title: "Nhà cung cấp", dataIndex: "SupplierName", key: "SupplierName" },
+    {
+      title: "Nhà cung cấp",
+      dataIndex: "SupplierID",
+      key: "SupplierID",
+      render: (supplierId) => supplierMap[supplierId] || "Không rõ",
+    },
     {
       title: "Tổng tiền",
       dataIndex: "TotalPrice",
@@ -324,13 +361,28 @@ const ViewDeliveryReceipt = () => {
           <Button type="link" onClick={() => openModal(record)}>
             Sửa
           </Button>
-          <Button
-            type="link"
-            danger
-            onClick={() => handleDelete(record.ReceiptID)}
-          >
-            Xóa
-          </Button>
+          {record.Status === "Chờ xử lý" ? (
+            <Select
+              value={record.Status}
+              style={{ width: 120 }}
+              onChange={(value) => {
+                if (value === "Hoàn thành") {
+                  handleCompleteDeliveryreceipt(record.id);
+                } else if (value === "Hủy") {
+                  handleCancelDeliveryreceipt(record.id);
+                }
+              }}
+            >
+              <Select.Option value="Hoàn thành">
+                hoàn thành đơn hàng
+              </Select.Option>
+              <Select.Option value="Hủy">hủy đơn hàng</Select.Option>
+            </Select>
+          ) : (
+            <Tag color={record.Status === "Hoàn thành" ? "green" : "red"}>
+              {record.Status}
+            </Tag>
+          )}
         </>
       ),
     },

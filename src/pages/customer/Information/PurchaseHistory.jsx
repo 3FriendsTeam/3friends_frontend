@@ -1,79 +1,290 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import api from "../../../middlewares/tokenMiddleware";
-
+import moment from "moment";
+import { message } from "antd";
 
 const PurchaseHistory = () => {
   const [purchaseHistory, setPurchaseHistory] = useState([]);
-  useEffect(async () => {
-    const response = await api.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/get-orders-by-id-customer`
-  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // State cho bộ lọc
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("Tất cả");
+
+  // State để quản lý các đơn hàng đang được mở rộng để xem chi tiết
+  const [expandedOrderIds, setExpandedOrderIds] = useState([]);
+
+  // State để quản lý việc hủy đơn hàng
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [cancelError, setCancelError] = useState(null);
+  const fetchPurchaseHistory = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-orders-by-id-customer`
+      );
+      setPurchaseHistory(response.data);
+      console.log("Dữ liệu purchaseHistory sau khi set:", response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải đơn hàng:", error);
+      setError("Đã xảy ra lỗi khi tải đơn hàng.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchPurchaseHistory();
   }, []);
+
+  // Hàm xử lý bộ lọc
+  const handleFilter = () => {
+    // Không cần làm gì thêm ở đây vì useMemo sẽ tự động cập nhật
+  };
+
+  // Sử dụng useMemo để tối ưu hiệu suất khi lọc
+  const filteredPurchaseHistory = useMemo(() => {
+    return purchaseHistory.filter((order) => {
+      const orderDate = moment(order.OrderDate);
+      const isWithinDateRange =
+        (!startDate || orderDate.isSameOrAfter(moment(startDate))) &&
+        (!endDate || orderDate.isSameOrBefore(moment(endDate)));
+      const isStatusMatch =
+        selectedStatus === "Tất cả" || order.OrderStatus === selectedStatus;
+      return isWithinDateRange && isStatusMatch;
+    });
+  }, [purchaseHistory, startDate, endDate, selectedStatus]);
+
+  // Các trạng thái có thể lọc
+  const orderStatuses = [
+    "Tất cả",
+    "Chờ xác nhận",
+    "Đã xác nhận",
+    "Đang vận chuyển",
+    "Đã giao hàng",
+    "Đã hủy",
+  ];
+
+  // Hàm để mở rộng hoặc thu gọn chi tiết đơn hàng
+  const toggleOrderDetails = (orderId) => {
+    setExpandedOrderIds((prev) =>
+      prev.includes(orderId)
+        ? prev.filter((id) => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  // Hàm để hủy đơn hàng
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Xác nhận hủy đơn hàng?", "", { type: "warning" })) {
+      return;
+    }
+    setCancellingOrderId(orderId);
+    setCancelError(null);
+    try {
+      await api.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${orderId}`,
+        { OrderStatus: "Hủy đơn hàng" } 
+    );
+    fetchPurchaseHistory();
+      message.success("Đơn hàng đã được hủy thành công.");
+    } catch (error) {
+      console.error("Lỗi khi hủy đơn hàng:", error);
+      message.error("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
+    }
+  };
 
   return (
     <div className="p-6 bg-gray-100">
       {/* Filter and Date Range */}
       <div className="flex items-center justify-between mb-6 flex-wrap">
-        <input
-          type="date"
-          className="border border-gray-300 p-2 rounded mr-4 mb-2"
-          placeholder="Từ ngày"
-        />
-        <input
-          type="date"
-          className="border border-gray-300 p-2 rounded mr-4 mb-2"
-          placeholder="Đến ngày"
-        />
-        <div className="flex flex-wrap gap-2">
-          <button className="bg-red-500 text-white px-4 py-2 rounded mb-2">Tất cả</button>
-          <button className="bg-gray-200 px-4 py-2 rounded mb-2">Chờ xác nhận</button>
-          <button className="bg-gray-200 px-4 py-2 rounded mb-2">Đã xác nhận</button>
-          <button className="bg-gray-200 px-4 py-2 rounded mb-2">Đang vận chuyển</button>
-          <button className="bg-gray-200 px-4 py-2 rounded mb-2">Đã giao hàng</button>
-          <button className="bg-gray-200 px-4 py-2 rounded mb-2">Đã hủy</button>
+        <div className="flex items-center flex-wrap gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Từ ngày
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border border-gray-300 p-2 rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Đến ngày
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border border-gray-300 p-2 rounded"
+            />
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+          {orderStatuses.map((status) => (
+            <button
+              key={status}
+              onClick={() => setSelectedStatus(status)}
+              className={`px-4 py-2 rounded ${
+                selectedStatus === status
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 md:mt-0">
+          <button
+            onClick={handleFilter}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Lọc
+          </button>
         </div>
       </div>
+
       {/* Order List */}
       <div className="space-y-6">
-        {orders.map((order) => (
-          <div
-            key={order.id}
-            className="bg-white shadow rounded-lg flex items-center p-4 gap-4"
-          >
-            <img
-              src={order.image}
-              alt={order.name}
-              className="w-20 h-20 object-cover rounded-md border"
-            />
-            <div className="flex-1">
-              <p className="text-lg font-semibold">{order.name}</p>
-              <p className="text-red-500 font-bold text-lg">{order.price}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="bg-gray-200 px-2 py-1 text-sm rounded">
-                  {order.status}
-                </span>
-                {order.additionalStatus && (
-                  <span className="bg-red-100 text-red-500 px-2 py-1 text-sm rounded">
-                    {order.additionalStatus}
-                  </span>
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <svg
+              className="animate-spin h-8 w-8 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              ></path>
+            </svg>
+          </div>
+        ) : error ? (
+          <div className="text-red-500">{error}</div>
+        ) : filteredPurchaseHistory.length > 0 ? (
+          filteredPurchaseHistory.map((order) => {
+            const isExpanded = expandedOrderIds.includes(order.id);
+            return (
+              <div
+                key={order.id}
+                className="bg-white shadow rounded-lg p-6 flex flex-col gap-4"
+              >
+                {/* Order Header */}
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-xl font-semibold">Đơn hàng #{order.id}</h2>
+                    <p className="text-gray-600">
+                      Ngày đặt hàng: {moment(order.OrderDate).format("DD/MM/YYYY")}
+                    </p>
+                    <p className="text-gray-600">Trạng thái: {order.OrderStatus}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-red-500">
+                      Tổng tiền: {Number(order.TotalAmount).toLocaleString()} VND
+                    </p>
+                    <p className="text-gray-600">
+                      Tổng thanh toán: {Number(order.SumTotalAmount).toLocaleString()} VND
+                    </p>
+                    <p className="text-gray-600">Số sản phẩm: {order.CountOrders}</p>
+                  </div>
+                </div>
+
+                {/* Order Actions */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => toggleOrderDetails(order.id)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    {isExpanded ? "Ẩn chi tiết" : "Xem chi tiết"}
+                  </button>
+                  {isExpanded && (
+                    <button
+                      onClick={() => toggleOrderDetails(order.id)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded"
+                    >
+                      Trở lại
+                    </button>
+                  )}
+                </div>
+
+                {/* Order Details */}
+                {isExpanded && (
+                  <div className="mt-4">
+                    {/* Order Products */}
+                    {order.OrderProductDetails.length > 0 ? (
+                      <div className="space-y-4">
+                        {order.OrderProductDetails.map((product) => (
+                          <div
+                            key={product.id}
+                            className="flex items-center gap-4 border-t pt-4"
+                          >
+                            <img
+                              src={product.Product.RepresentativeImage}
+                              alt={product.Product.ProductName}
+                              className="w-20 h-20 object-cover rounded-md border"
+                            />
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold">
+                                {product.Product.ProductName}
+                              </h3>
+                              <p className="text-gray-600">
+                                Số lượng: {product.Quantity}
+                              </p>
+                              <p className="text-gray-600">
+                                Giá: {Number(product.UnitPrice).toLocaleString()} VND
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-gray-600">
+                                Thành tiền:{" "}
+                                {(Number(product.UnitPrice) * product.Quantity).toLocaleString()}{" "}
+                                VND
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-600">Không có sản phẩm nào trong đơn hàng này.</p>
+                    )}
+
+                    {/* Hủy Đơn Hàng */}
+                    {order.OrderStatus === "Chờ xác nhận" && (
+                      <div className="mt-4">
+                        {cancelError && (
+                          <p className="text-red-500 mb-2">{cancelError}</p>
+                        )}
+                        <button
+                          onClick={() => handleCancelOrder(order.id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded"
+                          disabled={cancellingOrderId === order.id}
+                        >
+                          {cancellingOrderId === order.id ? "Đang hủy..." : "Hủy đơn hàng"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500 mb-2">{order.date}</p>
-              <div className="flex flex-wrap gap-2">
-                {order.actions.map((action, index) => (
-                  <button
-                    key={index}
-                    className="text-red-500 border border-red-500 px-2 py-1 rounded hover:bg-red-500 hover:text-white"
-                  >
-                    {action}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
+            );
+          })
+        ) : (
+          <p>Không có đơn hàng nào phù hợp với bộ lọc đã chọn.</p>
+        )}
       </div>
     </div>
   );

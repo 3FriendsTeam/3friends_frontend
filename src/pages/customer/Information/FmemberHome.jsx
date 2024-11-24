@@ -52,18 +52,6 @@ const FmemberHome = () => {
           </div>
         </div>
       </div>
-
-      <div className="flex justify-between items-center text-center bg-white rounded-xl p-2 shadow">
-        <div className=" flex-1 flex flex-col justify-center items-center">
-          <p className="text-4xl font-bold text-gray-800">3</p>
-          <p className="text-lg text-gray-500">đơn hàng</p>
-        </div>
-        <div className="h-24 w-px bg-black"></div>
-        <div className="flex-1 flex flex-col justify-center items-center">
-          <p className="text-4xl font-bold text-gray-800">11M</p>
-          <p className="text-lg text-gray-500">Tổng tiền tích lũy</p>
-        </div>
-      </div>
     </div>
   );
 };

@@ -96,10 +96,9 @@ function CustomerInformation() {
           {activeComponent === "profile" && <UserProfile />}
           {activeComponent === "historyReturnProduct" && <HistoryReturnProduct />}
           {activeComponent === "history" && (
-            <div>
-              <FmemberHome />
+            
               <PurchaseHistory />
-            </div>
+            
           )}
         </div>
       </div>

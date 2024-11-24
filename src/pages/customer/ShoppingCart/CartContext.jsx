@@ -1,13 +1,13 @@
 import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
-export const CartContext = createContext();
-export const CartProvider = ({ children }) => {
+export const CartContext = createContext();export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
-
   const addToCart = (product) => {
-    const productId = `${product.name}-${product.color}`;
-  
+    const productId = product.color
+      ? `${product.name}-${product.color}`
+      : `${product.name}`;
+    
     const existingProductIndex = cartItems.findIndex(
       (item) => item.id === productId
     );
@@ -22,11 +22,17 @@ export const CartProvider = ({ children }) => {
     } else {
       setCartItems([
         ...cartItems,
-        { ...product, id: productId, quantity: 1 },
+        {
+          ...product,
+          id: productId,
+          quantity: 1,
+          price: String(product.price),
+        },
       ]);
     }
   };
-
+  
+  
 
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
@@ -34,7 +40,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cartItems,setCartItems, addToCart, removeFromCart }}
+      value={{ cartItems, setCartItems, addToCart, removeFromCart }}
     >
       {children}
     </CartContext.Provider>

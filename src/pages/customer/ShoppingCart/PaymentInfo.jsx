@@ -105,7 +105,7 @@ const PaymentInfo = () => {
 
                     <div className="ml-6 flex-1">
                       <h2 className="font-semibold">
-                        {item?.name} - {item?.color}
+                      {item?.name} {item?.color && `- ${item.color}`}
                       </h2>
                       <span className="text-[#e0052b]">
                         {formatPrice(

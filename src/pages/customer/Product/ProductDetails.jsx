@@ -3,7 +3,6 @@ import NavigationBar from "../../../pages/customer/Animations/NavigationBar";
 import Footer from "../../../components/Client/Footer";
 import Header from "../../../components/Client/Header";
 import icons from "../../../utils/icons";
-import ctsp1 from "../../../assets/client/ctsp1.jpeg";
 import ProductsDescribe from "./ProductsDescribe";
 import { CartContext } from "../ShoppingCart/CartContext";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,34 +25,18 @@ const ProductDetails = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id`,
           {
-            params: { id: productId }, 
+            params: { id: productId },
           }
         );
         setProduct(response.data);
       } catch (error) {
         console.error("Error fetching product details:", error);
-        setProduct(null); 
+        setProduct(null);
       }
     };
 
-    if (productId) fetchProductDetails();  
+    if (productId) fetchProductDetails();
   }, [productId]);
-
-  
-  const products = [
-    {
-      name: "Samsung Galaxy Z 12GB 256GB",
-      price: "41.990.000 ₫",
-    },
-    {
-      name: "Samsung Galaxy Z 12GB 512GB",
-      price: "41.990.000 ₫",
-    },
-    {
-      name: "Samsung Galaxy Z 12GB 1TB",
-      price: "41.990.000 ₫",
-    },
-  ];
 
   const promotions = [
     {
@@ -89,42 +72,51 @@ const ProductDetails = () => {
     },
   ];
 
-  const colors = [
-    { name: "Xanh", imgSrc: ctsp1 },
-    { name: "Đen", imgSrc: ctsp1 },
-  ];
- 
-
   const [isExpanded, setIsExpanded] = useState(false);
   const { addToCart } = useContext(CartContext);
-  const [selectedIndex, setSelectedIndex] = useState(null);
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
-
-  const handleProductClick = (index) => {
-    setSelectedIndex(index);
-  };
 
   const handleColorClick = (index) => {
     setSelectedColorIndex(index);
   };
 
   const handleBuyNow = () => {
-    if (selectedIndex !== null && selectedColorIndex !== null) {
+    if (product?.Colors?.length > 0) {
+      if (selectedColorIndex !== null && product?.Colors) {
+        const selectedColor = product.Colors[selectedColorIndex];
+        if (selectedColor) {
+          const selectedProduct = {
+            id: product.id,
+            name: product.ProductName,
+            price: product.PromotionalPrice,
+            color: selectedColor.ColorName,
+            imgSrc: getImagePath(product.RepresentativeImage),
+            quantity: 1,
+          };
+  
+          addToCart(selectedProduct);
+          navigate(path.SHOPPINGCART);
+        } else {
+          alert("Lỗi: Không thể lấy thông tin màu sắc.");
+        }
+      } else {
+        alert("Vui lòng chọn màu sắc.");
+      }
+    } else {
       const selectedProduct = {
-        id: `${products[selectedIndex].id}-${colors[selectedColorIndex].name}`, // Tạo id duy nhất
-        name: products[selectedIndex].name,
-        price: products[selectedIndex].price,
-        color: colors[selectedColorIndex].name,
-        imgSrc: colors[selectedColorIndex].imgSrc,
+        id: product.id,
+        name: product.ProductName,
+        price: product.PromotionalPrice,
+        imgSrc: getImagePath(product.RepresentativeImage),
+        quantity: 1,
       };
   
       addToCart(selectedProduct);
       navigate(path.SHOPPINGCART);
-    } else {
-      alert("Vui lòng chọn cấu hình và màu sắc.");
     }
   };
   
+
   const toggleDetails = () => {
     setIsExpanded(!isExpanded);
   };
@@ -137,7 +129,7 @@ const ProductDetails = () => {
       <div className="flex justify-center items-center h-full">
         <p>Loading...</p>
       </div>
-    ); 
+    );
   }
 
   return (
@@ -152,9 +144,7 @@ const ProductDetails = () => {
         <div className="w-[1170px] flex bg-white rounded-xl">
           <div className="h-[700px] w-[585px] ">
             <div className="flex flex-col p-4  h-full">
-              <div className="font-bold text-xl">
-                {product.ProductName}
-              </div>
+              <div className="font-bold text-xl">{product.ProductName}</div>
               <div className="flex  mt-1">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="p-1 rounded-full">
@@ -163,9 +153,15 @@ const ProductDetails = () => {
                 ))}
                 <span className="text-gray-500 ml-4">7 đánh giá</span>
               </div>
-              <p className="text-red-500 text-xl font-bold mt-2">
-                {product.Price} 25.990.000 ₫
-              </p>
+              <div className="flex  space-x-2 mt-2">
+                <p className="text-red-500 text-xl font-bold">
+                  {product.PromotionalPrice} ₫
+                </p>
+                <p className="text-gray-400 font-medium text-sm line-through mt-[6px]">
+                  {product.ListedPrice} ₫
+                </p>
+              </div>
+
               <p className="text-[14px] text-gray-500 mt-2">
                 Đã bao gồm thuế VAT
               </p>
@@ -188,13 +184,15 @@ const ProductDetails = () => {
                   <icons.IoIosArrowDropleftCircle className="text-gray-400 text-3xl " />
                 </button>
                 <div className="flex mt-6 justify-center">
-                    <img
-                      src={product.RepresentativeImage
-                    ? getImagePath(product.RepresentativeImage)
-                    : ""}
-                      alt=""
-                      className="rounded-lg object-cover w-[333px] h-[333px]"
-                    />
+                  <img
+                    src={
+                      product.RepresentativeImage
+                        ? getImagePath(product.RepresentativeImage)
+                        : ""
+                    }
+                    alt=""
+                    className="rounded-lg object-cover w-[333px] h-[333px]"
+                  />
                 </div>
                 <button
                   onClick={() => {}}
@@ -233,49 +231,20 @@ const ProductDetails = () => {
               isExpanded ? "overflow-y-scroll" : ""
             }`}
           >
-            <h2 className="text-[16px] font-semibold">
-              LỰA CHỌN CẤU HÌNH VÀ MÀU SẮC
-            </h2>
-            <div className="flex space-x-4 mt-2 text-[14px] text-center">
-              {products.map((product, index) => (
-                <div
-                  key={index}
-                  className={`border rounded-xl ${
-                    selectedIndex === index
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <button
-                    className="font-semibold p-1 rounded-md"
-                    onClick={() => handleProductClick(index)}
-                  >
-                    {product.name}
-                  </button>
-                  <span className="text-[#555458] font-semibold">
-                    {product.price}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-[16px] font-semibold">LỰA CHỌN MÀU SẮC</h2>
 
             <div className="flex items-center space-x-4 mt-2 text-[14px]">
-              {colors.map((color, index) => (
+              {product?.Colors?.map((color, index) => (
                 <button
-                  key={index}
-                  className={`border p-2 rounded-xl flex items-center gap-2 w-[calc(20%+20px)] ${
+                  key={color.id}
+                  className={`border p-2 rounded-lg flex  text-center gap-2 w-[calc(20%+20px)] ${
                     selectedColorIndex === index
-                      ? "border-red-500"
+                      ? "border-[#f00]"
                       : "border-gray-300"
                   }`}
                   onClick={() => handleColorClick(index)}
                 >
-                  <img
-                    src={color.imgSrc}
-                    alt={color.name}
-                    className="h-[40px] w-[42px]"
-                  />
-                  <p>{color.name}</p>
+                  <p>{color.ColorName}</p>
                 </button>
               ))}
             </div>
@@ -290,7 +259,7 @@ const ProductDetails = () => {
             </div>
             <div
               className={`pt-8 pr-4 pb-4 pl-4 bg-gray-100 border border-gray-300 rounded-bl-lg rounded-br-lg transition-all duration-300 ${
-                isExpanded ? "" : "h-[340px]"
+                isExpanded ? "" : "h-[433px]"
               }`}
             >
               {promotions.map((promo, index) => (
@@ -301,7 +270,7 @@ const ProductDetails = () => {
                   </h3>
                   <ul className={`list-none text-[14px] ml-2`}>
                     {promo.details
-                      .slice(0, isExpanded ? promo.details.length : 1)
+                      .slice(0, isExpanded ? promo.details.length : 2)
                       .map((detail, idx) => (
                         <li key={idx} className="flex items-center mb-1">
                           <span className="text-yellow-500 mr-2">
@@ -315,7 +284,7 @@ const ProductDetails = () => {
               ))}
               <button
                 onClick={toggleDetails}
-                className="bg-white rounded-xl text-[14px] mt-3 flex items-center justify-center mx-auto p-1 gap-1 w-[100px]"
+                className="bg-white rounded-xl text-[14px] mt-2 flex items-center justify-center mx-auto p-1 gap-1 w-[100px]"
               >
                 {isExpanded ? "Ẩn bớt" : "Đọc thêm"}
                 {isExpanded ? <icons.IoIosArrowUp /> : <icons.IoIosArrowDown />}

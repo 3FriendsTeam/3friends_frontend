@@ -139,7 +139,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       section: 'WareHouseManagement',
       subItems: [
         { label: 'Sản phẩm sắp hết hàng', section: 'lowStockProduct' }, // hiển thị danh sách sản phẩm sắp hết hàng <10 sản phẩm xuất file báo cáo
-        { label: 'Nhập hàng', section: 'accountInfo1' }, // nhập hàng, xử lý theo excel nhập hàng
+        { label: 'Nhập hàng', section: 'DeliveryReceipt' }, // nhập hàng, xử lý theo excel nhập hàng
       ],
     },
     {

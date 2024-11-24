@@ -7,14 +7,14 @@ import { CartContext } from "./CartContext";
 import { path } from "../../../utils/constant";
 
 const ShoppingCart = () => {
-  const { cartItems,setCartItems, removeFromCart } = useContext(CartContext);
+  const { cartItems, setCartItems, removeFromCart } = useContext(CartContext);
   const navigate = useNavigate();
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert("Giỏ hàng của bạn đang trống!");
       return;
     }
-    navigate(path.PAYMENTINFO, { state: { cartItems } }); // Truyền dữ liệu cartItems
+    navigate(path.PAYMENTINFO, { state: { cartItems } });
   };
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -23,29 +23,36 @@ const ShoppingCart = () => {
     }).format(price);
   };
 
-  const handleIncreaseQuantity = (productId, color) => {
+  const handleIncreaseQuantity = (productId, color = null) => {
     const updatedCartItems = cartItems.map((item) =>
-      item.id === productId && item.color === color
+      item.id === productId && (item.color === color || !item.color)
         ? { ...item, quantity: item.quantity + 1 }
         : item
     );
     setCartItems(updatedCartItems);
   };
-  // Hàm để giảm số lượng sản phẩm
-  const handleDecreaseQuantity = (productId, color) => {
+
+  const handleDecreaseQuantity = (productId, color = null) => {
     const updatedCartItems = cartItems.map((item) =>
-      item.id === productId && item.color === color && item.quantity > 1
+      item.id === productId &&
+      (item.color === color || !item.color) &&
+      item.quantity > 1
         ? { ...item, quantity: item.quantity - 1 }
         : item
     );
     setCartItems(updatedCartItems);
   };
+
   const handleRemoveItem = (id) => {
-    removeFromCart(id); 
+    removeFromCart(id);
   };
-  
+
   const totalAmount = cartItems.reduce((total, item) => {
-    const price = parseFloat(item.price.replace(/\D/g, ""));
+    const price =
+      typeof item.price === "string"
+        ? parseFloat(item.price.replace(/\D/g, ""))
+        : item.price;
+
     return total + price * item.quantity;
   }, 0);
 
@@ -68,7 +75,7 @@ const ShoppingCart = () => {
         ) : (
           <div className="w-[758.4px] bg-white p-4 rounded-lg shadow-lg">
             <h2 className="text-[17px]  mb-2">
-              Có {cartItems.length}{" "}
+              Có {cartItems.length}
               <span className="font-semibold">sản phẩm</span> trong giỏ hàng
             </h2>
             {cartItems.map((item, index) => (
@@ -84,7 +91,11 @@ const ShoppingCart = () => {
 
                 <div className="flex-1 ml-4">
                   <p className="font-semibold text-base">{item.name}</p>
-                  <p className="text-gray-500 text-sm">Màu sắc: {item.color}</p>
+                  {item.color && (
+                    <p className="text-gray-500 text-sm">
+                      Màu sắc: {item.color}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center space-x-2 -mt-4">
@@ -97,21 +108,27 @@ const ShoppingCart = () => {
                   <div className="flex items-center text-[20px]  space-x-1 bg-slate-200 rounded-2xl">
                     <button
                       className="w-8 h-8 rounded-full  flex items-center justify-center text-black"
-                      onClick={() => handleDecreaseQuantity(item.id, item.color)}
+                      onClick={() =>
+                        handleDecreaseQuantity(item.id, item.color)
+                      }
                     >
                       <icons.IoIosRemoveCircle />
                     </button>
                     <span className="font-semibold">{item.quantity}</span>
                     <button
                       className="w-8 h-8 rounded-full flex items-center justify-center text-black"
-                      onClick={() => handleIncreaseQuantity(item.id, item.color)}
+                      onClick={() =>
+                        handleIncreaseQuantity(item.id, item.color)
+                      }
                     >
                       <icons.IoIosAddCircle />
                     </button>
                   </div>
                 </div>
                 <p className="text-red-500 font-bold text-base -mt-4 ml-6">
-                {formatPrice(parseFloat(item.price.replace(/\D/g, "")) * item.quantity)}
+                  {formatPrice(
+                    parseFloat(item.price.replace(/\D/g, "")) * item.quantity
+                  )}
                 </p>
               </div>
             ))}
@@ -128,12 +145,13 @@ const ShoppingCart = () => {
                   Tổng tiền ({cartItems.length} sản phẩm):
                 </p>
                 <p className="text-[#e0052b] font-bold">
-                {formatPrice(totalAmount)}
+                  {formatPrice(totalAmount)}
                 </p>
               </div>
-              <button 
-              onClick={handleCheckout}
-              className="bg-[#e0052b] mr-4 text-white font-semibold py-3 px-6 rounded-3xl hover:bg-red-600 transition">
+              <button
+                onClick={handleCheckout}
+                className="bg-[#e0052b] mr-4 text-white font-semibold py-3 px-6 rounded-3xl hover:bg-red-600 transition"
+              >
                 MUA NGAY
               </button>
             </div>

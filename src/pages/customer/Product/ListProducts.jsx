@@ -74,9 +74,12 @@ const ListProducts = () => {
               <p className="text-[16px] font-bold text-[#e0052b] text-left mt-1">
                 {product.ListedPrice + " ₫"}
               </p>
-              <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md hover:bg-gray-200">
-                {product.Description || "No promotion available"}
-              </p>
+              <p
+                  className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2"
+                  style={{ minHeight: "50px" }}
+                >
+                  {product.Description || "No promotion available"}
+                </p>
             </div>
           ))}
         </div>

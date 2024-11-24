@@ -1,4 +1,8 @@
 import { useState, useContext, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 import NavigationBar from "../../../pages/customer/Animations/NavigationBar";
 import Footer from "../../../components/Client/Footer";
 import Header from "../../../components/Client/Header";
@@ -8,6 +12,8 @@ import { CartContext } from "../ShoppingCart/CartContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { path } from "../../../utils/constant";
 import axios from "axios";
+import ProductReview from "./ProductReview";
+import CustomerReviewProducts from "../caseCustomer/CustomerReviewProducts";
 
 const getImagePath = (imageName) => {
   if (!imageName) return "";
@@ -17,7 +23,16 @@ const getImagePath = (imageName) => {
 const ProductDetails = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { addToCart } = useContext(CartContext);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(null);
+  const [swiperRef, setSwiperRef] = useState(null);
   const navigate = useNavigate();
+  const currentImage =
+    product?.Images?.[currentImageIndex]?.FilePath ||
+    product?.RepresentativeImage ||
+    "default_image_path.jpg";
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -72,10 +87,6 @@ const ProductDetails = () => {
     },
   ];
 
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { addToCart } = useContext(CartContext);
-  const [selectedColorIndex, setSelectedColorIndex] = useState(null);
-
   const handleColorClick = (index) => {
     setSelectedColorIndex(index);
   };
@@ -93,7 +104,7 @@ const ProductDetails = () => {
             imgSrc: getImagePath(product.RepresentativeImage),
             quantity: 1,
           };
-  
+
           addToCart(selectedProduct);
           navigate(path.SHOPPINGCART);
         } else {
@@ -110,12 +121,11 @@ const ProductDetails = () => {
         imgSrc: getImagePath(product.RepresentativeImage),
         quantity: 1,
       };
-  
+
       addToCart(selectedProduct);
       navigate(path.SHOPPINGCART);
     }
   };
-  
 
   const toggleDetails = () => {
     setIsExpanded(!isExpanded);
@@ -124,7 +134,7 @@ const ProductDetails = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  if (!product) {
+  if (!product || !product.Images) {
     return (
       <div className="flex justify-center items-center h-full">
         <p>Loading...</p>
@@ -154,7 +164,7 @@ const ProductDetails = () => {
                 <span className="text-gray-500 ml-4">7 đánh giá</span>
               </div>
               <div className="flex  space-x-2 mt-2">
-                <p className="text-red-500 text-xl font-bold">
+                <p className="text-[#f00] text-xl font-bold">
                   {product.PromotionalPrice} ₫
                 </p>
                 <p className="text-gray-400 font-medium text-sm line-through mt-[6px]">
@@ -176,29 +186,47 @@ const ProductDetails = () => {
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="flex mt-10 justify-center items-center relative">
                 <button
-                  onClick={() => {}}
-                  className="absolute z-50 left-0 top-1/2 transform -translate-y-1/2 ml-[180px] mt-[220px]"
+                  onClick={() => {
+                    if (swiperRef) swiperRef.slidePrev(); 
+                  }}
+                  className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10"
                 >
-                  <icons.IoIosArrowDropleftCircle className="text-gray-400 text-3xl " />
+                  <icons.IoIosArrowDropleftCircle className="text-gray-400 text-3xl" />
                 </button>
-                <div className="flex mt-6 justify-center">
-                  <img
-                    src={
-                      product.RepresentativeImage
-                        ? getImagePath(product.RepresentativeImage)
-                        : ""
-                    }
-                    alt=""
-                    className="rounded-lg object-cover w-[333px] h-[333px]"
-                  />
-                </div>
-                <button
-                  onClick={() => {}}
-                  className="absolute ml-[550px] -mt-[20px] top-1/2 transform -translate-y-1/2 z-10"
+
+                <Swiper
+                  modules={[Autoplay]}
+                  autoplay={{ delay: 5000 }} 
+                  loop
+                  className="w-[333px] h-[345px]" 
+                  onSwiper={(swiper) => setSwiperRef(swiper)} 
+                  onSlideChange={(swiper) =>
+                    setCurrentImageIndex(swiper.realIndex)
+                  } 
                 >
-                  <icons.IoIosArrowDroprightCircle className="text-gray-400 mt-[490px] text-3xl opacity-75 hover:opacity-100" />
+                  {product.Images.map((image, index) => (
+                    <SwiperSlide
+                      key={index}
+                      className="flex justify-center items-center h-[333px]"
+                    >
+                      <img
+                        src={getImagePath(currentImage)}
+                        alt={`Product ${index + 1}`}
+                        className="rounded-lg object-cover max-w-full max-h-full"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+
+                <button
+                  onClick={() => {
+                    if (swiperRef) swiperRef.slideNext(); 
+                  }}
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10"
+                >
+                  <icons.IoIosArrowDroprightCircle className="text-gray-400 text-3xl" />
                 </button>
               </div>
 
@@ -305,7 +333,13 @@ const ProductDetails = () => {
         </div>
       </div>
       <div className="">
-        <ProductsDescribe />
+        <ProductsDescribe productId={productId} />
+      </div>
+      <div >
+      <ProductReview product={product} />
+      </div>
+      <div >
+      <CustomerReviewProducts productId={productId} />
       </div>
       <Footer />
     </div>

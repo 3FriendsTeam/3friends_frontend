@@ -75,7 +75,7 @@ const ShoppingCart = () => {
         ) : (
           <div className="w-[758.4px] bg-white p-4 rounded-lg shadow-lg">
             <h2 className="text-[17px]  mb-2">
-              Có {cartItems.length}{" "}
+              Có {cartItems.length}
               <span className="font-semibold">sản phẩm</span> trong giỏ hàng
             </h2>
             {cartItems.map((item, index) => (

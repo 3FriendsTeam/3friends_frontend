@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import icons from "../../../utils/icons";
 
 const CustomerReviewProducts = ({ productId }) => {
   const [activeFilter, setActiveFilter] = useState("Tất cả");
-  const [reviews, setReviews] = useState([]); 
-  const [loading, setLoading] = useState(true); 
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -15,7 +16,7 @@ const CustomerReviewProducts = ({ productId }) => {
           `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id`,
           { params: { id: productId } }
         );
-        const fetchedReviews = response.data.Reviews || []; 
+        const fetchedReviews = response.data.Reviews || [];
         setReviews(fetchedReviews);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -99,7 +100,19 @@ const CustomerReviewProducts = ({ productId }) => {
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-gray-800">{review.ReviewContent}</p>
+              <div className="flex items-center mt-3 ml-[55px]">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <icons.FaStar
+                    key={i}
+                    className={`text-lg ${
+                      i < review.RatingLevel
+                        ? "text-[#ffbf00]"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="mt-3 text-gray-800 ml-[55px]">{review.ReviewContent}</p>
             </div>
           ))}
         </div>
@@ -109,7 +122,8 @@ const CustomerReviewProducts = ({ productId }) => {
 };
 
 CustomerReviewProducts.propTypes = {
-  productId: PropTypes.number.isRequired,
+  productId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+    .isRequired,
 };
 
 export default CustomerReviewProducts;

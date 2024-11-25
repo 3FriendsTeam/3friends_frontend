@@ -9,7 +9,7 @@ import { Navigate, NavLink } from "react-router-dom";
 import { path } from "../../../utils/constant.jsx";
 import login1 from "../../../assets/client/login1.png";
 import google from "../../../assets/client/google.png";
-import Loading from "../../../components/Client/loading.jsx";
+import Loading from '../../../components/Client/Loading.jsx';
 import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext.jsx";
 
 const CustomerRegister = () => {

@@ -44,10 +44,13 @@ const FmemberHome = () => {
               {customerData.CustomerName || "Đang tải..."}
             </p>
             <p className="text-[15px] text-gray-700 flex items-center gap-2">
-            {isPhoneHidden ? maskPhoneNumber(customerData.Email) : customerData.Email || "Đang tải..."}
+            {isPhoneHidden ? maskPhoneNumber(customerData.PhoneNumber) : customerData.PhoneNumber || "Đang tải..."}
               <span onClick={togglePhoneVisibility} className="cursor-pointer">
                 {isPhoneHidden ? <icons.IoEyeSharp /> : <icons.FaEyeSlash />}
               </span>
+            </p>
+            <p className="text-[15px] text-gray-700 flex items-center gap-2 ">
+              {customerData.Email || "Đang tải..."}
             </p>
           </div>
         </div>

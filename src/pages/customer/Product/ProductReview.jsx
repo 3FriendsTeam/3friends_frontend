@@ -1,12 +1,64 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import icons from "../../../utils/icons";
+import axios from "axios";
 
 const ProductReview = ({ product }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [reviewContent, setReviewContent] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const [rating, setRating] = useState(5);
+
+  const submitReview = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Bạn cần đăng nhập để đánh giá sản phẩm!");
+      return;
+    }
+  
+    if (reviewContent.length < 15) {
+      alert("Nội dung đánh giá phải có ít nhất 15 ký tự!");
+      return;
+    }
+  
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/re-view`,
+        {
+          RatingLevel: rating,
+          ReviewContent: reviewContent,
+          ReviewDate: new Date(),
+          ProductID: product.id,
+        },
+        console.log({
+          RatingLevel: rating,
+          ReviewContent: reviewContent,
+          ReviewDate: new Date(),
+          ProductID: product.id,
+        }),
+        
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert("Đánh giá đã được gửi thành công!");
+      console.log(response.data);
+      closeModal();
+    } catch (error) {
+      console.error("Lỗi chi tiết:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Không thể gửi đánh giá.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   return (
     <div className="bg-[#F2F2F2] w-[1536px] pb-6">
       <div className="ml-[170px] w-full max-w-[785px] mx-auto p-4 border rounded-lg shadow-lg bg-white">
@@ -54,12 +106,12 @@ const ProductReview = ({ product }) => {
         </div>
 
         <div className="mt-6 text-center">
-        <div className="border-t border-gray-300 mb-4"></div>
+          <div className="border-t border-gray-300 mb-4"></div>
           <button
             onClick={openModal}
             className="bg-[#e0052b] text-white py-2 px-6 rounded-lg hover:bg-[#f00]"
           >
-            Mua ngay
+            Đánh giá
           </button>
         </div>
       </div>
@@ -120,9 +172,15 @@ const ProductReview = ({ product }) => {
               placeholder="Xin mời chia sẻ một số cảm nhận về sản phẩm (nhập tối thiểu 15 ký tự)"
               className="w-full border border-gray-300 rounded-lg p-3 mb-6 focus:outline-none focus:ring-1 focus:ring-blue-300"
               rows="4"
+              value={reviewContent}
+              onChange={(e) => setReviewContent(e.target.value)}
             ></textarea>
 
-            <button className="w-full bg-[#e0052b] text-white py-2 rounded-lg hover:bg-[#f00]">
+            <button
+              onClick={submitReview}
+              disabled={loading}
+              className="w-full bg-[#e0052b] text-white py-2 rounded-lg hover:bg-[#f00]"
+            >
               Gửi đánh giá
             </button>
           </div>
@@ -132,6 +190,10 @@ const ProductReview = ({ product }) => {
   );
 };
 ProductReview.propTypes = {
-  product: PropTypes.string.isRequired,
+  product: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    ProductName: PropTypes.string.isRequired,
+  }).isRequired,
 };
+
 export default ProductReview;

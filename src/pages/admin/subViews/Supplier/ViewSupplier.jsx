@@ -138,7 +138,7 @@ const ViewSupplier = () => {
             const newSupplier = form.getFieldsValue();
             const supplierData = {
                 ...newSupplier,
-                Products: selectedProducts.map(({ key, ProductID, StartDate, EndDate }) => ({
+                Products: selectedProducts.map(({ ProductID, StartDate, EndDate }) => ({
                     ProductID,
                     StartDate: StartDate !== "Chưa có" ? StartDate : null,
                     EndDate: EndDate !== "Chưa có" ? EndDate : null,

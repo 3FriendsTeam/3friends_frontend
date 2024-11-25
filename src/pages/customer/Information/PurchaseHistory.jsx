@@ -38,11 +38,6 @@ const PurchaseHistory = () => {
     fetchPurchaseHistory();
   }, []);
 
-  // Hàm xử lý bộ lọc
-  const handleFilter = () => {
-    // Không cần làm gì thêm ở đây vì useMemo sẽ tự động cập nhật
-  };
-
   // Sử dụng useMemo để tối ưu hiệu suất khi lọc
   const filteredPurchaseHistory = useMemo(() => {
     return purchaseHistory.filter((order) => {
@@ -64,6 +59,7 @@ const PurchaseHistory = () => {
     "Đang vận chuyển",
     "Đã giao hàng",
     "Đã hủy",
+    "Đã hoàn thành"
   ];
 
   // Hàm để mở rộng hoặc thu gọn chi tiết đơn hàng
@@ -137,14 +133,6 @@ const PurchaseHistory = () => {
               {status}
             </button>
           ))}
-        </div>
-        <div className="mt-4 md:mt-0">
-          <button
-            onClick={handleFilter}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Lọc
-          </button>
         </div>
       </div>
 

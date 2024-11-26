@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import icons from "../../utils/icons";
 import React from "react";
-
+import { useNavigate } from "react-router-dom";
+import { path } from "../../utils/constant";
 const {
   BsFillPhoneFill,
   BsFillLaptopFill,
@@ -23,10 +24,13 @@ const availableIcons = {
   RiVipCrown2Fill,
 };
 
-const Category = () => {
+const Button = () => {
   const [categories, setCategories] = useState([]);
-  const [productTypes, setProductTypes] = useState([]); // Lưu product types
-  const [hoveredCategory, setHoveredCategory] = useState(null); // Theo dõi danh mục đang hover
+  const [productTypes, setProductTypes] = useState([]);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const categoryRef = useRef(null); 
+  const productTypesRef = useRef(null); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -68,13 +72,29 @@ const Category = () => {
     fetchProductTypes(category.id);
   };
 
-  const handleMouseLeave = () => {
-    setHoveredCategory(null);
-    setProductTypes([]);
+  const handleMouseLeave = (event) => {
+    if (
+      categoryRef.current &&
+      !categoryRef.current.contains(event.relatedTarget) &&
+      productTypesRef.current &&
+      !productTypesRef.current.contains(event.relatedTarget)
+    ) {
+      setHoveredCategory(null);
+      setProductTypes([]);
+    }
   };
+  const handleManufacturerClick = (manufacturerId) => {
+    navigate(`${path.LISTOFPRODUCTSBYCATEGORY}?manufacturerId=${manufacturerId}`);
+  };
+  
 
   return (
-    <div className="w-full bg-white relative group">
+    <div
+      className="w-full bg-white relative group"
+      ref={categoryRef}
+      onMouseLeave={handleMouseLeave}
+    >
+
       <div className="w-full max-w-[1170px] mx-auto bg-white rounded-lg">
         <div className="flex justify-between gap-4">
           {categories.map((category, index) => (
@@ -83,7 +103,6 @@ const Category = () => {
               className="flex items-center gap-2 rounded-lg"
               style={{ width: "150px", height: "50px" }}
               onMouseEnter={() => handleMouseEnter(category)}
-              onMouseLeave={handleMouseLeave}
             >
               {category.icon && (
                 <span className="text-[16px]">
@@ -100,16 +119,22 @@ const Category = () => {
       </div>
 
       {hoveredCategory && (
-        <div className="absolute top-full left-0 w-screen h-[250px] bg-white opacity-100 transition-opacity duration-300 z-50 border-y border-gray-300">
+        <div
+          className="absolute top-full left-0 w-screen h-[250px] bg-white opacity-100 transition-opacity duration-300 z-50 border-y border-gray-300"
+          ref={productTypesRef}
+        >
           <div className="p-4 max-w-[1170px] mx-auto">
             <h3 className="font-bold text-lg mb-4">Chọn theo hãng</h3>
             <div className="grid grid-cols-3 gap-2">
               {productTypes.map((type) => (
                 <div
                   key={type.id}
-                  className=" rounded-md shadow-sm  hover:bg-gray-300 transition"
+                  className="rounded-md shadow-sm hover:bg-gray-50 transition"
+                  onClick={() => handleManufacturerClick(type.id)}
                 >
-                  <span className="text-sm font-medium text-gray-500">{type.ManufacturerName}</span>
+                  <span className="text-sm font-medium text-gray-500 hover:cursor-pointer">
+                    {type.ManufacturerName}
+                  </span>
                 </div>
               ))}
             </div>
@@ -120,4 +145,4 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default Button;

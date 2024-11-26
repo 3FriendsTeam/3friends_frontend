@@ -19,3 +19,4 @@ export { default as CustomerLogin } from "./caseCustomer/CustomerLogin";
 export { default as ForgotPassword } from "./caseCustomer/ForgotPassword";
 export { default as CustomerRegister } from "./caseCustomer/CustomerRegister";
 export { default as CatalogSearch } from "./Product/CatalogSearch";
+export {default as ListOfProductsByCategory} from "./Product/ListOfProductsByCategory";

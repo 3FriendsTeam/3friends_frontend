@@ -13,4 +13,5 @@ export const path = {
   FORGOTPASSWORDADMIN: "/forgotpasswordadmin",
   PAYMENTINFO: "/paymentinfo",
   CATALOGSEARCH:"/catalogsearch",
+  LISTOFPRODUCTSBYCATEGORY:"/listofproductsbycategory"
 };

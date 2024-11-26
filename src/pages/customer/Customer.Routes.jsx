@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import {CustomerLogin, Fmember, HomePage, ListProducts, LookOrders, PaymentInfo, ProductDetails, ShoppingCart, CustomerRegister ,ForgotPassword, CatalogSearch } from "./index";
+import {CustomerLogin, Fmember, HomePage, ListProducts, LookOrders, PaymentInfo, ProductDetails, ShoppingCart, CustomerRegister ,ForgotPassword, CatalogSearch, ListOfProductsByCategory } from "./index";
 import { path } from "../../utils/constant";
 import { CartProvider } from "./ShoppingCart/CartContext";
 import {  ListProductProvider } from "./Product/ListProductsContext";
@@ -18,6 +18,7 @@ const CustomerRoutes = () => (
                 <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
                 <Route path={path.PAYMENTINFO} element={<PaymentInfo />} />
                 <Route path={path.CATALOGSEARCH} element={<CatalogSearch />} />
+                <Route path={path.LISTOFPRODUCTSBYCATEGORY} element={<ListOfProductsByCategory />} />
             </Routes>
         </CartProvider>
     </ListProductProvider>

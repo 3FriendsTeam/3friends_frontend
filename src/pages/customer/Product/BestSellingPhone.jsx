@@ -31,7 +31,7 @@ const BestSellingPhone = ({categoryId}) => {
     }
   };
   return (
-    <div className="w-full bg-[#F2F2F2] flex flex-col relative py-4 ">
+    <div className="w-full bg-[#F2F2F2] flex flex-col relative py-4">
       <div className="flex justify-between w-full h-[608px] mx-auto py-6 bg-white rounded-lg md:w-[1170px] md:h-[608px] md:mx-auto md:py-6 md:bg-white md:rounded-lg md:flex md:justify-between">
         <div className="font-bold text-[22px] ml-6 mt-2 whitespace-nowrap md:ml-6 md:mt-2 md:whitespace-nowrap">
         {getCategoryName(categoryId)}

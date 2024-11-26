@@ -49,10 +49,10 @@ const ListProducts = () => {
         return parseFloat(a.PromotionalPrice) - parseFloat(b.PromotionalPrice);
       }
       if (order === "sold") {
-        return b.Sold - a.Sold; // Sắp xếp giảm dần theo số lượng bán
+        return b.Sold - a.Sold;
       }
       if (order === "newest") {
-        return new Date(b.createdAt) - new Date(a.createdAt); // Sắp xếp giảm dần theo ngày tạo
+        return new Date(b.createdAt) - new Date(a.createdAt); 
       }
       return 0;
     });
@@ -67,66 +67,55 @@ const ListProducts = () => {
   };
 
   return (
-    <div className="flex flex-wrap flex-row w-full ">
-      <div className="w-[1536px]">
-        <Header />
-      </div>
-      <div className="bg-[#F2F2F2] w-[1536px] ">
-        <NavigationBar current="Sản phẩm" />
-        <Animation />
-        <ProductClassification
-          categoryId={categoryId}
-          onSortChange={handleSortChange}
-        />
-        <div className="ml-[183px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-3 gap-x-1 gap-y-6 pb-4 mb-6">
-          {sortedProducts.map((product, index) => (
-            <div
-              key={index}
-              onClick={() => handleProductClick(product.id)}
-              className="w-full sm:w-1/2 lg:w-[19%] p-4 ml-[7px] flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-            >
-              <img
-                src={
-                  product.RepresentativeImage
-                    ? getImagePath(product.RepresentativeImage)
-                    : ""
-                }
-                alt={product.ProductName}
-                className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.13]"
-              />
-
-              <h3
-                className="mt-6 text-[16px] font-bold text-left"
-                style={{ minHeight: "40px" }}
-              >
-                {product.ProductName || "Unknown Product"}
-              </h3>
-
-              <div className="w-full mt-2 text-left">
-                {/* Container for both prices */}
-                <p className="text-[16px] font-bold text-red-500">
-                  {product.PromotionalPrice + " ₫"}
-                </p>
-                <p
-                  className="text-[16px] font-bold text-[#bdbdbd] line-through"
-                  style={{ minHeight: "20px" }}
-                >
-                  {product.ListedPrice + " ₫"}
-                </p>
-              </div>
-
-              <p
-                className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2 text-left" 
-                style={{ minHeight: "50px" }}
-              >
-                {product.Description || "No promotion available"}
-              </p>
-            </div>
-          ))}
+<div className="flex flex-wrap flex-row w-full justify-center">
+  <div className="w-full lg:w-[1536px] mx-auto">
+    <Header />
+  </div>
+  <div className="bg-[#F2F2F2] w-full">
+    <NavigationBar current="Sản phẩm" />
+    <Animation />
+    <ProductClassification
+      categoryId={categoryId}
+      onSortChange={handleSortChange}
+    />
+    
+    <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
+      {sortedProducts.map((product, index) => (
+        <div
+          key={index}
+          onClick={() => handleProductClick(product.id)}
+          className="w-full sm:w-1/2 md:w-1/3 lg:w-[18.5%] p-4 flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+        >
+          <img
+            src={product.RepresentativeImage ? getImagePath(product.RepresentativeImage) : ""}
+            alt={product.ProductName}
+            className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.13]"
+          />
+      
+          <h3 className="mt-6 text-[16px] font-bold text-left" style={{ minHeight: "40px" }}>
+            {product.ProductName || "Unknown Product"}
+          </h3>
+      
+          <div className="w-full mt-2 text-left">
+            <p className="text-[16px] font-bold text-red-500">
+              {product.PromotionalPrice + " ₫"}
+            </p>
+            <p className="text-[16px] font-bold text-[#bdbdbd] line-through" style={{ minHeight: "20px" }}>
+              {product.ListedPrice + " ₫"}
+            </p>
+          </div>
+      
+          <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2 text-left" style={{ minHeight: "50px" }}>
+            {product.Description || "No promotion available"}
+          </p>
         </div>
-      </div>
-      <Footer />
+      ))}
     </div>
+  </div>
+  <Footer />
+</div>
+
+  
   );
 };
 

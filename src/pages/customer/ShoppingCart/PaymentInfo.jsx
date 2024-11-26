@@ -3,11 +3,27 @@ import { useLocation } from "react-router-dom";
 import icons from "../../../utils/icons";
 import api from "../../../middlewares/tokenMiddleware";
 import Toolbar from "../../../components/Client/Toolbar";
+import payment1 from "../../../assets/client/payment1.jpg";
+import payment2 from "../../../assets/client/payment2.jpg";
 
 const PaymentInfo = () => {
   const location = useLocation();
   const { cartItems } = location.state || { cartItems: [] };
+  const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [selectedMethodIndex, setSelectedMethodIndex] = useState(null); 
 
+  const togglePaymentModal = () => {
+    setPaymentModalOpen(!isPaymentModalOpen);
+  };
+  const handlePaymentMethodSelect = (method, index) => {
+    setSelectedPaymentMethod(method);
+    setSelectedMethodIndex(index); 
+  };
+
+  const handleConfirmSelection = () => {
+    setPaymentModalOpen(false); 
+  };
   const [customerData, setCustomerData] = useState({
     CustomerName: "",
     PhoneNumber: "",
@@ -105,7 +121,7 @@ const PaymentInfo = () => {
 
                     <div className="ml-6 flex-1">
                       <h2 className="font-semibold">
-                      {item?.name} {item?.color && `- ${item.color}`}
+                        {item?.name} {item?.color && `- ${item.color}`}
                       </h2>
                       <span className="text-[#e0052b]">
                         {formatPrice(
@@ -187,7 +203,6 @@ const PaymentInfo = () => {
                         placeholder="Nhập họ và tên"
                       />
                     </div>
-
 
                     <div className="w-1/2 pl-2">
                       <label className="block text-[10px] text-gray-400 mb-1">
@@ -314,23 +329,91 @@ const PaymentInfo = () => {
             <h3 className="text-lg mx-auto max-w-[600px] w-full text-left pt-1 pb-2">
               THÔNG TIN THANH TOÁN
             </h3>
-            <div className="bg-white w-full max-w-[600px] p-2 rounded-lg shadow-sm border border-gray-300 mb-4">
+            <div
+              onClick={togglePaymentModal}
+              className="bg-white w-full max-w-[600px] p-2 rounded-lg shadow-sm border border-gray-300 mb-4"
+            >
               <button className="flex items-center justify-between w-full text-left p-4 rounded-lg">
                 <div className="flex items-center">
                   <icons.MdOutlinePayments className="text-blue-700 text-3xl mr-3" />
                   <div>
-                    <p className="font-semibold text-[#e0052b] text-[16px]">
-                      Chọn phương thức thanh toán
-                    </p>
-                    <p className="text-[11px] text-gray-400">
-                      Giảm thêm tới 500.000đ
-                    </p>
+                    {selectedPaymentMethod ? (
+                      <>
+                        <p className="font-semibold text-[#e0052b] text-[16px]">
+                          {selectedPaymentMethod}
+                        </p>
+                        <p className="text-[11px] text-gray-400">
+                          Đã chọn phương thức thanh toán
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-[#e0052b] text-[16px]">
+                          Chọn phương thức thanh toán
+                        </p>
+                        <p className="text-[11px] text-gray-400">
+                          Giảm thêm tới 500.000đ
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
                 <icons.IoIosArrowForward className="text-[#e0052b] text-xl" />
               </button>
             </div>
+            {isPaymentModalOpen && (
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center"
+              onClick={togglePaymentModal}
+            >
+              <div
+                className="bg-white w-96 p-6 rounded-lg shadow-lg relative"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold mb-4">Chọn phương thức thanh toán</h3>
+                <p className="text-gray-600 mb-4 text-[13px]">KHẢ DỤNG</p>
+                
+                <div
+                  onClick={() => handlePaymentMethodSelect("Thanh toán tại cửa hàng", 1)}
+                  className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
+                    selectedMethodIndex === 1 ? "border-[#e0052b]" : "border-gray-300"
+                  } hover:bg-[#ffdada]`}
+                >
+                  <img src={payment1} className="w-[50px] h-[50px]" />
+                  <button className="w-full py-2 px-4 rounded-lg mb-2">
+                    Thanh toán tại cửa hàng
+                  </button>
+                </div>
 
+                {/* Thanh toán qua ví momo */}
+                <div
+                  onClick={() => handlePaymentMethodSelect("Thanh toán qua ví momo", 2)}
+                  className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
+                    selectedMethodIndex === 2 ? "border-[#e0052b]" : "border-gray-300"
+                  } hover:bg-[#ffdada]`}
+                >
+                  <img src={payment2} className="w-[50px] h-[50px]" />
+                  <button className="w-full py-2 px-4 rounded-lg mb-2">
+                    Thanh toán qua ví momo
+                  </button>
+                </div>
+
+                  <button
+                    onClick={handleConfirmSelection}
+                    className="w-full bg-[#e0052b] text-white py-2 rounded-lg mt-4"
+                  >
+                    Xác nhận
+                  </button>
+
+                <button
+                  onClick={togglePaymentModal}
+                  className="absolute top-7 right-2 text-sm font-semibold"
+                >
+                  ✖
+                </button>
+              </div>
+            </div>
+          )}
             {/* Shipping Info */}
             <h3 className="text-lg mx-auto max-w-[600px] w-full text-left pt-1 pb-2">
               THÔNG TIN NHẬN HÀNG

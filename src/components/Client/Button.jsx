@@ -73,16 +73,24 @@ const Button = () => {
   };
 
   const handleMouseLeave = (event) => {
-    if (
-      categoryRef.current &&
-      !categoryRef.current.contains(event.relatedTarget) &&
-      productTypesRef.current &&
-      !productTypesRef.current.contains(event.relatedTarget)
-    ) {
+    const relatedTarget = event.relatedTarget;
+    
+    if (relatedTarget && relatedTarget.nodeType === 1) { 
+      if (
+        categoryRef.current &&
+        !categoryRef.current.contains(relatedTarget) &&
+        productTypesRef.current &&
+        !productTypesRef.current.contains(relatedTarget)
+      ) {
+        setHoveredCategory(null);
+        setProductTypes([]);
+      }
+    } else {
       setHoveredCategory(null);
       setProductTypes([]);
     }
   };
+  
   const handleManufacturerClick = (manufacturerId) => {
     navigate(`${path.LISTOFPRODUCTSBYCATEGORY}?manufacturerId=${manufacturerId}`);
   };

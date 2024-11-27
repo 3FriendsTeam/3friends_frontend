@@ -18,7 +18,7 @@ const FmemberHome = () => {
       }
     };
     fetchCustomerData();
-  }, []);
+  }, [customerData]);
   const togglePhoneVisibility = () => {
     setIsPhoneHidden((prevState) => !prevState);
   };

@@ -13,51 +13,57 @@ const AddressCustomer = () => {
         const response = await api.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/get-address-by-id-customer`
         );
-        console.log("Dữ liệu addresses:", response.data);
-        setAddresses(response.data);
-      } catch {
+        if(response.data){
+          setAddresses(response.data.ShippingAddresses);}
+        else{
+          setAddresses([]);
+        }
+      } catch (error) {
+        console.log(error.message);
         message.error('Lỗi khi tải danh sách địa chỉ');
       }
     };
     fetchAddresses();
   }, []);
 
-  // Open the modal for adding or editing an address
   const openModal = (address = null) => {
     setCurrentAddress(address);
     setIsModalOpen(true);
   };
 
-  // Close the modal
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentAddress(null);
   };
 
-  // Save new or updated address
   const saveAddress = async (values) => {
     try {
       if (currentAddress) {
-        await api.put(`/api/addresses/${currentAddress.id}`, values);  // API PUT request to update address
+        await api.put(
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-address?id=${currentAddress.id}`, 
+          { ...values }
+        );
         setAddresses(addresses.map((addr) =>
           addr.id === currentAddress.id ? { ...addr, ...values } : addr
         ));
         message.success('Địa chỉ đã được cập nhật!');
       } else {
-        await api.post('/api/addresses', values); 
-        setAddresses([...addresses, { ...values, id: Date.now() }]);
+        console.log(values);
+        const response = await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-address`, values); 
+        setAddresses([...addresses, response.data]);
         message.success('Địa chỉ đã được thêm!');
       }
       closeModal();
-    } catch {
+    } catch (error){
+      console.log(error);
       message.error('Lỗi khi lưu địa chỉ');
     }
   };
 
-  // Delete an address
   const deleteAddress = async (id) => {
     try {
-      await api.delete(`/api/addresses/${id}`);  // API DELETE request to remove address
+      await api.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-address?id=${id}`, );
       setAddresses(addresses.filter((addr) => addr.id !== id));
       message.success('Địa chỉ đã bị xóa!');
     } catch {
@@ -69,7 +75,7 @@ const AddressCustomer = () => {
     <div className="p-6">
       <Row justify="space-between" align="middle">
         <Col>
-          <h2 className="text-left font-bold text-xl">Danh sách Địa chỉ</h2>
+          <h2 className="text-left font-bold text-xl">Danh sách địa chỉ</h2>
         </Col>
         <Col>
           <Button
@@ -100,10 +106,9 @@ const AddressCustomer = () => {
             className="mb-4 rounded-lg shadow-lg p-4"
           >
             <div>
-              <div className="font-semibold">{address.RecipientName}</div>
+              <div className="font-semibold">Người nhận: {address.RecipientName} | {address.PhoneNumber}</div>
               <div>{address.SpecificAddress}</div>
-              <div>{address.District}, {address.City}</div>
-              <div>Mã bưu điện: {address.PostalCode}</div>
+              <div>{address.Ward}, {address.District}, {address.City}</div>
             </div>
           </List.Item>
         )}
@@ -113,7 +118,7 @@ const AddressCustomer = () => {
       {/* Modal for adding or editing address */}
       <Modal
         title={currentAddress ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
-        visible={isModalOpen}
+        open={isModalOpen}
         onCancel={closeModal}
         footer={null}
         destroyOnClose
@@ -134,7 +139,10 @@ const AddressCustomer = () => {
           <Form.Item
             label="Số điện thoại"
             name="PhoneNumber"
-            rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+            rules={[
+              { required: true, message: 'Vui lòng nhập số điện thoại!' },
+              { pattern: new RegExp(/^0\d{9,10}$/), message: 'Số điện thoại không hợp lệ!' },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -146,7 +154,13 @@ const AddressCustomer = () => {
           >
             <Input />
           </Form.Item>
-
+          <Form.Item
+            label="Phường/Xã"
+            name="Ward"
+            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ phường/xã!' }]}
+          >
+            <Input />
+          </Form.Item>
           <Form.Item
             label="Quận/Huyện"
             name="District"
@@ -159,14 +173,6 @@ const AddressCustomer = () => {
             label="Thành phố"
             name="City"
             rules={[{ required: true, message: 'Vui lòng nhập thành phố!' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="Mã bưu điện"
-            name="PostalCode"
-            rules={[{ required: true, message: 'Vui lòng nhập mã bưu điện!' }]}
           >
             <Input />
           </Form.Item>

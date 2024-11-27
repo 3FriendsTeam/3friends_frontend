@@ -7,6 +7,7 @@ import FmenberHome from "./FmemberHome";
 import icons from "../../../utils/icons";
 import PurchaseHistory from "./PurchaseHistory";
 import HistoryReturnProduct from "./HistoryReturnProduct";
+import AddressCustomer from "./AddressCustomer";
 function CustomerInformation() {
   const [activeComponent, setActiveComponent] = useState("home");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -75,6 +76,17 @@ function CustomerInformation() {
               <icons.RiFileHistoryLine className="text-2xl" /> Lịch sử trả hàng
             </span>
           </a>
+          <a
+            href="#"
+            className={`flex items-center space-x-2 font-semibold px-3 py-2 rounded ${
+              activeComponent === "address" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+            }`}
+            onClick={() => setActiveComponent("address")}
+          >
+            <span className="flex items-center gap-3">
+              <icons.RiFileHistoryLine className="text-2xl" /> Địa chỉ
+            </span>
+          </a>
           <NavLink
             to="#"
             className={`flex items-center space-x-2 font-semibold px-3 py-2 rounded ${
@@ -95,6 +107,7 @@ function CustomerInformation() {
         {activeComponent === "profile" && <UserProfile />}
         {activeComponent === "historyReturnProduct" && <HistoryReturnProduct />}
         {activeComponent === "history" && <PurchaseHistory />}
+        {activeComponent === "address" && <AddressCustomer />}
       </div>
   
     </div>

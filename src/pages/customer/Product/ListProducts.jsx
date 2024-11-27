@@ -8,10 +8,6 @@ import ProductClassification from "./ProductClassification";
 import { path } from "../../../utils/constant";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const getImagePath = (imageName) => {
-  if (!imageName) return "";
-  return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
-};
 const ListProducts = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -87,7 +83,7 @@ const ListProducts = () => {
           className="w-full sm:w-1/2 md:w-1/3 lg:w-[18.5%] p-4 flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
         >
           <img
-            src={product.RepresentativeImage ? getImagePath(product.RepresentativeImage) : ""}
+            src={product.RepresentativeImage}
             alt={product.ProductName}
             className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.13]"
           />

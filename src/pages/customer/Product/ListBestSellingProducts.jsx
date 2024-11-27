@@ -96,11 +96,7 @@ const ListBestSellingProducts = ({ categoryId }) => {
                   )}
 
                   <img
-                    src={
-                      product.RepresentativeImage
-                        ? getImagePath(product.RepresentativeImage)
-                        : ""
-                    }
+                    src={product.RepresentativeImage}
                     alt={product.ProductName}
                     className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.13]"
                   />
@@ -114,13 +110,13 @@ const ListBestSellingProducts = ({ categoryId }) => {
                 </h3>
 
                 <p className="text-[16px] font-bold text-red-500 text-left">
-                  {product.PromotionalPrice + " ₫"}
+                  {product.PromotionalPrice.toLocaleString() + " ₫"}
                 </p>
                 <p
                   className="text-[16px] font-bold text-[#bdbdbd] text-left line-through"
                   style={{ minHeight: "20px" }}
                 >
-                  {product.ListedPrice + " ₫"}
+                  {product.ListedPrice.toLocaleString() + " ₫"}
                 </p>
 
                 <p

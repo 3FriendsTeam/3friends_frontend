@@ -1,9 +1,5 @@
 import  { useEffect, useState } from "react";
 import axios from "axios";
-const getImagePath = (imageName) => {
-  if (!imageName) return ""; 
-  return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
-};
 
 const Category = () => {
   
@@ -36,7 +32,7 @@ const Category = () => {
           style={{ width: "95px", height: "95px" }}
         >
           <img
-            src={category.pathImg ? getImagePath(category.pathImg) : ""}
+            src={category.pathImg}
             className="w-[48px] h-[60px] mb-4"
           />
           <span className="text-[13px] font-bold mt-2 text-nowrap">{category.CategoryName}</span>

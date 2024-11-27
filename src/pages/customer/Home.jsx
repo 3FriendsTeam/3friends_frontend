@@ -22,7 +22,7 @@ const Home = () => {
       <BestSellingPhone categoryId="6" />
       <BestSellingPhone categoryId="7" />
       <BestSellingPhone categoryId="8" />
-      <Footer />
+      <Footer  />
     </div>
   );
 };

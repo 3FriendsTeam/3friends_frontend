@@ -57,6 +57,17 @@ function CustomerInformation() {
           <a
             href="#"
             className={`flex items-center space-x-2 font-semibold px-3 py-2 rounded ${
+              activeComponent === "adress" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
+            }`}
+            onClick={() => setActiveComponent("adress")}
+          >
+            <span className="flex items-center gap-3">
+              <icons.FaAddressBook className="text-xl" /> Địa chỉ
+            </span>
+          </a>
+          <a
+            href="#"
+            className={`flex items-center space-x-2 font-semibold px-3 py-2 rounded ${
               activeComponent === "history" ? "bg-red-100 border-[#fd2424] text-[#fd2424] border-[1px]" : "bg-transparent border-transparent text-[#4a4a4a]"
             }`}
             onClick={() => setActiveComponent("history")}

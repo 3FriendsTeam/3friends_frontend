@@ -11,7 +11,6 @@ export { default as BestSellingPhone } from "./Product/BestSellingPhone";
 export { default as ListBestSellingProducts } from "./Product/ListBestSellingProducts";
 export { default as LookOrders } from "./Order/LookOrders";
 export { default as ProductDetails } from "./Product/ProductDetails";
-export { default as ProductsDescribe } from "./Product/ProductsDescribe";
 export { default as Fmember } from "./Information/Fmember";
 export { default as PaymentInfo } from "./ShoppingCart/PaymentInfo";
 export { default as UserProfile } from "./Information/UserProfile";

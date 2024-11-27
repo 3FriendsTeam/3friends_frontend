@@ -220,7 +220,7 @@ const LookOrders = () => {
               <Col span={12}>
                 {/* Thông tin khách hàng */}
                 <div className="border-2 border-gray-300 p-4 rounded-lg bg-gray-50 mb-4">
-                  <h4>Thông tin khách hàng</h4>
+                  <h4>Thông tin người nhận</h4>
                   <p>
                     <strong>Họ và tên:</strong> {orderData.ShippingAddress.RecipientName}
                   </p>

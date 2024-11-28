@@ -1,17 +1,17 @@
-import { useState, useContext, useEffect } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import NavigationBar from '../../../pages/customer/Animations/NavigationBar';
-import Footer from '../../../components/Client/Footer';
-import Header from '../../../components/Client/Header';
-import icons from '../../../utils/icons';
-import { CartContext } from '../ShoppingCart/CartContext';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { message } from 'antd';
-import api from '../../../middlewares/tokenMiddleware';
+import { useState, useContext, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import NavigationBar from "../../../pages/customer/Animations/NavigationBar";
+import Footer from "../../../components/Client/Footer";
+import Header from "../../../components/Client/Header";
+import icons from "../../../utils/icons";
+import { CartContext } from "../ShoppingCart/CartContext";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { message } from "antd";
+import api from "../../../middlewares/tokenMiddleware";
 
 const ProductDetails = () => {
   const { productId } = useParams();
@@ -26,7 +26,7 @@ const ProductDetails = () => {
   const [showMoreDesc, setShowMoreDesc] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(0);
-  const [reviewContent, setReviewContent] = useState('');
+  const [reviewContent, setReviewContent] = useState("");
   const [reviews, setReviews] = useState([]);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
@@ -43,70 +43,72 @@ const ProductDetails = () => {
         setReviews(response.data.Reviews);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching product details:', error);
+        console.error("Error fetching product details:", error);
         setProduct(null);
         setLoading(false);
       }
     };
-  
+
     if (productId) fetchProductDetails();
   }, [productId]);
-  
 
   const handleColorClick = (index) => {
     setSelectedColorIndex(index);
   };
 
   const handleBuyNow = () => {
-      if (product?.Colors?.length > 0) {
-        if (selectedColorIndex !== null && product?.Colors) {
-          const selectedColor = product.Colors[selectedColorIndex];
-          if (selectedColor) {
-            const selectedProduct = {
-              id: product.id,
-              name: product.ProductName,
-              price: product.PromotionalPrice,
-              color: selectedColor.ColorName,
-              imgSrc: product.RepresentativeImage,
-              quantity: 1,
-            };
-  
-            addToCart(selectedProduct);
-            message.success("Đã thêm vào giỏ hàng thành công! nhanh tay vào mục giỏ hàng để thanh toán sản phẩm nhé.");
-          } else {
-            message.error('Lỗi: Không thể lấy thông tin màu sắc.');
-          }
+    if (product?.Colors?.length > 0) {
+      if (selectedColorIndex !== null && product?.Colors) {
+        const selectedColor = product.Colors[selectedColorIndex];
+        if (selectedColor) {
+          const selectedProduct = {
+            id: product.id,
+            name: product.ProductName,
+            price: product.PromotionalPrice,
+            color: selectedColor.ColorName,
+            imgSrc: product.RepresentativeImage,
+            quantity: 1,
+          };
+
+          addToCart(selectedProduct);
+          message.success(
+            "Đã thêm vào giỏ hàng thành công! nhanh tay vào mục giỏ hàng để thanh toán sản phẩm nhé."
+          );
         } else {
-          message.error('Vui lòng chọn màu sắc.');
+          message.error("Lỗi: Không thể lấy thông tin màu sắc.");
         }
       } else {
-        const selectedProduct = {
-          id: product.id,
-          name: product.ProductName,
-          price: product.PromotionalPrice,
-          imgSrc: product.RepresentativeImage,
-          quantity: 1,
-        };
-  
-        addToCart(selectedProduct);
-        message.success("Đã thêm vào giỏ hàng thành công! nhanh tay vào mục giỏ hàng để thanh toán sản phẩm nhé.");
+        message.error("Vui lòng chọn màu sắc.");
       }
-  };
+    } else {
+      const selectedProduct = {
+        id: product.id,
+        name: product.ProductName,
+        price: product.PromotionalPrice,
+        imgSrc: product.RepresentativeImage,
+        quantity: 1,
+      };
 
+      addToCart(selectedProduct);
+      message.success(
+        "Đã thêm vào giỏ hàng thành công! nhanh tay vào mục giỏ hàng để thanh toán sản phẩm nhé."
+      );
+    }
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const submitReview = async () => {
-    const userToken = localStorage.getItem('token');
-    const userName = localStorage.getItem('username');
+    const userToken = localStorage.getItem("token");
+    const userName = localStorage.getItem("username");
     if (!userToken) {
       message.warning("Vui lòng đăng nhập để sử dụng tính năng này!");
       return;
     }
 
     if (reviewContent.length < 15) {
-      message.error('Xin mời nhập tối thiểu 15 ký tự cho đánh giá.');
+      message.error("Xin mời nhập tối thiểu 15 ký tự cho đánh giá.");
       return;
     }
 
@@ -115,16 +117,19 @@ const ProductDetails = () => {
         ReviewContent: reviewContent,
         RatingLevel: rating,
         ReviewDate: new Date().toISOString(),
-        Customer: { CustomerName: userName }
+        Customer: { CustomerName: userName },
       };
-      await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/re-view?id=${product.id}`, newReview);
+      await api.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/re-view?id=${product.id}`,
+        newReview
+      );
       setReviews([newReview, ...reviews]);
-      setReviewContent('');
+      setReviewContent("");
       closeModal();
-      message.success('Cảm ơn bạn đã đánh giá sản phẩm của chúng tôi.');
+      message.success("Cảm ơn bạn đã đánh giá sản phẩm của chúng tôi.");
     } catch (error) {
-      console.error('Error submitting review:', error);
-      message.error('vui lòng thử lại sau!');
+      console.error("Error submitting review:", error);
+      message.error("vui lòng thử lại sau!");
     }
   };
 
@@ -158,17 +163,19 @@ const ProductDetails = () => {
               {[...Array(5)].map((_, i) => (
                 <span key={i} className="p-1 rounded-full">
                   <icons.FaStar
-                  key={i}
-                  className={`${
-                    i <
-                    Math.round(
-                      reviews.reduce((acc, curr) => acc + curr.RatingLevel, 0) /
-                        reviews.length || 0
-                    )
-                      ? 'text-yellow-400'
-                      : 'text-gray-300'
-                  }`}
-                />
+                    key={i}
+                    className={`${
+                      i <
+                      Math.round(
+                        reviews.reduce(
+                          (acc, curr) => acc + curr.RatingLevel,
+                          0
+                        ) / reviews.length || 0
+                      )
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
                 </span>
               ))}
               <span className="text-gray-500 ml-4">
@@ -188,9 +195,7 @@ const ProductDetails = () => {
                 </p>
               )}
             </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Đã bao gồm thuế VAT
-            </p>
+            <p className="text-sm text-gray-500 mt-2">Đã bao gồm thuế VAT</p>
 
             <div className="flex mt-6 justify-center items-center relative">
               <button
@@ -245,7 +250,7 @@ const ProductDetails = () => {
           </div>
 
           <div className="flex flex-col p-4 w-full lg:w-1/2">
-          <h2 className="text-lg font-semibold">LỰA CHỌN MÀU SẮC</h2>
+            <h2 className="text-lg font-semibold">LỰA CHỌN MÀU SẮC</h2>
             {product.Colors && product.Colors.length > 0 ? (
               <div className="flex items-center space-x-4 mt-2 text-sm">
                 {product.Colors.map((color, index) => (
@@ -253,8 +258,8 @@ const ProductDetails = () => {
                     key={color.id}
                     className={`border p-2 rounded-lg flex text-center gap-2 w-24 ${
                       selectedColorIndex === index
-                        ? 'border-red-500'
-                        : 'border-gray-300'
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                     onClick={() => handleColorClick(index)}
                   >
@@ -271,7 +276,9 @@ const ProductDetails = () => {
             {/* Khuyến mãi và chính sách */}
             <div className="bg-gray-100 mt-4 rounded-lg border border-gray-300">
               <div className="flex justify-between items-center mt-3 mx-2 mb-4">
-                <p className="text-sm font-bold">Chính sách bảo hành và đổi trả</p>
+                <p className="text-sm font-bold">
+                  Chính sách bảo hành và đổi trả
+                </p>
               </div>
               <div className="px-4 pb-4">
                 <p className="text-sm">
@@ -283,40 +290,39 @@ const ProductDetails = () => {
               </div>
             </div>
             {product.IsDeleted ? (
-              <><div className="bg-gray-500 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
-              <button
-                className="text-white text-xl font-bold w-full h-full"
-                disabled
-              >
-                Sản phẩm đã ngưng kinh doanh mặt hàng này!
-              </button>
-            </div></>
-            ):(
               <>
-              {product.Stock > 0 ? (
-                <div className="bg-red-600 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
-                  <button
-                    onClick={handleBuyNow}
-                    className="text-white text-xl font-bold w-full h-full"
-                  >
-                    Thêm vào giỏ hàng
-                    <span className="text-white font-medium text-sm block">
-                      Thoải mái lựa chọn, xem hàng tại nhà
-                    </span>
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-red-600 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
+                <div className="bg-gray-500 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
                   <button
                     className="text-white text-xl font-bold w-full h-full"
+                    disabled
                   >
-                    Sản phẩm đã hết. xin vui lòng quay lại sau!
+                    Sản phẩm đã ngưng kinh doanh mặt hàng này!
                   </button>
                 </div>
-              )}
+              </>
+            ) : (
+              <>
+                {product.Stock > 0 ? (
+                  <div className="bg-red-600 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
+                    <button
+                      onClick={handleBuyNow}
+                      className="text-white text-xl font-bold w-full h-full"
+                    >
+                      Thêm vào giỏ hàng
+                      <span className="text-white font-medium text-sm block">
+                        Thoải mái lựa chọn, xem hàng tại nhà
+                      </span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-red-600 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
+                    <button className="text-white text-xl font-bold w-full h-full">
+                      Sản phẩm đã hết. xin vui lòng quay lại sau!
+                    </button>
+                  </div>
+                )}
               </>
             )}
-            
           </div>
         </div>
       </div>
@@ -327,39 +333,84 @@ const ProductDetails = () => {
             <h2 className="text-xl font-semibold mb-4">Đặc điểm nổi bật</h2>
             <div
               className={`relative overflow-hidden transition-all duration-300 ${
-                showMoreDesc ? 'max-h-full' : 'max-h-64'
+                showMoreDesc ? "max-h-full" : "max-h-[280px]"
               }`}
             >
-              <p className="text-sm">{product.Description}</p>
+              <div className="space-y-4">
+                {product.Description.split("\n")
+                  .reduce((acc, line, index) => {
+                    const groupIndex = Math.floor(index / 4);
+                    if (!acc[groupIndex]) {
+                      acc[groupIndex] = [];
+                    }
+                    acc[groupIndex].push(line);
+                    return acc;
+                  }, [])
+                  .map((group, idx) => (
+                    <div key={idx}>
+                      {group.map((line, lineIdx) => (
+                        <p key={lineIdx} className="text-sm">
+                          {line}
+                        </p>
+                      ))}
+                      {idx !==
+                        product.Description.split("\n").length / 4 - 1 && (
+                        <div className="my-4" />
+                      )}
+                    </div>
+                  ))}
+              </div>
             </div>
             <div className="flex justify-center py-4">
               <button
                 onClick={() => setShowMoreDesc(!showMoreDesc)}
-                className="bg-white py-2 px-4 rounded-2xl flex items-center justify-center text-sm gap-1 shadow-md"
+                className="bg-white py-2 px-4 mt-10 rounded-2xl flex items-center justify-center text-sm gap-1 shadow-md"
               >
-                {showMoreDesc ? 'Ẩn bớt' : 'Đọc thêm'}
-                {showMoreDesc ? <icons.IoIosArrowUp /> : <icons.IoIosArrowDown />}
+                {showMoreDesc ? "Ẩn bớt" : "Đọc thêm"}
+                {showMoreDesc ? (
+                  <icons.IoIosArrowUp />
+                ) : (
+                  <icons.IoIosArrowDown />
+                )}
               </button>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 w-full lg:w-1/3">
+          <div className="bg-white rounded-xl p-6 w-full lg:w-1/3 h-[500px]">
             <h2 className="text-xl font-semibold mb-4">Thông số kỹ thuật</h2>
             <div className="space-y-4">
               {product.ProductAttributeDetails &&
-                product.ProductAttributeDetails.map((attr) => (
-                  <div key={attr.id} className="flex justify-between text-sm">
-                    <span className="font-medium">
-                      {attr.ProductAttribute.AttributeName}
-                    </span>
-                    <span>{attr.AttributeValue}</span>
-                  </div>
-                ))}
+                Array.from(
+                  new Set(
+                    product.ProductAttributeDetails.map(
+                      (attr) => attr.ProductAttribute.AttributeName
+                    )
+                  )
+                )
+                  .slice(0, 8)
+                  .map((attributeName, index) => {
+                    const firstAttr = product.ProductAttributeDetails.find(
+                      (attr) =>
+                        attr.ProductAttribute.AttributeName === attributeName
+                    );
+                    return (
+                      <div
+                        key={index}
+                        className={`flex justify-between text-sm py-1 ${
+                          index % 2 === 0 ? "bg-gray-100" : ""
+                        }`}
+                      >
+                        <span className="font-medium">{attributeName}</span>
+                        <span>{firstAttr.AttributeValue}</span>
+                      </div>
+                    );
+                  })}
             </div>
+
             <div className="flex justify-center py-4">
               <button
                 onClick={() => setShowAllSpecs(true)}
-                className="text-blue-600 px-4 py-2 bg-gray-100 rounded-lg flex items-center gap-1"
+                className="text-blue-600 px-4 py-2  mt-4 bg-gray-100 rounded-lg flex items-center gap-1"
               >
                 Xem cấu hình chi tiết
                 <icons.IoIosArrowForward />
@@ -381,7 +432,10 @@ const ProductDetails = () => {
                   <div className="space-y-4">
                     {product.ProductAttributeDetails &&
                       product.ProductAttributeDetails.map((attr) => (
-                        <div key={attr.id} className="flex justify-between text-sm">
+                        <div
+                          key={attr.id}
+                          className="flex justify-between text-sm"
+                        >
                           <span className="font-medium">
                             {attr.ProductAttribute.AttributeName}
                           </span>
@@ -397,93 +451,97 @@ const ProductDetails = () => {
       </div>
 
       <div className="w-full bg-gray-100 py-6">
-      <div className="max-w-screen-xl mx-auto bg-white rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">Đánh giá & nhận xét</h2>
+        <div className="max-w-screen-xl mx-auto bg-white rounded-xl p-6">
+          <h2 className="text-xl font-semibold mb-4">Đánh giá & nhận xét</h2>
 
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-          <div className="flex items-center space-x-4">
-            <div className="text-3xl font-bold">
-              {(
-                reviews.reduce((acc, curr) => acc + curr.RatingLevel, 0) /
-                reviews.length || 0
-              ).toFixed(1)}
-              /5
-            </div>
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <icons.FaStar
-                  key={i}
-                  className={`${
-                    i <
-                    Math.round(
-                      reviews.reduce((acc, curr) => acc + curr.RatingLevel, 0) /
-                        reviews.length || 0
-                    )
-                      ? 'text-yellow-400'
-                      : 'text-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-          <button
-            onClick={openModal}
-            className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 mt-4 md:mt-0"
-          >
-            Viết đánh giá
-          </button>
-        </div>
-
-        <div className="mt-6 space-y-4">
-          {reviews.length > 0 ? (
-            (showAllReviews ? reviews : reviews.slice(0, 5)).map((review) => (
-              <div
-                key={review.id}
-                className="p-4 border border-gray-200 rounded-lg shadow-sm"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold uppercase">
-                    {review.Customer.CustomerName[0]}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">
-                      {review.Customer.CustomerName}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(review.ReviewDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center mt-2">
-                  {[...Array(5)].map((_, i) => (
-                    <icons.FaStar
-                      key={i}
-                      className={`${
-                        i < review.RatingLevel ? 'text-yellow-400' : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="mt-2 text-gray-800">{review.ReviewContent}</p>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+            <div className="flex items-center space-x-4">
+              <div className="text-3xl font-bold">
+                {(
+                  reviews.reduce((acc, curr) => acc + curr.RatingLevel, 0) /
+                    reviews.length || 0
+                ).toFixed(1)}
+                /5
               </div>
-            ))
-          ) : (
-            <p className="text-center text-gray-500">Chưa có đánh giá nào.</p>
-          )}
-        </div>
-
-        {reviews.length > 5 && (
-          <div className="flex justify-center mt-4">
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <icons.FaStar
+                    key={i}
+                    className={`${
+                      i <
+                      Math.round(
+                        reviews.reduce(
+                          (acc, curr) => acc + curr.RatingLevel,
+                          0
+                        ) / reviews.length || 0
+                      )
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
             <button
-              onClick={() => setShowAllReviews(!showAllReviews)}
-              className="text-blue-600"
+              onClick={openModal}
+              className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 mt-4 md:mt-0"
             >
-              {showAllReviews ? 'Ẩn bớt' : 'Xem tất cả'}
+              Viết đánh giá
             </button>
           </div>
-        )}
+
+          <div className="mt-6 space-y-4">
+            {reviews.length > 0 ? (
+              (showAllReviews ? reviews : reviews.slice(0, 5)).map((review) => (
+                <div
+                  key={review.id}
+                  className="p-4 border border-gray-200 rounded-lg shadow-sm"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold uppercase">
+                      {review.Customer.CustomerName[0]}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {review.Customer.CustomerName}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(review.ReviewDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-2">
+                    {[...Array(5)].map((_, i) => (
+                      <icons.FaStar
+                        key={i}
+                        className={`${
+                          i < review.RatingLevel
+                            ? "text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-2 text-gray-800">{review.ReviewContent}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500">Chưa có đánh giá nào.</p>
+            )}
+          </div>
+
+          {reviews.length > 5 && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => setShowAllReviews(!showAllReviews)}
+                className="text-blue-600"
+              >
+                {showAllReviews ? "Ẩn bớt" : "Xem tất cả"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white max-w-lg w-full p-6 rounded-lg shadow-lg relative">
@@ -498,16 +556,14 @@ const ProductDetails = () => {
               Đánh giá & nhận xét
             </h2>
             <h3 className="text-lg text-gray-600 text-center mb-6">
-              <span>{product?.ProductName || 'Sản phẩm'}</span> | Chính hãng
+              <span>{product?.ProductName || "Sản phẩm"}</span> | Chính hãng
               VN/A
             </h3>
 
             <div className="mb-6">
-              <p className="font-semibold text-gray-800 mb-2">
-                Đánh giá chung
-              </p>
+              <p className="font-semibold text-gray-800 mb-2">Đánh giá chung</p>
               <div className="flex justify-between items-center">
-                {['Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Tuyệt vời'].map(
+                {["Rất tệ", "Tệ", "Bình thường", "Tốt", "Tuyệt vời"].map(
                   (label, index) => (
                     <button
                       key={index + 1}
@@ -517,8 +573,8 @@ const ProductDetails = () => {
                       <span
                         className={`text-2xl transition-transform ${
                           index + 1 <= rating
-                            ? 'text-yellow-400'
-                            : 'text-gray-400 hover:text-yellow-400'
+                            ? "text-yellow-400"
+                            : "text-gray-400 hover:text-yellow-400"
                         }`}
                       >
                         <icons.FaStar />
@@ -526,8 +582,8 @@ const ProductDetails = () => {
                       <p
                         className={`text-sm mt-1 transition-colors ${
                           index + 1 <= rating
-                            ? 'text-gray-800 '
-                            : 'text-gray-400 '
+                            ? "text-gray-800 "
+                            : "text-gray-400 "
                         }`}
                       >
                         {label}

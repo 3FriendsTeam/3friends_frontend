@@ -5,24 +5,101 @@ import api from "../../../middlewares/tokenMiddleware";
 import Toolbar from "../../../components/Client/Toolbar";
 import payment1 from "../../../assets/client/payment1.jpg";
 import payment2 from "../../../assets/client/payment2.jpg";
+import axios from "axios";
 
 const PaymentInfo = () => {
   const location = useLocation();
   const { cartItems } = location.state || { cartItems: [] };
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-  const [selectedMethodIndex, setSelectedMethodIndex] = useState(null); 
+  const [selectedMethodIndex, setSelectedMethodIndex] = useState(null);
+  const [promotionCode, setPromotionCode] = useState("");
+  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [isDiscountApplied, setIsDiscountApplied] = useState(false);
+
+  const applyPromotion = async () => {
+    if (!promotionCode) {
+      alert("Vui lòng nhập mã giảm giá.");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-promotion-by-code`,
+        {
+          params: { Code: promotionCode },
+        }
+      );
+      const promotion = response.data;
+      if (!promotion || promotion.IsDeleted || promotion.DeletedAt) {
+        alert("Mã giảm giá không hợp lệ.");
+        return;
+      }
+
+      const currentDate = new Date();
+      const startDate = new Date(promotion.StartDate);
+      const endDate = new Date(promotion.EndDate);
+
+      if (currentDate < startDate || currentDate > endDate) {
+        alert("Mã giảm giá đã hết hạn.");
+        return;
+      }
+
+      if (totalAmount < promotion.MinValue) {
+        alert(
+          `Tổng giá trị đơn hàng phải đạt tối thiểu ${formatPrice(
+            promotion.MinValue
+          )} để sử dụng mã giảm giá.`
+        );
+        return;
+      }
+
+      if (totalAmount > promotion.MaxDiscount) {
+        alert(
+          `Mã giảm giá chỉ có thể áp dụng tối đa ${formatPrice(
+            promotion.MaxDiscount
+          )} cho đơn hàng.`
+        );
+        return;
+      }
+
+      if (promotion.Quantity <= 0) {
+        alert("Số lượng mã giảm giá đã hết.");
+        return;
+      }
+
+      const discountAmount = (promotion.DiscountValue / 100) * totalAmount;
+      const finalDiscount = Math.min(discountAmount, promotion.MaxDiscount);
+      const discountedPrice = totalAmount - finalDiscount;
+      const useDiscount = window.confirm(
+        `Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận, một khi đã bấm Xác nhận, voucher sẽ không thể sử dụng được cho đơn hàng khác nữa`
+      );
+
+      setDiscountPercent(promotion.DiscountValue);
+      setDiscountedPrice(discountedPrice);
+      setIsDiscountApplied(true);
+      if (useDiscount) {
+        setDiscountedPrice(discountedPrice);
+        alert("Mã giảm giá đã được áp dụng thành công!");
+      } else {
+        alert("Bạn đã chọn không sử dụng mã giảm giá.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi áp dụng mã giảm giá:", error);
+      alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+    }
+  };
 
   const togglePaymentModal = () => {
     setPaymentModalOpen(!isPaymentModalOpen);
   };
   const handlePaymentMethodSelect = (method, index) => {
     setSelectedPaymentMethod(method);
-    setSelectedMethodIndex(index); 
+    setSelectedMethodIndex(index);
   };
 
   const handleConfirmSelection = () => {
-    setPaymentModalOpen(false); 
+    setPaymentModalOpen(false);
   };
   const [customerData, setCustomerData] = useState({
     CustomerName: "",
@@ -285,12 +362,18 @@ const PaymentInfo = () => {
                     type="text"
                     className="flex-1 py-2 border-gray-300 border-b-[1px] focus:border-blue-500 focus:outline-none"
                     placeholder="Nhập mã giảm giá"
+                    value={promotionCode}
+                    onChange={(e) => setPromotionCode(e.target.value)}
                   />
-                  <button className="bg-gray-200 text-gray-400 text-sm px-4 py-2 rounded-lg">
+                  <button
+                    onClick={applyPromotion}
+                    className="bg-gray-200 text-gray-400 text-sm px-4 py-2 rounded-lg"
+                  >
                     Áp dụng
                   </button>
                 </div>
               </div>
+
               <div className="flex justify-between items-center mb-2 *:">
                 <span className="text-[16px] text-gray-500">
                   Số lượng sản phẩm
@@ -313,6 +396,14 @@ const PaymentInfo = () => {
                 </span>
                 <span className="text-gray-700 font-medium">Miễn phí</span>
               </div>
+              {isDiscountApplied && (
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[16px] text-gray-500">Discount</span>
+                  <span className="text-gray-700 font-medium">
+                    {discountPercent}%
+                  </span>
+                </div>
+              )}
               <div className="border-t border-gray-300 my-4"></div>
               <div className="flex justify-between items-center">
                 <span className="font-bold text-gray-800">
@@ -320,7 +411,9 @@ const PaymentInfo = () => {
                   <span className="font-normal"> ( đã gồm VAT)</span>
                 </span>
                 <span className="font-bold text-[#e0052b] text-lg">
-                  {formatPrice(totalAmount)}
+                  {discountedPrice
+                    ? formatPrice(discountedPrice)
+                    : formatPrice(totalAmount)}
                 </span>
               </div>
             </div>
@@ -362,41 +455,51 @@ const PaymentInfo = () => {
               </button>
             </div>
             {isPaymentModalOpen && (
-            <div
-              className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center"
-              onClick={togglePaymentModal}
-            >
               <div
-                className="bg-white w-96 p-6 rounded-lg shadow-lg relative"
-                onClick={(e) => e.stopPropagation()}
+                className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center"
+                onClick={togglePaymentModal}
               >
-                <h3 className="text-xl font-bold mb-4">Chọn phương thức thanh toán</h3>
-                <p className="text-gray-600 mb-4 text-[13px]">KHẢ DỤNG</p>
-                
                 <div
-                  onClick={() => handlePaymentMethodSelect("Thanh toán tại cửa hàng", 1)}
-                  className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
-                    selectedMethodIndex === 1 ? "border-[#e0052b]" : "border-gray-300"
-                  } hover:bg-[#ffdada]`}
+                  className="bg-white w-96 p-6 rounded-lg shadow-lg relative"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <img src={payment1} className="w-[50px] h-[50px]" />
-                  <button className="w-full py-2 px-4 rounded-lg mb-2">
-                    Thanh toán tại cửa hàng
-                  </button>
-                </div>
+                  <h3 className="text-xl font-bold mb-4">
+                    Chọn phương thức thanh toán
+                  </h3>
+                  <p className="text-gray-600 mb-4 text-[13px]">KHẢ DỤNG</p>
 
-                {/* Thanh toán qua ví momo */}
-                <div
-                  onClick={() => handlePaymentMethodSelect("Thanh toán qua ví momo", 2)}
-                  className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
-                    selectedMethodIndex === 2 ? "border-[#e0052b]" : "border-gray-300"
-                  } hover:bg-[#ffdada]`}
-                >
-                  <img src={payment2} className="w-[50px] h-[50px]" />
-                  <button className="w-full py-2 px-4 rounded-lg mb-2">
-                    Thanh toán qua ví momo
-                  </button>
-                </div>
+                  <div
+                    onClick={() =>
+                      handlePaymentMethodSelect("Thanh toán tại cửa hàng", 1)
+                    }
+                    className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
+                      selectedMethodIndex === 1
+                        ? "border-[#e0052b]"
+                        : "border-gray-300"
+                    } hover:bg-[#ffdada]`}
+                  >
+                    <img src={payment1} className="w-[50px] h-[50px]" />
+                    <button className="w-full py-2 px-4 rounded-lg mb-2">
+                      Thanh toán tại cửa hàng
+                    </button>
+                  </div>
+
+                  {/* Thanh toán qua ví momo */}
+                  <div
+                    onClick={() =>
+                      handlePaymentMethodSelect("Thanh toán qua ví momo", 2)
+                    }
+                    className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
+                      selectedMethodIndex === 2
+                        ? "border-[#e0052b]"
+                        : "border-gray-300"
+                    } hover:bg-[#ffdada]`}
+                  >
+                    <img src={payment2} className="w-[50px] h-[50px]" />
+                    <button className="w-full py-2 px-4 rounded-lg mb-2">
+                      Thanh toán qua ví momo
+                    </button>
+                  </div>
 
                   <button
                     onClick={handleConfirmSelection}
@@ -405,15 +508,15 @@ const PaymentInfo = () => {
                     Xác nhận
                   </button>
 
-                <button
-                  onClick={togglePaymentModal}
-                  className="absolute top-7 right-2 text-sm font-semibold"
-                >
-                  ✖
-                </button>
+                  <button
+                    onClick={togglePaymentModal}
+                    className="absolute top-7 right-2 text-sm font-semibold"
+                  >
+                    ✖
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
             {/* Shipping Info */}
             <h3 className="text-lg mx-auto max-w-[600px] w-full text-left pt-1 pb-2">
               THÔNG TIN NHẬN HÀNG

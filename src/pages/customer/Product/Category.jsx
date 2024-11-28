@@ -1,7 +1,10 @@
 import  { useEffect, useState } from "react";
 import axios from "axios";
+import { path } from "../../../utils/constant";
+import { NavLink } from "react-router-dom";
+import PropTypes from 'prop-types';
 
-const Category = () => {
+const Category = ({categoryId}) => {
   
   const [categories, setCategories] = useState([]);
 
@@ -24,8 +27,9 @@ const Category = () => {
     <h2 className="text-xl font-bold mb-8 -ml-4 -mt-2">Danh mục nổi bật</h2>
     <div className="flex flex-wrap justify-between text-[12px] gap-4 -mt-4">
       {categories.map((category, index) => (
-        <div
+        <NavLink
           key={index}
+          to={`${path.LISTPRODUCTS}?categoryId=${category.id}`}
           className={`flex flex-col items-center bg-pink-100 p-4 rounded-lg group hover:scale-110 transition-transform duration-300 relative ${
             index > 4 ? 'hidden lg:flex' : ''
           }`}
@@ -36,13 +40,16 @@ const Category = () => {
             className="w-[48px] h-[60px] mb-4"
           />
           <span className="text-[13px] font-bold mt-2 text-nowrap">{category.CategoryName}</span>
-        </div>
+        </NavLink>
       ))}
     </div>
   </div>
 </div>
 
   );
+};
+Category.propTypes = {
+  categoryId: PropTypes.string.isRequired,
 };
 
 export default Category;

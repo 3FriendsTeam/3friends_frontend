@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
 import icons from "../../../utils/icons";
-import axios from "axios";
 import PropTypes from "prop-types";
 
-const ProductClassification = ({ categoryId, onSortChange }) => {
-  const [productCount, setProductCount] = useState(0);
+const ProductClassification = ({ onFilterChange, onSortChange   }) => {
   const images = [
     "https://placehold.co/153x40?text=Image+1",
     "https://placehold.co/153x40?text=Image+2",
@@ -15,36 +12,17 @@ const ProductClassification = ({ categoryId, onSortChange }) => {
     "https://placehold.co/153x40?text=Image+7",
   ];
 
-  useEffect(() => {
-    const fetchProductCount = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id-category`,
-          {
-            params: { id: categoryId },
-          }
-        );
-        setProductCount(response.data.length);
-      } catch (error) {
-        console.error("Error fetching product count:", error);
-      }
-    };
-
-    if (categoryId) {
-      fetchProductCount();
+  const handleAction = (type, value) => {
+    if (type === "filter") {
+      onFilterChange({ priceRange: value, sortOrder: "" });
+    } else if (type === "sort") {
+      onSortChange({ priceRange: "", sortOrder: value });
     }
-  }, [categoryId]);
+  };
 
   return (
     <div className="p-6 w-full max-w-[1536px] mx-auto flex justify-center bg-[#F2F2F2] -mb-12">
       <div className="w-full lg:w-[1170px] bg-white rounded-2xl">
-        {/* Tiêu đề và số sản phẩm */}
-        {/* <div className="flex items-center gap-4 ml-6 mt-4">
-      <h1 className="text-2xl font-bold mb-2 text-[#333]">Điện thoại</h1>
-      <p className="text-gray-600">{productCount} sản phẩm</p>
-    </div> */}
-
-        {/* Bộ lọc: Hãng sản xuất */}
         <p className="mt-6 ml-6 font-bold text-[#333]">Hãng sản xuất</p>
         <div className="flex flex-wrap mt-4 mb-6 ml-6">
           <div className="flex items-center space-x-2">
@@ -54,7 +32,7 @@ const ProductClassification = ({ categoryId, onSortChange }) => {
           </div>
         </div>
 
-        {/* Bộ lọc: Mức giá, Màn hình, Camera, v.v. */}
+        {/* Lọc theo */}
         <div className="flex flex-col mb-4 ml-6 text-[#333]">
           <span className="mr-4 font-bold">Lọc theo</span>
           <div className="flex flex-wrap mt-2 text-[14px]">
@@ -62,16 +40,28 @@ const ProductClassification = ({ categoryId, onSortChange }) => {
               <icons.FaFilter />
               Mức giá:
             </p>
-            <button className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1">
+            <button
+              onClick={() => handleAction("filter", "under5")}
+              className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1"
+            >
               Dưới 5 triệu
             </button>
-            <button className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1">
+            <button
+              onClick={() => handleAction("filter", "5to10")}
+              className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1"
+            >
               Từ 5 - 10 triệu
             </button>
-            <button className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1">
+            <button
+              onClick={() => handleAction("filter", "10to15")}
+              className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1"
+            >
               Từ 10 - 15 triệu
             </button>
-            <button className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1">
+            <button
+              onClick={() => handleAction("filter", "to15")}
+              className="border border-gray-200 rounded-md px-3 py-1 mr-2 flex items-center gap-1"
+            >
               Trên 15 triệu
             </button>
           </div>
@@ -83,25 +73,25 @@ const ProductClassification = ({ categoryId, onSortChange }) => {
           <div className="flex flex-wrap mt-2 text-[14px]">
             <button
               className="border border-gray-200 rounded-md px-3 py-1 mr-2"
-              onClick={() => onSortChange("newest")}
+              onClick={() => handleAction("sort", "newest")}
             >
               Mới nhất
             </button>
             <button
               className="border border-gray-200 rounded-md px-3 py-1 mr-2"
-              onClick={() => onSortChange("sold")}
+              onClick={() => handleAction("sort", "sold")}
             >
               Bán chạy
             </button>
             <button
               className="border border-gray-200 rounded-md px-3 py-1 mr-2"
-              onClick={() => onSortChange("price_high")}
+              onClick={() => handleAction("sort", "price_high")}
             >
               Giá tăng
             </button>
             <button
               className="border border-gray-200 rounded-md px-3 py-1 mr-2"
-              onClick={() => onSortChange("price_low")}
+              onClick={() => handleAction("sort", "price_low")}
             >
               Giá giảm
             </button>
@@ -109,11 +99,12 @@ const ProductClassification = ({ categoryId, onSortChange }) => {
         </div>
       </div>
     </div>
-
   );
 };
+
 ProductClassification.propTypes = {
-  categoryId: PropTypes.string.isRequired,
+  onFilterChange: PropTypes.func.isRequired,
   onSortChange: PropTypes.func.isRequired,
 };
+
 export default ProductClassification;

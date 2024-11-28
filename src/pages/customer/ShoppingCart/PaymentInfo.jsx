@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { Button, Modal, List, message } from "antd";
+import PropTypes from "prop-types";
 import icons from "../../../utils/icons";
 import api from "../../../middlewares/tokenMiddleware";
 import Toolbar from "../../../components/Client/Toolbar";
@@ -17,6 +19,44 @@ const PaymentInfo = () => {
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [isDiscountApplied, setIsDiscountApplied] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  // Lấy danh sách địa chỉ khi component mount
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await api.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-address-by-id-customer`
+        );
+        if (response.data) {
+          setAddresses(response.data.ShippingAddresses);
+          if (response.data.ShippingAddresses.length > 0 && !selectedAddress) {
+            setSelectedAddress(response.data.ShippingAddresses[0]);
+          }
+        } else {
+          setAddresses([]);
+        }
+      } catch (error) {
+        message.error("Lỗi khi tải danh sách địa chỉ",error);
+      }
+    };
+    fetchAddresses();
+  }, [selectedAddress]);
+
+  const openAddressModal = () => {
+    setIsAddressModalOpen(true);
+  };
+
+  const closeAddressModal = () => {
+    setIsAddressModalOpen(false);
+  };
+
+  const selectAddress = (address) => {
+    setSelectedAddress(address);
+    closeAddressModal();
+  };
 
   const applyPromotion = async () => {
     if (!promotionCode) {
@@ -85,8 +125,7 @@ const PaymentInfo = () => {
         alert("Bạn đã chọn không sử dụng mã giảm giá.");
       }
     } catch (error) {
-      console.error("Lỗi khi áp dụng mã giảm giá:", error);
-      alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+      alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.", error);
     }
   };
 
@@ -101,11 +140,7 @@ const PaymentInfo = () => {
   const handleConfirmSelection = () => {
     setPaymentModalOpen(false);
   };
-  const [customerData, setCustomerData] = useState({
-    CustomerName: "",
-    PhoneNumber: "",
-    Email: "",
-  });
+
   const [currentStep, setCurrentStep] = useState(1);
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -120,27 +155,17 @@ const PaymentInfo = () => {
     0
   );
 
-  useEffect(() => {
-    const fetchCustomerData = async () => {
-      try {
-        const response = await api.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-customer-info`
-        );
-        setCustomerData(response.data);
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin khách hàng:", error);
-      }
-    };
-    fetchCustomerData();
-  }, []);
   const handleNextStep = () => {
     if (currentStep === 1) setCurrentStep(2);
   };
 
   const handlePreviousStep = () => {
-    if (currentStep === 2) setCurrentStep(1);
+    if (currentStep === 2) {
+      console.log("Thanh toán");
+      setCurrentStep(1); 
+    }
   };
-
+  
   return (
     <div>
       <Toolbar />
@@ -220,137 +245,106 @@ const PaymentInfo = () => {
               </div>
             </div>
 
-            <h3 className="text-lg mx-auto max-w-[600px] w-full text-left  ">
-              THÔNG TIN KHÁCH HÀNG
-            </h3>
-            <div className="bg-white w-full max-w-[600px] mt-4 p-4 rounded-lg shadow-sm border border-gray-300">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <label className="text-[16px] font-medium">
-                    {customerData.CustomerName}
-                  </label>
-                  <span className="text-sm font-medium text-gray-500">
-                    {customerData.PhoneNumber}
-                  </span>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 ">EMAIL</label>
-                  <input
-                    type="email"
-                    className="w-full py-2 border-b-[1px] focus:border-blue-500 focus:outline-none"
-                    value={customerData.Email}
-                    onChange={(e) =>
-                      setCustomerData({
-                        ...customerData,
-                        Email: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
+            <div className="flex ">
+              <h3 className="text-lg mx-auto max-w-[600px] w-full text-left pt-1 pb-2">
+                THÔNG TIN NHẬN HÀNG
+              </h3>
+              <Button
+                type="primary"
+                onClick={openAddressModal}
+                className="mt-1 mb-4"
+              >
+                Thêm địa chỉ
+              </Button>
             </div>
-
-            <h3 className="text-lg mx-auto max-w-[600px] w-full text-left mt-6">
-              THÔNG TIN NHẬN HÀNG
-            </h3>
-            <div className="bg-white w-full max-w-[600px] mt-4 p-6 rounded-lg shadow-lg  border border-gray-300">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center">
-                    <input type="radio" name="delivery" className="mr-2" />
-                    Giao hàng tận nơi
-                  </label>
-                </div>
-                <div className="space-y-4">
+            <div className="bg-white w-full max-w-[600px] p-4 rounded-lg shadow-sm border border-gray-300 ">
+              {selectedAddress && (
+                <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <div className="w-1/2 pr-2">
-                      <label className="block text-[10px] text-gray-400 mb-1">
-                        TÊN NGƯỜI NHẬN{" "}
-                      </label>
-                      <input
-                        type="text"
-                        value={customerData.CustomerName}
-                        onChange={(e) =>
-                          setCustomerData({
-                            ...customerData,
-                            CustomerName: e.target.value,
-                          })
-                        }
-                        className="w-full border-b-[1px] border-gray-300 focus:border-blue-500 focus:outline-none p-1"
-                        placeholder="Nhập họ và tên"
-                      />
-                    </div>
-
-                    <div className="w-1/2 pl-2">
-                      <label className="block text-[10px] text-gray-400 mb-1">
-                        SĐT NGƯỜI NHẬN
-                      </label>
-                      <input
-                        type="text"
-                        value={customerData.PhoneNumber}
-                        onChange={(e) =>
-                          setCustomerData({
-                            ...customerData,
-                            PhoneNumber: e.target.value,
-                          })
-                        }
-                        className="w-full border-b-[1px] border-gray-300 focus:border-blue-500 focus:outline-none p-1"
-                        placeholder="Nhập số điện thoại"
-                      />
-                    </div>
+                    <span className="text-gray-500 font-semibold">
+                      Người nhận
+                    </span>
+                    <span className="text-gray-500">
+                      {selectedAddress.RecipientName}
+                    </span>
                   </div>
-                  <div className="flex space-x-4">
-                    <div className="w-1/2">
-                      <label className="block text-sm text-gray-400">
-                        Tỉnh / Thành phố
-                      </label>
-                      <select className="w-full py-2 border-b-[1px] focus:border-blue-500 focus:outline-none">
-                        <option>Hồ Chí Minh</option>
-                        <option>Hà Nội</option>
-                      </select>
-                    </div>
-                    <div className="w-1/2">
-                      <label className="block text-sm text-gray-400">
-                        Quận / Huyện
-                      </label>
-                      <select className="w-full py-2 border-b-[1px] focus:border-blue-500 focus:outline-none">
-                        <option>Quận 1</option>
-                        <option>Quận 2</option>
-                      </select>
-                    </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">
+                      Số điện thoại
+                    </span>
+                    <span className="text-gray-500">
+                      {selectedAddress.PhoneNumber}
+                    </span>
                   </div>
-
-                  <div className="flex space-x-4">
-                    <div className="w-1/2">
-                      <label className="block text-sm text-gray-400">
-                        Phường / Xã
-                      </label>
-                      <select className="w-full py-2 border-b-[1px] focus:border-blue-500 focus:outline-none">
-                        <option>Phường 1</option>
-                        <option>Phường 2</option>
-                      </select>
-                    </div>
-                    <div className="w-1/2">
-                      <label className="block text-sm text-gray-400">
-                        Địa chỉ
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full py-2 border-b-[1px] focus:border-blue-500 focus:outline-none"
-                        placeholder="Nhập số nhà, tên đường"
-                      />
-                    </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">City</span>
+                    <span className="text-gray-500">
+                      {selectedAddress.City}
+                    </span>
                   </div>
-                  <div className="pt-3">
-                    <input
-                      type="text"
-                      className="w-full py-2 border-b-[1px] focus:border-blue-500 focus:outline-none"
-                      placeholder="Ghi chú khác nếu có"
-                    />
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">
+                      Quận / huyện
+                    </span>
+                    <span className="text-gray-500">
+                      {selectedAddress.District}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">
+                      Phường / xã
+                    </span>
+                    <span className="text-gray-500">
+                      {selectedAddress.Ward}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-semibold">Địa chỉ</span>
+                    <span className="text-gray-500">
+                      {selectedAddress.SpecificAddress}
+                    </span>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
+
+            <Modal
+              title="Chọn địa chỉ nhận hàng"
+              visible={isAddressModalOpen}
+              onCancel={closeAddressModal}
+              footer={null}
+            >
+              <List
+                bordered
+                dataSource={addresses}
+                renderItem={(address) => (
+                  <List.Item
+                    key={address.id}
+                    actions={[
+                      <Button
+                        key="select"
+                        type="primary"
+                        onClick={() => selectAddress(address)}
+                      >
+                        Chọn
+                      </Button>,
+                    ]}
+                    className="mb-4 rounded-lg shadow-lg p-4"
+                  >
+                    <div>
+                      <div className="font-semibold">
+                        Người nhận: {address.RecipientName} |{" "}
+                        {address.PhoneNumber}
+                      </div>
+                      <div>{address.SpecificAddress}</div>
+                      <div>
+                        {address.Ward}, {address.District}, {address.City}
+                      </div>
+                    </div>
+                  </List.Item>
+                )}
+              />
+            </Modal>
           </div>
         )}
         {currentStep === 2 && (
@@ -524,43 +518,50 @@ const PaymentInfo = () => {
             <div className="bg-white w-full max-w-[600px] p-4 rounded-lg shadow-sm border border-gray-300 ">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">
-                    Khách hàng
-                  </span>
+                  <span className="text-gray-500 font-semibold">Khách hàng</span>
                   <span className="text-gray-500">
-                    {customerData.CustomerName}
+                    {selectedAddress ? selectedAddress.RecipientName : "Chưa chọn địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">
-                    Số điện thoại
-                  </span>
+                  <span className="text-gray-500 font-semibold">Số điện thoại</span>
                   <span className="text-gray-500">
-                    {customerData.PhoneNumber}
+                    {selectedAddress ? selectedAddress.PhoneNumber : "Chưa có thông tin"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Email</span>
-                  <span className="text-gray-500">{customerData.Email}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">
-                    Nhận hàng tại
-                  </span>
+                  <span className="text-gray-500 font-semibold">City</span>
                   <span className="text-gray-500">
-                    {customerData.Address || "Chưa có thông tin địa chỉ"}
+                    {selectedAddress ? selectedAddress.City : "Chưa có thông tin"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">
-                    Người nhận
-                  </span>
+                  <span className="text-gray-500 font-semibold">District</span>
                   <span className="text-gray-500">
-                    {customerData.CustomerName} - {customerData.PhoneNumber}
+                    {selectedAddress ? selectedAddress.District : "Chưa có thông tin địa chỉ"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-semibold">Ward</span>
+                  <span className="text-gray-500">
+                    {selectedAddress ? selectedAddress.Ward : "Chưa có thông tin địa chỉ"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-semibold">SpecificAddress</span>
+                  <span className="text-gray-500">
+                    {selectedAddress ? selectedAddress.SpecificAddress : "Chưa có thông tin địa chỉ"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-semibold">Người nhận</span>
+                  <span className="text-gray-500">
+                    {selectedAddress ? `${selectedAddress.RecipientName} - ${selectedAddress.PhoneNumber}` : "Chưa có thông tin"}
                   </span>
                 </div>
               </div>
             </div>
+
           </div>
         )}
 
@@ -584,5 +585,12 @@ const PaymentInfo = () => {
     </div>
   );
 };
-
+PaymentInfo.propTypes = {
+  customerData: PropTypes.shape({
+    CustomerName: PropTypes.string.isRequired,
+    PhoneNumber: PropTypes.string.isRequired,
+    Email: PropTypes.string.isRequired,
+    Address: PropTypes.string,
+  }).isRequired,
+};
 export default PaymentInfo;

@@ -72,7 +72,7 @@ const AddressCustomer = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-50">
       <Row justify="space-between" align="middle">
         <Col>
           <h2 className="text-left font-bold text-xl">Danh sách địa chỉ</h2>

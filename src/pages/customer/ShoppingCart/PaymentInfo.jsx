@@ -21,11 +21,9 @@ const PaymentInfo = () => {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  
 
   const checkDiscount = () => {
     return new Promise((resolve) => {
-      // Mở modal
       Modal.confirm({
         title: "Xác nhận Voucher",
         content: (
@@ -41,7 +39,7 @@ const PaymentInfo = () => {
       });
     });
   };
-  // Lấy danh sách địa chỉ khi component mount
+
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -57,30 +55,14 @@ const PaymentInfo = () => {
           setAddresses([]);
         }
       } catch (error) {
-        message.error("Lỗi khi tải danh sách địa chỉ",error);
+        message.error("Lỗi khi tải danh sách địa chỉ", error);
       }
     };
     fetchAddresses();
   }, [selectedAddress]);
+  
 
-  const openAddressModal = () => {
-    setIsAddressModalOpen(true);
-  };
-
-  const closeAddressModal = () => {
-    setIsAddressModalOpen(false);
-  };
-
-  const selectAddress = (address) => {
-    setSelectedAddress(address);
-    closeAddressModal();
-  };
-  const removeDiscount = () => {
-    setDiscountedPrice(null);
-    setDiscountPercent(0);
-    setIsDiscountApplied(false);
-  }
-  const applyPromotion = async () => {
+    const applyPromotion = async () => {
     if (!promotionCode) {
       message.warning("Vui lòng nhập mã giảm giá.");
       return;
@@ -125,16 +107,30 @@ const PaymentInfo = () => {
       const finalDiscount = Math.min(discountAmount, promotion.MaxDiscount);
       const discountedPrice = totalAmount - finalDiscount;
       const useDiscount = await checkDiscount();
-      setDiscountPercent(promotion.DiscountValue);
-      setDiscountedPrice(discountedPrice);
-      setIsDiscountApplied(true);
+
       if (useDiscount) {
+        setDiscountPercent(promotion.DiscountValue);
         setDiscountedPrice(discountedPrice);
+        setIsDiscountApplied(true);
+        console.log(discountedPrice);
         message.success("Mã giảm giá đã được áp dụng thành công!");
       }
     } catch (error) {
       message.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.", error);
     }
+  };
+
+  const openAddressModal = () => {
+    setIsAddressModalOpen(true);
+  };
+
+  const closeAddressModal = () => {
+    setIsAddressModalOpen(false);
+  };
+
+  const selectAddress = (address) => {
+    setSelectedAddress(address);
+    closeAddressModal();
   };
 
   const togglePaymentModal = () => {
@@ -170,10 +166,10 @@ const PaymentInfo = () => {
   const handlePreviousStep = () => {
     if (currentStep === 2) {
       console.log("Thanh toán");
-      setCurrentStep(1); 
+      setCurrentStep(1);
     }
   };
-  
+
   return (
     <div>
       <Toolbar />
@@ -285,7 +281,9 @@ const PaymentInfo = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">Thành phố / Tỉnh </span>
+                    <span className="text-gray-500 font-semibold">
+                      Thành phố / Tỉnh{" "}
+                    </span>
                     <span className="text-gray-500">
                       {selectedAddress.City}
                     </span>
@@ -369,7 +367,7 @@ const PaymentInfo = () => {
                   />
                   <button
                     onClick={applyPromotion}
-                    className="bg-[#ec8181] text-white hover:bg-[#f00] text-sm px-4 py-2 rounded-lg"
+                    className="bg-[#d73d3d] text-white hover:bg-[#f00] text-sm px-4 py-2 rounded-lg"
                   >
                     Áp dụng
                   </button>
@@ -404,11 +402,7 @@ const PaymentInfo = () => {
                   <span className="text-gray-700 font-medium">
                     {discountPercent}%
                   </span>
-                  <Button className="text-gray-700 font-medium" onClick={removeDiscount()}>
-                    Xóa mã giảm
-                  </Button>
                 </div>
-                
               )}
               <div className="border-t border-gray-300 my-4"></div>
               <div className="flex justify-between items-center">
@@ -513,50 +507,75 @@ const PaymentInfo = () => {
             <div className="bg-white w-full max-w-[600px] p-4 rounded-lg shadow-sm border border-gray-300 ">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Khách hàng</span>
+                  <span className="text-gray-500 font-semibold">
+                    Khách hàng
+                  </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? selectedAddress.RecipientName : "Chưa chọn địa chỉ"}
+                    {selectedAddress
+                      ? selectedAddress.RecipientName
+                      : "Chưa chọn địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Số điện thoại</span>
+                  <span className="text-gray-500 font-semibold">
+                    Số điện thoại
+                  </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? selectedAddress.PhoneNumber : "Chưa có thông tin"}
+                    {selectedAddress
+                      ? selectedAddress.PhoneNumber
+                      : "Chưa có thông tin"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Thành phố / Tỉnh</span>
+                  <span className="text-gray-500 font-semibold">
+                    Thành phố / Tỉnh
+                  </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? selectedAddress.City : "Chưa có thông tin"}
+                    {selectedAddress
+                      ? selectedAddress.City
+                      : "Chưa có thông tin"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Quận / Huyện</span>
+                  <span className="text-gray-500 font-semibold">
+                    Quận / Huyện
+                  </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? selectedAddress.District : "Chưa có thông tin địa chỉ"}
+                    {selectedAddress
+                      ? selectedAddress.District
+                      : "Chưa có thông tin địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Phường / Xã</span>
+                  <span className="text-gray-500 font-semibold">
+                    Phường / Xã
+                  </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? selectedAddress.Ward : "Chưa có thông tin địa chỉ"}
+                    {selectedAddress
+                      ? selectedAddress.Ward
+                      : "Chưa có thông tin địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-semibold">Địa chỉ </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? selectedAddress.SpecificAddress : "Chưa có thông tin địa chỉ"}
+                    {selectedAddress
+                      ? selectedAddress.SpecificAddress
+                      : "Chưa có thông tin địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Người nhận</span>
+                  <span className="text-gray-500 font-semibold">
+                    Người nhận
+                  </span>
                   <span className="text-gray-500">
-                    {selectedAddress ? `${selectedAddress.RecipientName} - ${selectedAddress.PhoneNumber}` : "Chưa có thông tin"}
+                    {selectedAddress
+                      ? `${selectedAddress.RecipientName} - ${selectedAddress.PhoneNumber}`
+                      : "Chưa có thông tin"}
                   </span>
                 </div>
               </div>
             </div>
-
           </div>
         )}
 

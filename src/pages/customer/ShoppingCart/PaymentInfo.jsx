@@ -6,7 +6,6 @@ import icons from "../../../utils/icons";
 import api from "../../../middlewares/tokenMiddleware";
 import Toolbar from "../../../components/Client/Toolbar";
 import payment1 from "../../../assets/client/payment1.jpg";
-import payment2 from "../../../assets/client/payment2.jpg";
 import axios from "axios";
 
 const PaymentInfo = () => {
@@ -22,7 +21,26 @@ const PaymentInfo = () => {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  
 
+  const checkDiscount = () => {
+    return new Promise((resolve) => {
+      // Mở modal
+      Modal.confirm({
+        title: "Xác nhận Voucher",
+        content: (
+          <p>
+            Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận, một khi đã bấm
+            Xác nhận, voucher sẽ không thể sử dụng được cho đơn hàng khác nữa.
+          </p>
+        ),
+        okText: "Xác nhận",
+        cancelText: "Hủy",
+        onOk: () => resolve(true),
+        onCancel: () => resolve(false),
+      });
+    });
+  };
   // Lấy danh sách địa chỉ khi component mount
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -57,10 +75,14 @@ const PaymentInfo = () => {
     setSelectedAddress(address);
     closeAddressModal();
   };
-
+  const removeDiscount = () => {
+    setDiscountedPrice(null);
+    setDiscountPercent(0);
+    setIsDiscountApplied(false);
+  }
   const applyPromotion = async () => {
     if (!promotionCode) {
-      alert("Vui lòng nhập mã giảm giá.");
+      message.warning("Vui lòng nhập mã giảm giá.");
       return;
     }
     try {
@@ -72,7 +94,7 @@ const PaymentInfo = () => {
       );
       const promotion = response.data;
       if (!promotion || promotion.IsDeleted || promotion.DeletedAt) {
-        alert("Mã giảm giá không hợp lệ.");
+        message.warning("Mã giảm giá không hợp lệ.");
         return;
       }
 
@@ -81,12 +103,12 @@ const PaymentInfo = () => {
       const endDate = new Date(promotion.EndDate);
 
       if (currentDate < startDate || currentDate > endDate) {
-        alert("Mã giảm giá đã hết hạn.");
+        message.error("Mã giảm giá đã hết hạn.");
         return;
       }
 
       if (totalAmount < promotion.MinValue) {
-        alert(
+        message.warning(
           `Tổng giá trị đơn hàng phải đạt tối thiểu ${formatPrice(
             promotion.MinValue
           )} để sử dụng mã giảm giá.`
@@ -94,38 +116,24 @@ const PaymentInfo = () => {
         return;
       }
 
-      if (totalAmount > promotion.MaxDiscount) {
-        alert(
-          `Mã giảm giá chỉ có thể áp dụng tối đa ${formatPrice(
-            promotion.MaxDiscount
-          )} cho đơn hàng.`
-        );
-        return;
-      }
-
       if (promotion.Quantity <= 0) {
-        alert("Số lượng mã giảm giá đã hết.");
+        message.error("Số lượng mã giảm giá đã hết.");
         return;
       }
 
       const discountAmount = (promotion.DiscountValue / 100) * totalAmount;
       const finalDiscount = Math.min(discountAmount, promotion.MaxDiscount);
       const discountedPrice = totalAmount - finalDiscount;
-      const useDiscount = window.confirm(
-        `Kiểm tra kỹ voucher của bạn trước khi bấm xác nhận, một khi đã bấm Xác nhận, voucher sẽ không thể sử dụng được cho đơn hàng khác nữa`
-      );
-
+      const useDiscount = await checkDiscount();
       setDiscountPercent(promotion.DiscountValue);
       setDiscountedPrice(discountedPrice);
       setIsDiscountApplied(true);
       if (useDiscount) {
         setDiscountedPrice(discountedPrice);
-        alert("Mã giảm giá đã được áp dụng thành công!");
-      } else {
-        alert("Bạn đã chọn không sử dụng mã giảm giá.");
+        message.success("Mã giảm giá đã được áp dụng thành công!");
       }
     } catch (error) {
-      alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.", error);
+      message.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.", error);
     }
   };
 
@@ -254,7 +262,7 @@ const PaymentInfo = () => {
                 onClick={openAddressModal}
                 className="mt-1 mb-4"
               >
-                Thêm địa chỉ
+                Thay đổi địa chỉ
               </Button>
             </div>
             <div className="bg-white w-full max-w-[600px] p-4 rounded-lg shadow-sm border border-gray-300 ">
@@ -277,7 +285,7 @@ const PaymentInfo = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">City</span>
+                    <span className="text-gray-500 font-semibold">Thành phố / Tỉnh </span>
                     <span className="text-gray-500">
                       {selectedAddress.City}
                     </span>
@@ -361,7 +369,7 @@ const PaymentInfo = () => {
                   />
                   <button
                     onClick={applyPromotion}
-                    className="bg-gray-200 text-gray-400 text-sm px-4 py-2 rounded-lg"
+                    className="bg-[#ec8181] text-white hover:bg-[#f00] text-sm px-4 py-2 rounded-lg"
                   >
                     Áp dụng
                   </button>
@@ -392,11 +400,15 @@ const PaymentInfo = () => {
               </div>
               {isDiscountApplied && (
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[16px] text-gray-500">Discount</span>
+                  <span className="text-[16px] text-gray-500">Giảm giá</span>
                   <span className="text-gray-700 font-medium">
                     {discountPercent}%
                   </span>
+                  <Button className="text-gray-700 font-medium" onClick={removeDiscount()}>
+                    Xóa mã giảm
+                  </Button>
                 </div>
+                
               )}
               <div className="border-t border-gray-300 my-4"></div>
               <div className="flex justify-between items-center">
@@ -478,23 +490,6 @@ const PaymentInfo = () => {
                     </button>
                   </div>
 
-                  {/* Thanh toán qua ví momo */}
-                  <div
-                    onClick={() =>
-                      handlePaymentMethodSelect("Thanh toán qua ví momo", 2)
-                    }
-                    className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
-                      selectedMethodIndex === 2
-                        ? "border-[#e0052b]"
-                        : "border-gray-300"
-                    } hover:bg-[#ffdada]`}
-                  >
-                    <img src={payment2} className="w-[50px] h-[50px]" />
-                    <button className="w-full py-2 px-4 rounded-lg mb-2">
-                      Thanh toán qua ví momo
-                    </button>
-                  </div>
-
                   <button
                     onClick={handleConfirmSelection}
                     className="w-full bg-[#e0052b] text-white py-2 rounded-lg mt-4"
@@ -530,25 +525,25 @@ const PaymentInfo = () => {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">City</span>
+                  <span className="text-gray-500 font-semibold">Thành phố / Tỉnh</span>
                   <span className="text-gray-500">
                     {selectedAddress ? selectedAddress.City : "Chưa có thông tin"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">District</span>
+                  <span className="text-gray-500 font-semibold">Quận / Huyện</span>
                   <span className="text-gray-500">
                     {selectedAddress ? selectedAddress.District : "Chưa có thông tin địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Ward</span>
+                  <span className="text-gray-500 font-semibold">Phường / Xã</span>
                   <span className="text-gray-500">
                     {selectedAddress ? selectedAddress.Ward : "Chưa có thông tin địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">SpecificAddress</span>
+                  <span className="text-gray-500 font-semibold">Địa chỉ </span>
                   <span className="text-gray-500">
                     {selectedAddress ? selectedAddress.SpecificAddress : "Chưa có thông tin địa chỉ"}
                   </span>

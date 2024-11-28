@@ -2,9 +2,9 @@ import  { useEffect, useState } from "react";
 import axios from "axios";
 import { path } from "../../../utils/constant";
 import { NavLink } from "react-router-dom";
-import PropTypes from 'prop-types';
 
-const Category = ({categoryId}) => {
+
+const Category = () => {
   
   const [categories, setCategories] = useState([]);
 
@@ -47,9 +47,6 @@ const Category = ({categoryId}) => {
 </div>
 
   );
-};
-Category.propTypes = {
-  categoryId: PropTypes.string.isRequired,
 };
 
 export default Category;

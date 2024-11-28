@@ -134,7 +134,7 @@ const ViewCustomer = () => {
               okText="Có"
               cancelText="Không"
             >
-              <Button type="link" className="text-red-600 font-bold mx-1">
+              <Button type="link" className="text-green-600 font-bold mx-1">
                 Mở khóa tài khoản
               </Button>
             </Popconfirm>

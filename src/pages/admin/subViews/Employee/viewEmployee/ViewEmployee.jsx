@@ -268,7 +268,7 @@ const ViewEmployee = () => {
               okText="Có"
               cancelText="Không"
             >
-              <Button type="link" className="text-red-600 font-bold mx-1">
+              <Button type="link" className="text-green-600 font-bold mx-1">
                 Mở khóa tài khoản
               </Button>
             </Popconfirm>
@@ -325,6 +325,8 @@ const ViewEmployee = () => {
         visible={isAddModalVisible}
         onOk={handleAddSave}
         onCancel={handleAddCancel}
+        okText="Thêm nhân viên"
+        cancelText="Huỷ"
         width={700}
       >
         <Form form={form} layout="vertical">
@@ -340,6 +342,7 @@ const ViewEmployee = () => {
           <Form.Item
             name="DateOfBirth"
             label="Ngày sinh"
+            required
             rules={[
               {
                 validator: (_, value) => validateAge(value),
@@ -383,9 +386,37 @@ const ViewEmployee = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item name="PhoneNumber" label="Số điện thoại">
-            <Input />
+          <Form.Item
+            name="PhoneNumber"
+            label="Số điện thoại"
+            rules={[
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
+              {
+                validator: (_, value) => {
+                  // Kiểm tra số điện thoại bắt đầu bằng số 0 và có độ dài từ 10 đến 11 chữ số
+                  const regex = /^0\d{9,10}$/; // Đảm bảo số điện thoại bắt đầu bằng 0 và có 10 hoặc 11 chữ số
+                  if (!value || regex.test(value)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("Số điện thoại phải bắt đầu bằng số 0 và có 10 hoặc 11 chữ số!")
+                  );
+                },
+              },
+            ]}
+          >
+            <Input
+              type="tel"
+              inputMode="numeric"  // Hiển thị bàn phím số trên thiết bị di động
+              maxLength={11}        // Giới hạn độ dài của số điện thoại (10 hoặc 11 chữ số)
+              onChange={(e) => {
+                // Loại bỏ ký tự không phải số trong lúc nhập
+                e.target.value = e.target.value.replace(/[^0-9]/g, ''); // Chỉ cho phép nhập số
+              }}
+            />
           </Form.Item>
+
+
           <Form.Item
             name="PositionID"
             label="Chức vụ"
@@ -401,7 +432,7 @@ const ViewEmployee = () => {
             name="Username"
             label="Tên tài khoản"
             rules={[
-              { required: true, message: "Vui lòng nhập tên nhân viên!" },
+              { required: true, message: "Vui lòng nhập tên tài khoản!" },
             ]}
           >
             <Input />
@@ -410,7 +441,8 @@ const ViewEmployee = () => {
             name="Password"
             label="Mật khẩu"
             rules={[
-              { required: true, message: "Mật khẩu không được để trống!" },
+              { required: true, message: 'Vui lòng nhập mật khẩu!' },
+              { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' },
             ]}
           >
             <Input.Password />

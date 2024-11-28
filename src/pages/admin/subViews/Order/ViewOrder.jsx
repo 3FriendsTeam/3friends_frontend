@@ -152,7 +152,7 @@ const ViewNewOrder = () => {
             Đóng
           </Button>,
         ]}
-        width={800}
+        width={600}
       >
         {orderDetails ? (
           <div>

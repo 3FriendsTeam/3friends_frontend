@@ -1,8 +1,9 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../../assets/admin/logo.png";
 import { EmployeeAuthContext } from "../../../AuthContext/EmployeeAuthContext";
 import AdminLoading from "../../../components/admin/animation/AdminLoading";
+import logo3friend from '../../../assets/admin/3friends.png';
+
 
 const AdminLogin = () => {
   const { login } = useContext(EmployeeAuthContext);
@@ -36,8 +37,8 @@ const AdminLogin = () => {
       <AdminLoading status={isLoading} />
       <div className="flex bg-white shadow-lg rounded-lg border border-gray-300 w-full max-w-4xl overflow-hidden">
         {/* Logo bên trái */}
-        <div className="w-1/2 bg-blue-600 flex items-center justify-center">
-          <img src={logo} alt="Logo" className="h-24" />
+        <div className="w-1/2 flex items-center justify-center">
+          <img src={logo3friend} alt="Logo" className="h-full w-full" />
         </div>
         {/* Form bên phải */}
         <div className="w-1/2 p-10">

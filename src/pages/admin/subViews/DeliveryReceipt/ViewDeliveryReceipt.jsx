@@ -479,6 +479,8 @@ const ViewDeliveryReceipt = () => {
         confirmLoading={submitLoading}
         onOk={() => form.submit()}
         width={800}
+        okText="Lưu"
+        cancelText="Đóng"
       >
         <Form
           form={form}

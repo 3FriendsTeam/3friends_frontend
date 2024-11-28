@@ -379,9 +379,18 @@ const ViewSupplier = () => {
                     <Form.Item
                         name="PhoneNumber"
                         label="Số điện thoại"
-                        rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+                        rules={[
+                            { required: true, message: "Vui lòng nhập số điện thoại!" },
+                        ]}
                     >
-                        <Input />
+                        <Input
+                            type="tel"
+                            inputMode="numeric" // Chỉ cho phép nhập số
+                            onChange={(e) => {
+                                // Loại bỏ ký tự không phải số
+                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         name="Email"

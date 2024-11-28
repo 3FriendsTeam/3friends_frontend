@@ -111,12 +111,12 @@ const ViewDiscontinuedProducts = () => {
         },
         {
             title: "Ảnh đại diện",
-            dataIndex: "RepresentImage",
-            key: "RepresentImage",
-            render: (RepresentImage) =>
-                RepresentImage ? (
+            dataIndex: "RepresentativeImage",
+            key: "RepresentativeImage",
+            render: (RepresentativeImage) =>
+                RepresentativeImage ? (
                     <img
-                        src={RepresentImage}
+                        src={RepresentativeImage}
                         alt="Ảnh sản phẩm"
                         style={{ width: 50, height: 50 }}
                     />

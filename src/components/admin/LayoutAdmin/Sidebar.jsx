@@ -85,15 +85,15 @@ const EmployeeSidebar = ({ onSectionClick }) => {
         { label: 'Chương trình Khuyến mãi', section: 'promotionPrograms' },// danh sách các chương trình khuyến mãi. ngừng Khuyến mãi, sửa tên, giá, số lượng, minValue, maxDiscount, ngày bắt đầu, kết thúc
       ],
     },
-    {
-      positionIds: [1,2],
-      label: 'Quản lý Thanh toán',
-      icon: <FaCreditCard className="h-6 w-6 mr-2" />,
-      section: 'paymentManagement',
-      subItems: [
-        { label: 'Phương thức Thanh toán', section: 'paymentMethods' },// hiển thị danh sách phương thức thanh toán. chỉnh lại hoạt động hay không
-      ],
-    },
+    // {
+    //   positionIds: [1,2],
+    //   label: 'Quản lý Thanh toán',
+    //   icon: <FaCreditCard className="h-6 w-6 mr-2" />,
+    //   section: 'paymentManagement',
+    //   subItems: [
+    //     { label: 'Phương thức Thanh toán', section: 'paymentMethods' },// hiển thị danh sách phương thức thanh toán. chỉnh lại hoạt động hay không
+    //   ],
+    // },
     {
       positionIds: [3],
       label: 'Đơn hàng Vận chuyển',

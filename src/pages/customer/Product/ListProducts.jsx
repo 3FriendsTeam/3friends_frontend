@@ -11,11 +11,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 const ListProducts = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [sortedProducts, setSortedProducts] = useState([]);
+  const [filteredAndSortedProducts, setFilteredAndSortedProducts] = useState([]);
+  const [priceFilter, setPriceFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const categoryId = queryParams.get("categoryId");
 
+ 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -26,7 +29,6 @@ const ListProducts = () => {
           }
         );
         setProducts(response.data);
-        setSortedProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -36,82 +38,125 @@ const ListProducts = () => {
       fetchProducts();
     }
   }, [categoryId]);
-  const sortProducts = (order) => {
-    const sorted = [...products].sort((a, b) => {
-      if (order === "price_low") {
-        return parseFloat(b.PromotionalPrice) - parseFloat(a.PromotionalPrice);
-      }
-      if (order === "price_high") {
-        return parseFloat(a.PromotionalPrice) - parseFloat(b.PromotionalPrice);
-      }
-      if (order === "sold") {
-        return b.Sold - a.Sold;
-      }
-      if (order === "newest") {
-        return new Date(b.createdAt) - new Date(a.createdAt); 
-      }
-      return 0;
-    });
-    setSortedProducts(sorted);
+
+  useEffect(() => {
+    let updatedProducts = [...products];
+
+    // Logic for filtering
+    if (priceFilter === "under5") {
+      updatedProducts = updatedProducts.filter(
+        (product) => parseFloat(product.PromotionalPrice) < 5000000
+      );
+    } else if (priceFilter === "5to10") {
+      updatedProducts = updatedProducts.filter(
+        (product) =>
+          parseFloat(product.PromotionalPrice) >= 5000000 &&
+          parseFloat(product.PromotionalPrice) <= 10000000
+      );
+    } else if (priceFilter === "10to15") {
+      updatedProducts = updatedProducts.filter(
+        (product) =>
+          parseFloat(product.PromotionalPrice) >= 10000000 &&
+          parseFloat(product.PromotionalPrice) <= 15000000
+      );
+    } else if (priceFilter === "to15") {
+      updatedProducts = updatedProducts.filter(
+        (product) => parseFloat(product.PromotionalPrice) > 15000000
+      );
+    }
+
+    // Sorting logic
+    if (sortOrder === "price_low") {
+      updatedProducts.sort(
+        (a, b) =>
+          parseFloat(a.PromotionalPrice) - parseFloat(b.PromotionalPrice)
+      );
+    } else if (sortOrder === "price_high") {
+      updatedProducts.sort(
+        (a, b) =>
+          parseFloat(b.PromotionalPrice) - parseFloat(a.PromotionalPrice)
+      );
+    } else if (sortOrder === "sold") {
+      updatedProducts.sort((a, b) => b.Sold - a.Sold);
+    } else if (sortOrder === "newest") {
+      updatedProducts.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+    }
+
+    setFilteredAndSortedProducts(updatedProducts);
+  }, [priceFilter, sortOrder, products]); 
+
+  const handlePriceFilter = (priceRange) => {
+    setPriceFilter(priceRange);
   };
 
   const handleSortChange = (order) => {
-    sortProducts(order);
+    setSortOrder(order);
   };
+
   const handleProductClick = (productId) => {
     navigate(`${path.PRODUCTSDETAILS}/${productId}`);
   };
 
   return (
-<div className="flex flex-wrap flex-row w-full justify-center">
-  <div className="w-full lg:w-[1536px] mx-auto">
-    <Header />
-  </div>
-  <div className="bg-[#F2F2F2] w-full">
-    <NavigationBar current="Sản phẩm" />
-    <Animation />
-    <ProductClassification
-      categoryId={categoryId}
-      onSortChange={handleSortChange}
-    />
-    
-    <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
-      {sortedProducts.map((product, index) => (
-        <div
-          key={index}
-          onClick={() => handleProductClick(product.id)}
-          className="w-full sm:w-1/2 md:w-1/3 lg:w-[18.5%] p-4 flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-        >
-          <img
-            src={product.RepresentativeImage}
-            alt={product.ProductName}
-            className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.13]"
-          />
-      
-          <h3 className="mt-6 text-[16px] font-bold text-left" style={{ minHeight: "40px" }}>
-            {product.ProductName || "Unknown Product"}
-          </h3>
-      
-          <div className="w-full mt-2 text-left">
-            <p className="text-[16px] font-bold text-red-500">
-              {product.PromotionalPrice + " ₫"}
-            </p>
-            <p className="text-[16px] font-bold text-[#bdbdbd] line-through" style={{ minHeight: "20px" }}>
-              {product.ListedPrice + " ₫"}
-            </p>
-          </div>
-      
-          <p className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2 text-left" style={{ minHeight: "50px" }}>
-            {product.Description || "No promotion available"}
-          </p>
-        </div>
-      ))}
-    </div>
-  </div>
-  <Footer />
-</div>
+    <div className="flex flex-wrap flex-row w-full justify-center">
+      <div className="w-full lg:w-[1536px] mx-auto">
+        <Header />
+      </div>
+      <div className="bg-[#F2F2F2] w-full">
+        <NavigationBar current="Sản phẩm" />
+        <Animation />
+        <ProductClassification
+          categoryId={categoryId}
+          onSortChange={handleSortChange}
+          onFilterChange={handlePriceFilter}
+        />
 
-  
+        <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
+          {filteredAndSortedProducts.map((product, index) => (
+            <div
+              key={index}
+              onClick={() => handleProductClick(product.id)}
+              className="w-full sm:w-1/2 md:w-1/3 lg:w-[18.5%] p-4 flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+            >
+              <img
+                src={product.RepresentativeImage}
+                alt={product.ProductName}
+                className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.13]"
+              />
+
+              <h3
+                className="mt-6 text-[16px] font-bold text-left"
+                style={{ minHeight: "40px" }}
+              >
+                {product.ProductName || "Unknown Product"}
+              </h3>
+
+              <div className="w-full mt-2 text-left">
+                <p className="text-[16px] font-bold text-red-500">
+                  {product.PromotionalPrice + " ₫"}
+                </p>
+                <p
+                  className="text-[16px] font-bold text-[#bdbdbd] line-through"
+                  style={{ minHeight: "20px" }}
+                >
+                  {product.ListedPrice + " ₫"}
+                </p>
+              </div>
+
+              <p
+                className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2 text-left"
+                style={{ minHeight: "50px" }}
+              >
+                {product.Description || "No promotion available"}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Footer />
+    </div>
   );
 };
 

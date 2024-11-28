@@ -92,9 +92,9 @@ const PurchaseHistory = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100">
+    <div className="bg-gray-100">
       {/* Filter and Date Range */}
-      <div className="flex items-center justify-between mb-6 flex-wrap">
+      <div className="flex items-center shadow-md justify-between mb-6 flex-wrap">
         <div className="flex items-center flex-wrap gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -137,7 +137,7 @@ const PurchaseHistory = () => {
       </div>
 
       {/* Order List */}
-      <div className="space-y-6">
+      <div className="space-y-6 ">
         {loading ? (
           <div className="flex justify-center items-center">
             <svg

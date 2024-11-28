@@ -19,7 +19,7 @@ const HistoryReturnProduct = () => {
   
     return (
       <div className="p-6 bg-gray-100">
-        {/* Filter and Date Range */}
+
         <div className="flex items-center justify-between mb-6 flex-wrap">
           <input
             type="date"
@@ -38,7 +38,7 @@ const HistoryReturnProduct = () => {
             <button className="bg-gray-200 px-4 py-2 rounded mb-2">Đã hủy</button>
           </div>
         </div>
-        {/* Order List */}
+
         <div className="space-y-6">
           {ListHistoryReturnProduct.map((order) => (
             <div

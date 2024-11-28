@@ -14,6 +14,7 @@ const ShoppingCart = () => {
       alert("Giỏ hàng của bạn đang trống!");
       return;
     }
+    console.log(cartItems);
     navigate(path.PAYMENTINFO, { state: { cartItems } });
   };
   const formatPrice = (price) => {

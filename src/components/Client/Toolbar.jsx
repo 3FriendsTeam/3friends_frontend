@@ -185,7 +185,7 @@ function Toolbar() {
                 >
                   {username ? (
                     <span className="font-bold whitespace-nowrap">
-                    {username}
+                      Xin chào, Member
                     </span>
                   ) : (
                     <NavLink to={path.CUSTOMERLOGIN} className="font-bold">

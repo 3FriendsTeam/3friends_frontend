@@ -66,7 +66,8 @@ const checkEmail = async ({ email }) => {
       }
   
       localStorage.setItem("token", await userCredential.getIdToken());
-    localStorage.setItem("username", 'Thông tin cá nhân');
+      if(userCredential.displayName)
+        localStorage.setItem("username", userCredential.displayName);
       message.success('Đăng nhập thành công!');
       
     } catch {

@@ -200,13 +200,12 @@ const ViewProduct = () => {
           ? productDetails.Colors.map((color) => color.ColorName)
           : []
       );
-
       // Map specifications
       setSpecifications(
         productDetails.ProductAttributeDetails
           ? productDetails.ProductAttributeDetails.map((attr) => ({
             key: attr.id,
-            name: attr.AttributeName || attr.AttributeID, // Nếu có AttributeName
+            name: attr.ProductAttribute.AttributeName, 
             value: attr.AttributeValue,
           }))
           : []

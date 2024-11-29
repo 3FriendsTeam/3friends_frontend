@@ -406,7 +406,8 @@ export default function RevenueChart() {
               Tổng doanh thu:{" "}
               {new Intl.NumberFormat("vi-VN").format(totalAmount)} VNĐ
             </Typography>
-            <div style={{ position: "relative" }}>
+            <div
+            className="p-4" style={{ position: "relative" }}>
               <BarChart
                 dataset={data}
                 xAxis={[
@@ -419,6 +420,7 @@ export default function RevenueChart() {
                   },
                 ]}
                 {...chartSetting}
+                margin={{ left: 78 }}
               />
               <Button
                 variant="contained"

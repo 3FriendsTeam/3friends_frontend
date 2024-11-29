@@ -381,6 +381,7 @@ const ViewSupplier = () => {
                         label="Số điện thoại"
                         rules={[
                             { required: true, message: "Vui lòng nhập số điện thoại!" },
+                            { pattern: new RegExp(/^0\d{9,10}$/), message: 'Số điện thoại không hợp lệ!' },
                         ]}
                     >
                         <Input
@@ -414,9 +415,6 @@ const ViewSupplier = () => {
                         </Form.Item>
                         <Form.Item name="StartDate" style={{ flex: 1 }}>
                             <DatePicker placeholder="Ngày bắt đầu" style={{ width: "100%" }} />
-                        </Form.Item>
-                        <Form.Item name="EndDate" style={{ flex: 1 }}>
-                            <DatePicker placeholder="Ngày kết thúc" style={{ width: "100%" }} />
                         </Form.Item>
                         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddProduct}>
                             Thêm
@@ -471,7 +469,7 @@ const ViewSupplier = () => {
             {/* Modal sửa nhà cung cấp */}
             <Modal
                 title="Sửa thông tin nhà cung cấp"
-                visible={isEditModalVisible}
+                open={isEditModalVisible}
                 onCancel={handleEditCancel}
                 footer={[
                     <Button key="cancel" onClick={handleEditCancel}>
@@ -494,13 +492,16 @@ const ViewSupplier = () => {
                         name="Address"
                         label="Địa chỉ"
                         rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
+                        
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
                         name="PhoneNumber"
                         label="Số điện thoại"
-                        rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+                        rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" },
+                            { pattern: new RegExp(/^0\d{9,10}$/), message: 'Số điện thoại không hợp lệ!' }
+                        ]}
                     >
                         <Input />
                     </Form.Item>
@@ -526,9 +527,6 @@ const ViewSupplier = () => {
                         </Form.Item>
                         <Form.Item name="StartDate" style={{ flex: 1 }}>
                             <DatePicker placeholder="Ngày bắt đầu" style={{ width: "100%" }} />
-                        </Form.Item>
-                        <Form.Item name="EndDate" style={{ flex: 1 }}>
-                            <DatePicker placeholder="Ngày kết thúc" style={{ width: "100%" }} />
                         </Form.Item>
                         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddProduct}>
                             Thêm

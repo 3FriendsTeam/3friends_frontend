@@ -36,6 +36,7 @@ const ViewProduct = () => {
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [representativeImageList, setRepresentativeImageList] = useState([]);
   const [galleryFileList, setGalleryFileList] = useState([]);
+  const [countryOfOrigin, setContryOfOrigin] = useState([]);
   const nameEmployee = getEmployeeName();
 
   // Lọc danh sách sản phẩm theo từ khóa tìm kiếm
@@ -80,7 +81,20 @@ const ViewProduct = () => {
         setLoading(false);
       }
     };
-
+    const fetchContryOfOrigin = async()=>
+    {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/country-of-origin`
+        );
+        setContryOfOrigin(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        message.error(
+          "Không thể tải xuất xứ sản phẩm. Vui lòng thử lại sau."
+        );
+      }
+    }
     const fetchCategoryData = async () => {
       try {
         const response = await axios.get(
@@ -121,7 +135,7 @@ const ViewProduct = () => {
         );
       }
     };
-
+    fetchContryOfOrigin();
     fetchManufacturerData();
     fetchCategoryData();
     fetchProductData();
@@ -133,7 +147,6 @@ const ViewProduct = () => {
     const category = categories.find((p) => p.id === parseInt(CategoryID));
     return category ? category.CategoryName : "Chưa xác định";
   };
-
   // Hàm tìm tên NSX dựa trên ManufacturerID
   const getManufacturerName = (ManufacturerID) => {
     const manufacturer = manufacturers.find(
@@ -158,7 +171,6 @@ const ViewProduct = () => {
     }
   };
 
-  // Mở modal chỉnh sửa và gọi API lấy chi tiết sản phẩm
   const showEditModal = async (product) => {
     setLoading(true);
     try {
@@ -168,6 +180,7 @@ const ViewProduct = () => {
           params: { id: product.id }
         }
       );
+      console.log(response.data);
       const productDetails = response.data;
       form.setFieldsValue({
         ProductName: productDetails.ProductName,
@@ -176,13 +189,12 @@ const ViewProduct = () => {
         ListedPrice: productDetails.ListedPrice,
         Promotion: productDetails.Promotion || 0,
         PromotionalPrice: productDetails.PromotionalPrice,
-        Origin: productDetails.CountryOfOrigin.CountryName, 
+        CountryID: productDetails.CountryID, 
         Description: productDetails.Description,
         WarrantyPolicyID: productDetails.WarrantyPolicyID,
       });
 
       setEditingProduct(productDetails);
-
       // Map colors
       setColors(
         productDetails.Colors
@@ -436,10 +448,12 @@ const ViewProduct = () => {
           ThuTu: index + 1,
         })),
       };
+      console.log(newProduct)
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-product`,
         { newProduct, nameEmployee }
       );
+
       handleAddCancel();
       reloadProductList();
       message.success("Thêm sản phẩm thành công!");
@@ -735,13 +749,22 @@ const ViewProduct = () => {
               {/* Cột phải */}
               <div>
                 <Form.Item
-                  name="Origin"
+                  name="CountryID"
                   label="Xuất xứ"
                   rules={[
                     { required: true, message: "Vui lòng chọn xuất xứ!" },
                   ]}
                 >
-                  <Input placeholder="Nhập xuất xứ" />
+                  <Select placeholder="Chọn nơi xuất xứ">
+                    {countryOfOrigin.map((countryOfOrigin) => (
+                      <Select.Option
+                        key={countryOfOrigin.id}
+                        value={countryOfOrigin.id}
+                      >
+                        {countryOfOrigin.CountryName}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 </Form.Item>
 
                 <Form.Item
@@ -1018,14 +1041,25 @@ const ViewProduct = () => {
               {/* Cột phải */}
               <div>
                 <Form.Item
-                  name="Origin"
+                  name="CountryID"
                   label="Xuất xứ"
                   rules={[
                     { required: true, message: "Vui lòng chọn xuất xứ!" },
                   ]}
                 >
-                  <Input placeholder="Nhập xuất xứ" />
+                  <Select placeholder="Chọn nơi xuất xứ">
+                    {countryOfOrigin.map((countryOfOrigin) => (
+                      <Select.Option
+                        key={countryOfOrigin.id}
+                        value={countryOfOrigin.id}
+                      >
+                        {countryOfOrigin.CountryName}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 </Form.Item>
+
+
 
                 <Form.Item
                   name="Description"

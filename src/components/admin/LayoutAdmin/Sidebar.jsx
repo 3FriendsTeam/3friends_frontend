@@ -43,7 +43,6 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       subItems: [
         { label: 'Đơn hàng mới', section: 'Danh sách khách hàng mới' }, // xác nhận đơn chuyển qua bộ phận kho để đóng gói, hủy đơn
         { label: 'Danh sách đơn hàng', section: 'Danh sách đơn hàng' }, // hiển thị danh sách đơn hàng
-        { label: 'Khiếu nại đơn hàng', section: 'returnsRefunds' },// danh sách các đơn hàng khiếu nại
       ],
     },
     {

@@ -81,8 +81,7 @@ const ViewProduct = () => {
         setLoading(false);
       }
     };
-    const fetchContryOfOrigin = async()=>
-    {
+    const fetchContryOfOrigin = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/country-of-origin`
@@ -189,7 +188,7 @@ const ViewProduct = () => {
         ListedPrice: productDetails.ListedPrice,
         Promotion: productDetails.Promotion || 0,
         PromotionalPrice: productDetails.PromotionalPrice,
-        CountryID: productDetails.CountryID, 
+        CountryID: productDetails.CountryID,
         Description: productDetails.Description,
         WarrantyPolicyID: productDetails.WarrantyPolicyID,
       });
@@ -206,10 +205,10 @@ const ViewProduct = () => {
       setSpecifications(
         productDetails.ProductAttributeDetails
           ? productDetails.ProductAttributeDetails.map((attr) => ({
-              key: attr.id,
-              name: attr.AttributeName || attr.AttributeID, // Nếu có AttributeName
-              value: attr.AttributeValue,
-            }))
+            key: attr.id,
+            name: attr.AttributeName || attr.AttributeID, // Nếu có AttributeName
+            value: attr.AttributeValue,
+          }))
           : []
       );
 
@@ -226,11 +225,11 @@ const ViewProduct = () => {
       setGalleryFileList(
         productDetails.Images
           ? productDetails.Images.map((image, index) => ({
-              uid: index.toString(),
-              name: `GalleryImage${index}`,
-              status: "done",
-              url: image.FilePath,
-            }))
+            uid: index.toString(),
+            name: `GalleryImage${index}`,
+            status: "done",
+            url: image.FilePath,
+          }))
           : []
       );
 
@@ -374,7 +373,7 @@ const ViewProduct = () => {
           ThuTu: index + 1,
         })),
       };
-      console.log(updatedProduct,nameEmployee);
+      console.log(updatedProduct, nameEmployee);
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/update-product?id=${editingProduct.id}`,
         {
@@ -382,7 +381,7 @@ const ViewProduct = () => {
           nameEmployee,
         }
       );
-      
+
       message.success("Cập nhật thông tin sản phẩm thành công.");
       handleEditCancel();
       reloadProductList();
@@ -865,7 +864,7 @@ const ViewProduct = () => {
             </Form.Item>
 
             <Form.Item
-              name="Gallery"
+              name="Images"
               label="Ảnh minh họa"
               rules={[
                 { required: true, message: "Vui lòng tải lên ảnh minh họa!" },
@@ -1154,7 +1153,7 @@ const ViewProduct = () => {
             </Form.Item>
 
             <Form.Item
-              name="Gallery"
+              name="Images"
               label="Ảnh minh họa"
             >
               <Upload

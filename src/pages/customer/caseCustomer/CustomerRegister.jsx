@@ -5,17 +5,19 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import axios from "axios";
-import { Navigate, NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { path } from "../../../utils/constant.jsx";
 import login1 from "../../../assets/client/login1.png";
 import google from "../../../assets/client/google.png";
 import Loading from '../../../components/Client/Loading.jsx';
 import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext.jsx";
+import { message } from "antd";
 
 const CustomerRegister = () => {
   const {loginWithGoogle } = useContext(CustomerAuthContext);
   const [errorResult, setErrorResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     customerName: "",
     email: "",
@@ -157,7 +159,7 @@ const CustomerRegister = () => {
     setIsLoading(true);
     try {
       await loginWithGoogle();
-      Navigate(path.HOMEPAGE);
+      navigate(path.HOMEPAGE);
     } catch (error) {
       setErrorResult(
         "Đã xảy ra lỗi khi đăng nhập với Google. Vui lòng thử lại."
@@ -173,60 +175,52 @@ const CustomerRegister = () => {
     const { email, password } = formData;
 
     try {
-      setIsLoading(true);
-      const checkCreatedEmail = await checkEmail({ email });
-      if (checkCreatedEmail) {
-        setErrorResult("Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!");
-        throw new Error("Email đã đăng ký");
-      }
-      try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        if (userCredential) {
-          const success = await saveAccount({
-            uid: userCredential.user.uid,
-            customerName: formData.customerName,
-            gender: formData.gender,
-            email: formData.email,
-            phoneNumber: formData.phoneNumber,
-            birthDate: formData.birthday,
-          });
-          if (!success) {
-            setErrorResult("lỗi hệ thống vui lòng thử lại sau");
-            throw new Error("Error saving account");
+        const checkCreatedEmail = await checkEmail({ email });
+        if (checkCreatedEmail) {
+            message.warning('Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!');
+            throw new Error('Email đã đăng ký');
+        }
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            if (userCredential) {
+                const success = await saveAccount({
+                    uid: userCredential.user.uid,
+                    customerName: formData.customerName,
+                    gender: formData.gender,
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    birthDate: formData.birthday,
+                });
+                if (!success) {
+                    message.error('lỗi hệ thống vui lòng thử lại sau');
+                    throw new Error('Error saving account');
+                }
+            
+            setFormData({
+                customerName: '',
+                email: '',
+                phoneNumber: '',
+                birthday: '',
+                password: '',
+                confirmPassword: '',
+            });
+            message.sussces('Đăng ký thành công vui lòng xác thực email!');
+            navigate(path.CUSTOMERLOGIN)
+            sendEmailVerification(userCredential.user);
+            
+          }else{
+            message.error("Đăng kí thất bại vui lòng thử lại sau!");
           }
+        } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+              message.warning('Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!');
+            }
         }
-        setFormData({
-          customerName: "",
-          email: "",
-          phoneNumber: "",
-          birthday: "",
-          password: "",
-          confirmPassword: "",
-        });
-        sendEmailVerification(userCredential.user);
-        errorResult("Đăng ký thành công vui lòng xác thực email!");
-        Navigate(path.CUSTOMERLOGIN);
-      } catch (error) {
-        if (error.code === "auth/email-already-in-use") {
-          errorResult(
-            "Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!"
-          );
-        }
-      }
     } catch (error) {
-      console.error("Lỗi đăng ký:", error.message);
-      setErrors({
-        ...errors,
-        email: error.message || "Đăng ký thất bại. Thử lại email khác.",
-      });
-    } finally {
-      setIsLoading(false);
+        console.error('Lỗi đăng ký:', error.message);
+        setErrors({ ...errors, email: error.message || 'Đăng ký thất bại. Thử lại email khác.' });
     }
-  };
+};
 
   return (
 

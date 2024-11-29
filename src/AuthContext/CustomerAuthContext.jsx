@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { createContext, useState } from "react";
 import { signInWithEmailPassword, signInWithGoogle } from "../config/firebaseService";
 import axios from "axios";
+import { message } from "antd";
 
 export const CustomerAuthContext = createContext();
 
@@ -57,14 +58,21 @@ const checkEmail = async ({ email }) => {
 
   const login = async (email, password) => {
     try {
-        const user = await signInWithEmailPassword(email, password);
-        localStorage.setItem("token", await user.getIdToken());
-        localStorage.setItem("username", user.displayName);
-        alert('Đăng nhập thành công!');
+      const userCredential = await signInWithEmailPassword(email, password);
+      console.log(userCredential);
+      console.log(userCredential.emailVerified);
+      if (!userCredential.emailVerified) {
+        throw new Error('Vui lòng xác thực email trong thư mục tin nhắn để đăng nhập!');
+      }
+  
+      localStorage.setItem("token", await userCredential.getIdToken());
+    localStorage.setItem("username", 'Thông tin cá nhân');
+      message.success('Đăng nhập thành công!');
+      
     } catch {
-      throw new Error('Đã xảy ra lỗi khi đăng nhập.');
+      message.warning('vui lòng kiểm tra và xác thực email trước khi đăng nhập!.');
     }
-}
+  };
 
   const loginWithGoogle = async () => {
     try {

@@ -12,11 +12,14 @@ export const EmployeeAuthProvider = ({ children }) => {
         username,
         password,
       });
+      if(response.data.data.IsActive){
       if (response.status === 200) {
         localStorage.setItem('employee', JSON.stringify(response.data));
         localStorage.setItem('Position', response.data.data.Position.PositionName);
         localStorage.setItem('isAuthenticated', 'true');
         return { success: true };
+      }}else{
+        return { success: false, message: 'tài khoản của bạn đã bị khóa! vui lòng liên hệ quản lý để biết thêm thông tin chi tiết.' };
       }
     } catch (error) {
       if (error.response) {

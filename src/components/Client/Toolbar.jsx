@@ -185,7 +185,7 @@ function Toolbar() {
                 >
                   {username ? (
                     <span className="font-bold whitespace-nowrap">
-                      Xin chào, {username}
+                    {username}
                     </span>
                   ) : (
                     <NavLink to={path.CUSTOMERLOGIN} className="font-bold">
@@ -222,24 +222,6 @@ function Toolbar() {
                           <icons.IoIosArrowForward />
                         </span>
                       </div>
-                    </div>
-
-                    <div className="p-4 text-center">
-                      <h3 className="text-gray-600 font-bold mb-2">
-                        Thông báo
-                      </h3>
-                      <img
-                        src="https://via.placeholder.com/100"
-                        alt="Thông báo trống"
-                        className="mx-auto mb-2"
-                      />
-                      <p className="text-gray-600 font-semibold">
-                        Ở đây hơi trống trải.
-                      </p>
-                      <p className="text-gray-500 text-sm">
-                        S-Ant sẽ gửi cho bạn những thông báo mới nhất tại đây
-                        nhé!
-                      </p>
                     </div>
 
                     <button

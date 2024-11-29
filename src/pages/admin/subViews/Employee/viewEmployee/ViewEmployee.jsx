@@ -391,18 +391,7 @@ const ViewEmployee = () => {
             label="Số điện thoại"
             rules={[
               { required: true, message: "Vui lòng nhập số điện thoại!" },
-              {
-                validator: (_, value) => {
-                  // Kiểm tra số điện thoại bắt đầu bằng số 0 và có độ dài từ 10 đến 11 chữ số
-                  const regex = /^0\d{9,10}$/; // Đảm bảo số điện thoại bắt đầu bằng 0 và có 10 hoặc 11 chữ số
-                  if (!value || regex.test(value)) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error("Số điện thoại phải bắt đầu bằng số 0 và có 10 hoặc 11 chữ số!")
-                  );
-                },
-              },
+              { pattern: new RegExp(/^0\d{9,10}$/), message: 'Số điện thoại không hợp lệ!' },
             ]}
           >
             <Input

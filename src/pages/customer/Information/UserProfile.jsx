@@ -58,7 +58,7 @@ const UserProfile = () => {
       },300);
     } catch (error) {
       console.log(error);
-      alert("Đã xảy ra lỗi khi cập nhật thông tin!");
+      message.error("Đã xảy ra lỗi khi cập nhật thông tin!");
     }
   };
 
@@ -71,15 +71,26 @@ const UserProfile = () => {
     setIsEditing({ ...isEditing, phoneNumber: true });
     setUpdatedPhoneNumber(formData.PhoneNumber);
   };
-
+  const validateEmail = (email) => {
+    // A regular expression to check if the email address is valid
+    // Hàm kiểm tra định dạng email
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
   const handleSaveEmail = () => {
+    if(validateEmail(updatedEmail)){
     setFormData({ ...formData, Email: updatedEmail });
-    setIsEditing({ ...isEditing, email: false });
+    setIsEditing({ ...isEditing, email: false });}
+    else{
+      message.warning("email không hợp lệ!");
+      return;
+    }
+    
   };
 
   const handleSavePhoneNumber = () => {
     if (updatedPhoneNumber.length !== 10 || !/^\d+$/.test(updatedPhoneNumber)) {
-      alert("Số điện thoại phải bao gồm 10 chữ số.");
+      message.warning("Số điện thoại phải bao gồm 10 chữ số.");
       return;
     }
     setFormData({ ...formData, PhoneNumber: updatedPhoneNumber });

@@ -24,6 +24,7 @@ const ViewDiscontinuedProducts = () => {
                 const response = await axios.get(
                     `${import.meta.env.VITE_BACKEND_URL}/api/get-discontinued-products`
                 );
+                
                 setProducts(
                     response.data.map((product, index) => ({ key: index, ...product }))
                 );
@@ -77,6 +78,7 @@ const ViewDiscontinuedProducts = () => {
         fetchProductData();
         fetchCategoryData();
         fetchManufacturerData();
+        console.log(products)
     }, []);
 
     // Hàm tìm tên loại sản phẩm dựa trên ProductTypeID
@@ -115,15 +117,15 @@ const ViewDiscontinuedProducts = () => {
             key: "RepresentativeImage",
             render: (RepresentativeImage) =>
                 RepresentativeImage ? (
-                    <img
-                        src={RepresentativeImage}
-                        alt="Ảnh sản phẩm"
-                        style={{ width: 50, height: 50 }}
-                    />
-                ) : (
-                    "Chưa có ảnh"
-                ),
-        },
+                <img
+                  src={RepresentativeImage}
+                  alt="Ảnh đại diện"
+                  className="w-12 h-12 object-cover rounded"
+                />
+              ) : (
+                "Chưa có ảnh"
+              ),
+          },
         {
             title: "Tên sản phẩm",
             dataIndex: "ProductName",

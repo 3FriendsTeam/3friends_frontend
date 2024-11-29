@@ -4,7 +4,8 @@ import PropTypes from "prop-types";
 export const CartContext = createContext();export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const addToCart = (product) => {
-    const productId = product.color
+    const productId = product.id;
+    const productName = product.color
       ? `${product.name}-${product.color}`
       : `${product.name}`;
     
@@ -25,6 +26,7 @@ export const CartContext = createContext();export const CartProvider = ({ childr
         {
           ...product,
           id: productId,
+          name: productName,
           quantity: 1,
           price: String(product.price),
         },

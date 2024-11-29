@@ -1,13 +1,48 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Modal, List, message } from "antd";
 import PropTypes from "prop-types";
 import icons from "../../../utils/icons";
 import api from "../../../middlewares/tokenMiddleware";
 import Toolbar from "../../../components/Client/Toolbar";
 import payment1 from "../../../assets/client/payment1.jpg";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
-
+import { path } from "../../../utils/constant";
+const PaymentModal = ({ isVisible, isSuccess, onClose }) => {
+  return (
+    <Modal
+      open={isVisible}
+      onCancel={onClose}
+      footer={null}
+      centered
+      className="max-w-xs mx-auto"
+    >
+      <div className="flex flex-col items-center p-4">
+        {isSuccess ? (
+          <CheckCircleOutlined className="text-green-500 text-6xl mb-4" />
+        ) : (
+          <CloseCircleOutlined className="text-red-500 text-6xl mb-4" />
+        )}
+        <h3 className="text-xl font-semibold">
+          {isSuccess ? "Thanh toán thành công!" : "Thanh toán thất bại!"}
+        </h3>
+        <p className="text-center mt-2">
+          {isSuccess
+            ? "3FRIENDS Cảm ơn bạn đã mua hàng của chúng tôi. Đơn hàng của bạn đang được xử lý. Vui lòng chờ điện thoại chúng tôi sẽ liên hệ với bạn và xử lí đơn hàng một cách nhanh nhất!"
+            : "Xin lỗi, có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại!"}
+        </p>
+        <Button
+          type={isSuccess ? "primary" : "default"}
+          onClick={onClose}
+          className="mt-4"
+        >
+          Đóng
+        </Button>
+      </div>
+    </Modal>
+  );
+};
 const PaymentInfo = () => {
   const location = useLocation();
   const { cartItems } = location.state || { cartItems: [] };
@@ -15,12 +50,18 @@ const PaymentInfo = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [selectedMethodIndex, setSelectedMethodIndex] = useState(null);
   const [promotionCode, setPromotionCode] = useState("");
-  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(null);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [isDiscountApplied, setIsDiscountApplied] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentMethods, setPaymentMethodsID] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [promotion, setPromotion] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const checkDiscount = () => {
     return new Promise((resolve) => {
@@ -46,23 +87,48 @@ const PaymentInfo = () => {
         const response = await api.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/get-address-by-id-customer`
         );
-        if (response.data) {
-          setAddresses(response.data.ShippingAddresses);
-          if (response.data.ShippingAddresses.length > 0 && !selectedAddress) {
-            setSelectedAddress(response.data.ShippingAddresses[0]);
-          }
-        } else {
-          setAddresses([]);
+        const addresses = response.data?.ShippingAddresses || [];
+        setAddresses(addresses);
+        if (addresses.length > 0 && !selectedAddress) {
+          setSelectedAddress(addresses[0]);
         }
       } catch (error) {
         message.error("Lỗi khi tải danh sách địa chỉ", error);
       }
     };
+    setTotalAmount(
+      cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+    );
     fetchAddresses();
-  }, [selectedAddress]);
-  
+  }, [cartItems, selectedAddress]);
 
-    const applyPromotion = async () => {
+  const handleNextStep = () => {
+    if (currentStep === 1) setCurrentStep(2);
+    else {
+      if (paymentMethods === null)
+        return message.warning("Vui lòng chọn phương thức thanh toán!");
+      handleSubmitOrder();
+    }
+  };
+
+  const handleSubmitOrder = async () => {
+    try {
+      await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-order`, {
+        TotalAmount: totalAmount,
+        PaymentMethodID: paymentMethods,
+        PromotionID: promotion?.id,
+        AddressID: selectedAddress.id,
+        ListProduct: cartItems,
+        Infomation: selectedAddress,
+      });
+      showModalSubmitOrder(true);
+    } catch (error) {
+      setIsPaymentSuccess(false);
+      console.log(error);
+    }
+  };
+
+  const applyPromotion = async () => {
     if (!promotionCode) {
       message.warning("Vui lòng nhập mã giảm giá.");
       return;
@@ -74,45 +140,45 @@ const PaymentInfo = () => {
           params: { Code: promotionCode },
         }
       );
-      const promotion = response.data;
-      if (!promotion || promotion.IsDeleted || promotion.DeletedAt) {
+      const Promotion = response.data;
+      if (!Promotion || Promotion.IsDeleted || Promotion.DeletedAt) {
         message.warning("Mã giảm giá không hợp lệ.");
         return;
       }
 
       const currentDate = new Date();
-      const startDate = new Date(promotion.StartDate);
-      const endDate = new Date(promotion.EndDate);
+      const startDate = new Date(Promotion.StartDate);
+      const endDate = new Date(Promotion.EndDate);
 
       if (currentDate < startDate || currentDate > endDate) {
         message.error("Mã giảm giá đã hết hạn.");
         return;
       }
 
-      if (totalAmount < promotion.MinValue) {
+      if (totalAmount < Promotion.MinValue) {
         message.warning(
           `Tổng giá trị đơn hàng phải đạt tối thiểu ${formatPrice(
-            promotion.MinValue
+            Promotion.MinValue
           )} để sử dụng mã giảm giá.`
         );
         return;
       }
 
-      if (promotion.Quantity <= 0) {
+      if (Promotion.Quantity <= 0) {
         message.error("Số lượng mã giảm giá đã hết.");
         return;
       }
 
-      const discountAmount = (promotion.DiscountValue / 100) * totalAmount;
-      const finalDiscount = Math.min(discountAmount, promotion.MaxDiscount);
+      const discountAmount = (Promotion.DiscountValue / 100) * totalAmount;
+      const finalDiscount = Math.min(discountAmount, Promotion.MaxDiscount);
       const discountedPrice = totalAmount - finalDiscount;
       const useDiscount = await checkDiscount();
 
       if (useDiscount) {
-        setDiscountPercent(promotion.DiscountValue);
-        setDiscountedPrice(discountedPrice);
+        setPromotion(Promotion);
+        setDiscountPercent(Promotion.DiscountValue);
+        setTotalAmount(discountedPrice);
         setIsDiscountApplied(true);
-        console.log(discountedPrice);
         message.success("Mã giảm giá đã được áp dụng thành công!");
       }
     } catch (error) {
@@ -141,26 +207,28 @@ const PaymentInfo = () => {
     setSelectedMethodIndex(index);
   };
 
+  const ChoosePaymentMethod = () => {
+    setPaymentMethodsID(1);
+  };
   const handleConfirmSelection = () => {
     setPaymentModalOpen(false);
   };
-
-  const [currentStep, setCurrentStep] = useState(1);
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(price);
   };
+  const showModalSubmitOrder = (success) => {
+    setIsPaymentSuccess(success);
+    setIsModalVisible(true);
+  };
 
-  const totalAmount = cartItems.reduce(
-    (total, item) =>
-      total + parseFloat(item.price.replace(/\D/g, "")) * item.quantity,
-    0
-  );
-
-  const handleNextStep = () => {
-    if (currentStep === 1) setCurrentStep(2);
+  const handleCloseSubmitOrder = () => {
+    if (isPaymentSuccess) {
+      navigate(path.HOMEPAGE);
+    }
+    setIsModalVisible(false);
   };
 
   const handlePreviousStep = () => {
@@ -172,6 +240,12 @@ const PaymentInfo = () => {
 
   return (
     <div>
+      <PaymentModal
+        isVisible={isModalVisible}
+        isSuccess={isPaymentSuccess}
+        onClose={handleCloseSubmitOrder}
+      />
+
       <Toolbar />
       <div className="min-h-screen bg-gray-100 flex flex-col items-center">
         <div className="bg-[#f4f6f8] w-full max-w-[600px] mx-auto p-3 flex items-center justify-between  border-b border-gray-300">
@@ -411,9 +485,7 @@ const PaymentInfo = () => {
                   <span className="font-normal"> ( đã gồm VAT)</span>
                 </span>
                 <span className="font-bold text-[#e0052b] text-lg">
-                  {discountedPrice
-                    ? formatPrice(discountedPrice)
-                    : formatPrice(totalAmount)}
+                  {formatPrice(totalAmount)}
                 </span>
               </div>
             </div>
@@ -479,7 +551,10 @@ const PaymentInfo = () => {
                     } hover:bg-[#ffdada]`}
                   >
                     <img src={payment1} className="w-[50px] h-[50px]" />
-                    <button className="w-full py-2 px-4 rounded-lg mb-2">
+                    <button
+                      onClick={ChoosePaymentMethod}
+                      className="w-full py-2 px-4 rounded-lg mb-2"
+                    >
                       Thanh toán tại cửa hàng
                     </button>
                   </div>
@@ -598,6 +673,11 @@ const PaymentInfo = () => {
       </div>
     </div>
   );
+};
+PaymentModal.propTypes = {
+  isVisible: PropTypes.bool.isRequired,
+  isSuccess: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 PaymentInfo.propTypes = {
   customerData: PropTypes.shape({

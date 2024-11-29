@@ -18,7 +18,6 @@ const ListProducts = () => {
   const queryParams = new URLSearchParams(location.search);
   const categoryId = queryParams.get("categoryId");
 
- 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -42,7 +41,7 @@ const ListProducts = () => {
   useEffect(() => {
     let updatedProducts = [...products];
 
-    // Logic for filtering
+
     if (priceFilter === "under5") {
       updatedProducts = updatedProducts.filter(
         (product) => parseFloat(product.PromotionalPrice) < 5000000
@@ -65,7 +64,7 @@ const ListProducts = () => {
       );
     }
 
-    // Sorting logic
+ 
     if (sortOrder === "price_low") {
       updatedProducts.sort(
         (a, b) =>
@@ -85,35 +84,23 @@ const ListProducts = () => {
     }
 
     setFilteredAndSortedProducts(updatedProducts);
-  }, [priceFilter, sortOrder, products]); 
-
-  const handlePriceFilter = (priceRange) => {
-    setPriceFilter(priceRange);
-  };
-
-  const handleSortChange = (order) => {
-    setSortOrder(order);
-  };
-
-  const handleProductClick = (productId) => {
+  }, [priceFilter, sortOrder, products]);  
+   const handleProductClick = (productId) => {
     navigate(`${path.PRODUCTSDETAILS}/${productId}`);
   };
-
   return (
-    <div className="flex flex-wrap flex-row w-full justify-center">
+    <div className="flex flex-wrap flex-row w-full justify-center ">
       <div className="w-full lg:w-[1536px] mx-auto">
         <Header />
       </div>
       <div className="bg-[#F2F2F2] w-full">
-        <NavigationBar current="Sản phẩm" />
-        <Animation />
-        <ProductClassification
-          categoryId={categoryId}
-          onSortChange={handleSortChange}
-          onFilterChange={handlePriceFilter}
-        />
-
-        <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
+      <NavigationBar />
+      <Animation />
+      <ProductClassification
+        onFilterChange={(filter) => setPriceFilter(filter.priceRange)}
+        onSortChange={(sort) => setSortOrder(sort.sortOrder)}
+      />
+      <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
           {filteredAndSortedProducts.map((product, index) => (
             <div
               key={index}

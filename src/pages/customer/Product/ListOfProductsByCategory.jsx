@@ -18,7 +18,9 @@ const getImagePath = (imageName) => {
 const ListOfProductsByCategory = () => {
   const [products, setProducts] = useState([]);
   const [isLoading,setIsLoading] = useState(false);
-  const [sortedProducts, setSortedProducts] = useState([]);
+  const [filteredAndSortedProducts, setFilteredAndSortedProducts] = useState([]);
+  const [priceFilter, setPriceFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const location = useLocation();
   const navigate=useNavigate();
   const queryParams = new URLSearchParams(location.search);
@@ -36,7 +38,6 @@ const ListOfProductsByCategory = () => {
             }
           );
           setProducts(response.data);
-          setSortedProducts(response.data);
         } catch (error) {
           console.error("Error fetching products:", error);
         } finally {
@@ -50,27 +51,53 @@ const ListOfProductsByCategory = () => {
     }
   }, [manufacturerId]);
 
-  const sortProducts = (order) => {
-    const sorted = [...products].sort((a, b) => {
-      if (order === "price_low") {
-        return parseFloat(b.PromotionalPrice) - parseFloat(a.PromotionalPrice);
-      }
-      if (order === "price_high") {
-        return parseFloat(a.PromotionalPrice) - parseFloat(b.PromotionalPrice);
-      }
-      if (order === "sold") {
-        return b.Sold - a.Sold; // Sắp xếp giảm dần theo số lượng bán
-      }
-      if (order === "newest") {
-        return new Date(b.createdAt) - new Date(a.createdAt); // Sắp xếp giảm dần theo ngày tạo
-      }
-      return 0;
-    });
-    setSortedProducts(sorted);
-  };
-  const handleSortChange = (order) => {
-    sortProducts(order);
-  };
+  useEffect(() => {
+    let updatedProducts = [...products];
+
+
+    if (priceFilter === "under5") {
+      updatedProducts = updatedProducts.filter(
+        (product) => parseFloat(product.PromotionalPrice) < 5000000
+      );
+    } else if (priceFilter === "5to10") {
+      updatedProducts = updatedProducts.filter(
+        (product) =>
+          parseFloat(product.PromotionalPrice) >= 5000000 &&
+          parseFloat(product.PromotionalPrice) <= 10000000
+      );
+    } else if (priceFilter === "10to15") {
+      updatedProducts = updatedProducts.filter(
+        (product) =>
+          parseFloat(product.PromotionalPrice) >= 10000000 &&
+          parseFloat(product.PromotionalPrice) <= 15000000
+      );
+    } else if (priceFilter === "to15") {
+      updatedProducts = updatedProducts.filter(
+        (product) => parseFloat(product.PromotionalPrice) > 15000000
+      );
+    }
+
+ 
+    if (sortOrder === "price_low") {
+      updatedProducts.sort(
+        (a, b) =>
+          parseFloat(a.PromotionalPrice) - parseFloat(b.PromotionalPrice)
+      );
+    } else if (sortOrder === "price_high") {
+      updatedProducts.sort(
+        (a, b) =>
+          parseFloat(b.PromotionalPrice) - parseFloat(a.PromotionalPrice)
+      );
+    } else if (sortOrder === "sold") {
+      updatedProducts.sort((a, b) => b.Sold - a.Sold);
+    } else if (sortOrder === "newest") {
+      updatedProducts.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+    }
+
+    setFilteredAndSortedProducts(updatedProducts);
+  }, [priceFilter, sortOrder, products]);  
   const handleProductClick = (productId) => {
     navigate(`${path.PRODUCTSDETAILS}/${productId}`);
   };
@@ -90,9 +117,12 @@ const ListOfProductsByCategory = () => {
       <div className="bg-[#F2F2F2] w-[1536px] ">
         <NavigationBar current="Sản phẩm" />
         <Animation />
-        <ProductClassification  onSortChange={handleSortChange} />
-        <div className="ml-[183px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-3 gap-x-1 gap-y-6 pb-4 mb-4">
-          {sortedProducts.map((product, index) => (
+        <ProductClassification
+        onFilterChange={(filter) => setPriceFilter(filter.priceRange)}
+        onSortChange={(sort) => setSortOrder(sort.sortOrder)}
+      />
+        <div className="ml-[174.5px] w-[1170px] flex flex-wrap rounded-lg bg-white mt-2 gap-x-1 gap-y-6 pb-4 mb-4">
+          {filteredAndSortedProducts.map((product, index) => (
             <div
               key={index}
               onClick={() => handleProductClick(product.id)}

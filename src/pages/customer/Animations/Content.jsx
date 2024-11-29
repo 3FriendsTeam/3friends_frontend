@@ -50,7 +50,7 @@ const FeaturedProducts = () => {
 
   const goToSlide = (index) => {
     if (swiperRef.current) {
-      swiperRef.current.slideToLoop(index); 
+      swiperRef.current.slideToLoop(index);
       setCurrentIndex(index);
     }
   };
@@ -67,7 +67,7 @@ const FeaturedProducts = () => {
 
       <div className="container mx-auto px-4 lg:px-[160px] -mt-[110px] bg-transparent">
         <div className="p-6 rounded-lg flex flex-col lg:flex-row gap-4">
-          <div className="relative overflow-hidden w-full lg:w-[770px] lg:h-[330px] group">
+          <div className="relative overflow-hidden w-full lg:w-[770px] lg:h-[400px] group">
             <button
               onClick={prevMain}
               className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 opacity-75 hover:opacity-100"
@@ -76,10 +76,10 @@ const FeaturedProducts = () => {
             </button>
 
             <Swiper
-              modules={[ Autoplay]}
+              modules={[Autoplay]}
               loop={true}
               onSwiper={(swiper) => (swiperRef.current = swiper)}
-              onSlideChange={(swiper) => setCurrentIndex(swiper.realIndex)} 
+              onSlideChange={(swiper) => setCurrentIndex(swiper.realIndex)}
               autoplay={{
                 delay: 4000,
                 disableOnInteraction: false,
@@ -96,6 +96,24 @@ const FeaturedProducts = () => {
                 </SwiperSlide>
               ))}
             </Swiper>
+            <div className="text-black text-center relative z-20">
+              <div className="flex justify-center bg-white">
+                {imageNames.map((name, index) => (
+                  <div
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`bg-white p-4 w-[150px] lg:w-[190px] text-center cursor-pointer ${
+                      index === currentIndex ? "border-b-4 border-[#f00]" : ""
+                    } relative z-20`} 
+                  >
+                    <div className="mx-auto flex flex-col -mt-[60px] border-gray-500">
+                      <h3 className="text-sm font-medium">{name}</h3>
+                      <p className="text-sm">{prices[index]}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <button
               onClick={nextMain}
@@ -103,23 +121,6 @@ const FeaturedProducts = () => {
             >
               <icons.IoIosArrowDropright className="text-white text-3xl" />
             </button>
-          </div>
-
-          <div className="absolute bottom-[-70px] text-black text-center hidden lg:block">
-            <div className="flex justify-center flex-wrap">
-              {imageNames.map((name, index) => (
-                <div
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`bg-white p-4 w-[150px] lg:w-[190px] text-center cursor-pointer ${
-                    index === currentIndex ? "border-b-4 border-[#f00]" : ""
-                  }`}
-                >
-                  <h3 className="text-sm font-medium">{name}</h3>
-                  <p className="text-sm">{prices[index]}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
           <div className="flex flex-col justify-center items-center gap-6 lg:gap-5">
@@ -132,7 +133,7 @@ const FeaturedProducts = () => {
               </button>
 
               <Swiper
-                modules={[ Autoplay]}
+                modules={[Autoplay]}
                 loop={true}
                 autoplay={{
                   delay: 5000,
@@ -169,7 +170,7 @@ const FeaturedProducts = () => {
               </button>
 
               <Swiper
-                modules={[ Autoplay]}
+                modules={[Autoplay]}
                 loop={true}
                 autoplay={{
                   delay: 5000,

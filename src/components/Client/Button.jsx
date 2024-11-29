@@ -9,9 +9,10 @@ const {
   BsFillLaptopFill,
   FaTablet,
   IoWatchSharp,
+  IoHeadset,
   GiRiceCooker,
   HiMiniTv,
-  RiVipCrown2Fill,
+  FaLaptopCode,
 } = icons;
 
 const availableIcons = {
@@ -19,9 +20,10 @@ const availableIcons = {
   BsFillLaptopFill,
   FaTablet,
   IoWatchSharp,
+  IoHeadset,
   GiRiceCooker,
   HiMiniTv,
-  RiVipCrown2Fill,
+  FaLaptopCode,
 };
 
 const Button = () => {
@@ -108,8 +110,8 @@ const Button = () => {
           {categories.map((category, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 rounded-lg"
-              style={{ width: "150px", height: "50px" }}
+              className="flex items-center gap-2 rounded-lg h-[50px] "
+         
               onMouseEnter={() => handleMouseEnter(category)}
             >
               {category.icon && (
@@ -118,7 +120,7 @@ const Button = () => {
                 </span>
               )}
 
-              <span className="text-[13px] font-medium truncate overflow-hidden">
+              <span className="text-[13px] font-medium whitespace-nowrap ">
                 {category.CategoryName}
               </span>
             </div>

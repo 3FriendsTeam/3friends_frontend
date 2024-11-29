@@ -3,6 +3,7 @@ import icons from "../../utils/icons";
 import { path } from "../../utils/constant";
 import logoFriends from "../../assets/admin/3Friends.png";
 import { useEffect, useState } from "react";
+import login1 from "../../assets/client/login1.png";
 
 function Toolbar() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -207,7 +208,7 @@ function Toolbar() {
                   <div className="absolute right-0 top-full mt-2 w-80 bg-white border rounded-lg shadow-lg z-20 px-3">
                     <div className="mt-2 p-2 flex items-center border-[1.5px] border-red-500 rounded-lg h-[50px]">
                       <img
-                        src="https://via.placeholder.com/50"
+                        src={login1}
                         alt="S-Ant"
                         className="w-10 h-10 mr-3"
                       />

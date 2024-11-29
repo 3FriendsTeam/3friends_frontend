@@ -7,6 +7,8 @@ const ViewCompleteOrder = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
+    const [customers, setCustomers] = useState([]);
+
 
     // Hàm lấy danh sách đơn hàng đã hoàn thành
     const fetchOrderData = async () => {
@@ -29,9 +31,33 @@ const ViewCompleteOrder = () => {
         }
     };
 
+    const fetchCustomerData = async () => {
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_BACKEND_URL}/api/get-all-customer`
+            );
+            console.log("Danh sách khách hàng:", response.data);
+            setCustomers(response.data);
+        } catch (error) {
+            console.error("Lỗi khi tải dữ liệu:", error);
+            message.error(
+                "Không thể tải danh sách chính sách bảo hành. Vui lòng thử lại sau."
+            );
+        }
+    };
+
     useEffect(() => {
         fetchOrderData();
+        fetchCustomerData();
     }, []);
+
+    const getCustomerName = (CustomerID) => {
+        if (!customers || customers.length === 0) {
+          return "Chưa xác định";
+        }
+        const customer = customers.find((p) => p.id === CustomerID);
+        return customer ? customer.CustomerName : "Chưa xác định";
+      };
 
     // Lọc danh sách đơn hàng theo từ khóa tìm kiếm
     const filteredOrders = orders.filter((order) =>
@@ -95,10 +121,10 @@ const ViewCompleteOrder = () => {
         },
         {
             title: "Khách hàng",
-            dataIndex: "CustomerName",
-            key: "CustomerName",
-            render: (CustomerName) => CustomerName || "Chưa cập nhật",
-        },
+            dataIndex: "CustomerID",
+            key: "CustomerID",
+            render: (CustomerID) => getCustomerName(CustomerID) || "Chưa cập nhật",
+          },
         {
             title: "Trạng thái thanh toán",
             dataIndex: "PaymentStatus",

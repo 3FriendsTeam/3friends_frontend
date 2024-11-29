@@ -105,7 +105,7 @@ const ListProducts = () => {
             <div
               key={index}
               onClick={() => handleProductClick(product.id)}
-              className="w-full sm:w-1/2 md:w-1/3 lg:w-[18.5%] p-4 flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+              className="w-full sm:w-1/2 md:w-1/3 lg:w-[18.5%] p-4 flex flex-col  border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
             >
               <img
                 src={product.RepresentativeImage}
@@ -123,12 +123,14 @@ const ListProducts = () => {
               <div className="w-full mt-2 text-left">
                 <p className="text-[16px] font-bold text-red-500">
                   {product.PromotionalPrice + " ₫"}
+                  
                 </p>
                 <p
                   className="text-[16px] font-bold text-[#bdbdbd] line-through"
                   style={{ minHeight: "20px" }}
                 >
                   {product.ListedPrice + " ₫"}
+                  
                 </p>
               </div>
 

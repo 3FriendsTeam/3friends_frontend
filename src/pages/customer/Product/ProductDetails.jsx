@@ -212,19 +212,19 @@ const ProductDetails = () => {
                 modules={[Autoplay]}
                 autoplay={{ delay: 5000 }}
                 loop
-                className="w-full max-w-md h-[333px]"
+                className="w-full max-w-md h-[400px] "
                 onSwiper={(swiper) => setSwiperRef(swiper)}
               >
                 {product.Images && product.Images.length > 0 ? (
                   product.Images.map((image, index) => (
                     <SwiperSlide
                       key={index}
-                      className="flex justify-center items-center h-[333px]"
+                      className="flex justify-center items-center h-[400px]"
                     >
                       <img
                         src={image.FilePath}
                         alt={`Product ${index + 1}`}
-                        className="rounded-lg object-cover w-full h-auto max-h-[333px]"
+                        className="rounded-lg object-cover w-[400px] h-[400px] "
                       />
                     </SwiperSlide>
                   ))
@@ -233,7 +233,7 @@ const ProductDetails = () => {
                     <img
                       src={product.RepresentativeImage}
                       alt="Representative Image"
-                      className="rounded-lg object-cover w-full h-auto max-h-[333px]"
+                      className="rounded-lg object-cover w-[333px] h-[333px]"
                     />
                   </SwiperSlide>
                 )}

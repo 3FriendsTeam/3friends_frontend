@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
-import { FaBoxOpen, FaUsers, FaTags, FaCreditCard, FaTruck, FaUser, FaChartLine, FaWarehouse  } from 'react-icons/fa6';
+import { FaBoxOpen, FaUsers, FaTags, FaTruck, FaUser, FaChartLine, FaWarehouse  } from 'react-icons/fa6';
 import { MdAssignmentTurnedIn, MdAccountCircle } from 'react-icons/md';
 import { FiLogOut } from 'react-icons/fi';
 import logo3friend from '../../../assets/admin/3friends.png';

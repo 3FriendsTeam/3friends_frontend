@@ -1,9 +1,10 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../../components/Client/Header";
 import Footer from "../../../components/Client/Footer";
 import Loading from "../../../components/Client/Loading";
+import { path } from "../../../utils/constant";
 
 const getImagePath = (imageName) => {
   if (!imageName) return "";
@@ -12,6 +13,7 @@ const getImagePath = (imageName) => {
 
 const CatalogSearch = () => {
   const location = useLocation();
+  const navigate= useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get("query")?.toLowerCase() || "";
 
@@ -65,6 +67,9 @@ const CatalogSearch = () => {
     return filteredProducts;
   }, [sortType, filteredProducts]);
 
+  const handleProductClick = (productId) => {
+    navigate(`${path.PRODUCTSDETAILS}/${productId}`);
+  };
   return (
     <div className="bg-white">
       {loading && (
@@ -123,6 +128,7 @@ const CatalogSearch = () => {
             sortedProducts.map((product, index) => (
               <div
                 key={index}
+                onClick={() => handleProductClick(product.id)}
                 className="product-card border p-4 m-2 w-[250px] transform transition-all duration-300  hover:translate-y-[-10px] hover:shadow-lg"
               >
                 <img

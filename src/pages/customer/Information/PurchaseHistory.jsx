@@ -92,9 +92,9 @@ const PurchaseHistory = () => {
   };
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-50 px-6 rounded-md -mt-4 pt-4 shadow-xl w-[870px]">
       {/* Filter and Date Range */}
-      <div className="flex items-center shadow-md justify-between mb-6 flex-wrap">
+      <div className="flex items-center justify-between mb-6 flex-wrap ">
         <div className="flex items-center flex-wrap gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -119,7 +119,7 @@ const PurchaseHistory = () => {
             />
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+        <div className="flex flex-wrap gap-2 mt-4 md:mt-4">
           {orderStatuses.map((status) => (
             <button
               key={status}
@@ -137,7 +137,7 @@ const PurchaseHistory = () => {
       </div>
 
       {/* Order List */}
-      <div className="space-y-6 ">
+      <div className="space-y-6 w-[820px] pb-4">
         {loading ? (
           <div className="flex justify-center items-center">
             <svg
@@ -211,10 +211,10 @@ const PurchaseHistory = () => {
 
                 {/* Order Details */}
                 {isExpanded && (
-                  <div className="mt-4">
+                  <div className="mt-4 ">
                     {/* Order Products */}
                     {order.OrderProductDetails.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-4 ">
                         {order.OrderProductDetails.map((product) => (
                           <div
                             key={product.id}

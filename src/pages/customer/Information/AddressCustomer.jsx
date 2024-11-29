@@ -72,7 +72,7 @@ const AddressCustomer = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50">
+    <div className="px-6 pb-5 bg-gray-50 -mt-4 pt-3 rounded-md w-[870px]">
       <Row justify="space-between" align="middle">
         <Col>
           <h2 className="text-left font-bold text-xl">Danh sách địa chỉ</h2>
@@ -81,7 +81,7 @@ const AddressCustomer = () => {
           <Button
             type="primary"
             onClick={() => openModal()}
-            className="float-right mb-4"
+            className="float-right  "
           >
             Thêm địa chỉ mới
           </Button>
@@ -103,7 +103,7 @@ const AddressCustomer = () => {
                 Xóa
               </Button>,
             ]}
-            className="mb-4 rounded-lg shadow-lg p-4"
+            className="mt-4 rounded-lg shadow-md"
           >
             <div>
               <div className="font-semibold">Người nhận: {address.RecipientName} | {address.PhoneNumber}</div>
@@ -122,6 +122,7 @@ const AddressCustomer = () => {
         onCancel={closeModal}
         footer={null}
         destroyOnClose
+        className=""
       >
         <Form
           initialValues={currentAddress}

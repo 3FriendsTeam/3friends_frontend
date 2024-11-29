@@ -87,7 +87,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="flex mr-[150px] -mt-5 bg-gray-100">
+    <div className="flex mr-[150px] -mt-5 bg-gray-50">
       {isLoading && (
         <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-70 z-10">
           <div className="relative -translate-y-[30px]">

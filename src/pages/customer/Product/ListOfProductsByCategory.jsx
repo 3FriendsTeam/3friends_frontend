@@ -5,8 +5,10 @@ import Footer from "../../../components/Client/Footer";
 import NavigationBar from "../../../pages/customer/Animations/NavigationBar";
 import Animation from "../../../pages/customer/Animations/Animation";
 import ProductClassification from "./ProductClassification";
-import { useLocation } from "react-router-dom";
+import { useLocation ,useNavigate} from "react-router-dom";
 import Loading from "../../../components/Client/Loading";
+import { path } from "../../../utils/constant";
+
 
 const getImagePath = (imageName) => {
   if (!imageName) return "";
@@ -18,6 +20,7 @@ const ListOfProductsByCategory = () => {
   const [isLoading,setIsLoading] = useState(false);
   const [sortedProducts, setSortedProducts] = useState([]);
   const location = useLocation();
+  const navigate=useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const manufacturerId = queryParams.get("manufacturerId"); 
 
@@ -68,6 +71,9 @@ const ListOfProductsByCategory = () => {
   const handleSortChange = (order) => {
     sortProducts(order);
   };
+  const handleProductClick = (productId) => {
+    navigate(`${path.PRODUCTSDETAILS}/${productId}`);
+  };
 
   return (
     <div className="flex flex-wrap flex-row w-full ">
@@ -89,6 +95,7 @@ const ListOfProductsByCategory = () => {
           {sortedProducts.map((product, index) => (
             <div
               key={index}
+              onClick={() => handleProductClick(product.id)}
               className="w-full sm:w-1/2 lg:w-[19%] p-4 ml-[7px] flex flex-col items-center border border-gray-300 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
             >
               <img
@@ -112,7 +119,7 @@ const ListOfProductsByCategory = () => {
             </div>
           ))}
         </div>
-      </div >
+      </div>
       <Footer />
     </div>
   );

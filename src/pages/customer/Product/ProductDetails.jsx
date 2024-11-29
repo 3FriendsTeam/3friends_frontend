@@ -29,6 +29,7 @@ const ProductDetails = () => {
   const [reviewContent, setReviewContent] = useState("");
   const [reviews, setReviews] = useState([]);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -273,22 +274,55 @@ const ProductDetails = () => {
               </p>
             )}
 
-            {/* Khuyến mãi và chính sách */}
-            <div className="bg-gray-100 mt-4 rounded-lg border border-gray-300">
+
+            <div className="bg-gray-50 mt-4 rounded-lg border border-gray-300">
               <div className="flex justify-between items-center mt-3 mx-2 mb-4">
                 <p className="text-sm font-bold">
                   Chính sách bảo hành và đổi trả
                 </p>
               </div>
+
               <div className="px-4 pb-4">
-                <p className="text-sm">
-                  {product.WarrantyPolicy?.PolicyContent}
-                </p>
-                <p className="text-sm">
-                  {product.WarrantyPolicy?.WarrantyConditions}
-                </p>
+                <div
+                  className={`relative overflow-hidden transition-all duration-300 ${
+                    showMore ? "max-h-full" : "max-h-[360px]"
+                  }`}
+                >
+                  {product.WarrantyPolicy?.PolicyContent.split("\n").map(
+                    (line, index) => (
+                      <p key={index} className="text-sm">
+                        {line}
+                      </p>
+                    )
+                  )}
+
+
+                  {product.WarrantyPolicy?.WarrantyConditions.split("\n").map(
+                    (line, index) => (
+                      <p key={index} className="text-sm">
+                        {line}
+                      </p>
+                    )
+                  )}
+                </div>
+
+
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setShowMore(!showMore)}
+                    className="bg-white py-2 px-4 mt-4 rounded-2xl flex items-center justify-center text-sm gap-1 shadow-md"
+                  >
+                    {showMore ? "Ẩn bớt" : "Đọc thêm"}
+                    {showMore ? (
+                      <icons.IoIosArrowUp />
+                    ) : (
+                      <icons.IoIosArrowDown />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
+
             {product.IsDeleted ? (
               <>
                 <div className="bg-gray-500 flex flex-col items-center justify-center rounded-lg mt-6 h-16">
@@ -327,19 +361,19 @@ const ProductDetails = () => {
         </div>
       </div>
 
-      <div className="w-full bg-gray-100 py-6">
+      <div className="w-full bg-gray-100 ">
         <div className="max-w-screen-xl mx-auto flex flex-col lg:flex-row gap-6">
           <div className="bg-white rounded-xl p-6 flex-1">
             <h2 className="text-xl font-semibold mb-4">Đặc điểm nổi bật</h2>
             <div
               className={`relative overflow-hidden transition-all duration-300 ${
-                showMoreDesc ? "max-h-full" : "max-h-[280px]"
+                showMoreDesc ? "max-h-full" : "max-h-[360px]"
               }`}
             >
               <div className="space-y-4">
                 {product.Description.split("\n")
                   .reduce((acc, line, index) => {
-                    const groupIndex = Math.floor(index / 4);
+                    const groupIndex = Math.floor(index / 2);
                     if (!acc[groupIndex]) {
                       acc[groupIndex] = [];
                     }
@@ -354,17 +388,17 @@ const ProductDetails = () => {
                         </p>
                       ))}
                       {idx !==
-                        product.Description.split("\n").length / 4 - 1 && (
+                        product.Description.split("\n").length / 2 - 1 && (
                         <div className="my-4" />
                       )}
                     </div>
                   ))}
               </div>
             </div>
-            <div className="flex justify-center py-4">
+            <div className="flex justify-center ">
               <button
                 onClick={() => setShowMoreDesc(!showMoreDesc)}
-                className="bg-white py-2 px-4 mt-10 rounded-2xl flex items-center justify-center text-sm gap-1 shadow-md"
+                className="bg-white py-2 px-4 mt-4 rounded-2xl flex items-center justify-center text-sm gap-1 shadow-md"
               >
                 {showMoreDesc ? "Ẩn bớt" : "Đọc thêm"}
                 {showMoreDesc ? (
@@ -419,7 +453,7 @@ const ProductDetails = () => {
 
             {showAllSpecs && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl h-3/4 overflow-auto relative">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-2/5 max-w-2xl h-3/4 overflow-auto relative">
                   <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
                     onClick={() => setShowAllSpecs(false)}

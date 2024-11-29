@@ -23,9 +23,9 @@ const BestSellingPhone = ({categoryId}) => {
       case '6':
         return "Gia dụng bán chạy";
       case '7':
-        return "Sim bán chạy";
-      case '8':
         return "Tivi bán chạy";
+      case '8':
+        return "PC bán chạy";
       default:
         return "Điện thoại bán chạy";  
     }

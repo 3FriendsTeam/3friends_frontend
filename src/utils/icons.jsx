@@ -39,6 +39,8 @@ import { RiFileHistoryLine } from "react-icons/ri";
 import { HiOutlineHome } from "react-icons/hi2";
 import { FaEyeSlash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
+import { IoHeadset } from "react-icons/io5";
+import { FaLaptopCode } from "react-icons/fa";
 const icons={
     IoIosArrowDropright,
     IoIosArrowDropleft,
@@ -81,5 +83,7 @@ const icons={
     HiOutlineHome,
     FaEyeSlash,
     IoEyeSharp,
+    IoHeadset,
+    FaLaptopCode
 }
 export default icons

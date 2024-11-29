@@ -8,15 +8,14 @@ const PurchaseHistory = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // State cho bộ lọc
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tất cả");
 
-  // State để quản lý các đơn hàng đang được mở rộng để xem chi tiết
+
   const [expandedOrderIds, setExpandedOrderIds] = useState([]);
 
-  // State để quản lý việc hủy đơn hàng
   const [cancellingOrderId, setCancellingOrderId] = useState(null);
   const [cancelError, setCancelError] = useState(null);
   const fetchPurchaseHistory = async () => {
@@ -38,7 +37,6 @@ const PurchaseHistory = () => {
     fetchPurchaseHistory();
   }, []);
 
-  // Sử dụng useMemo để tối ưu hiệu suất khi lọc
   const filteredPurchaseHistory = useMemo(() => {
     return purchaseHistory.filter((order) => {
       const orderDate = moment(order.OrderDate);
@@ -51,7 +49,7 @@ const PurchaseHistory = () => {
     });
   }, [purchaseHistory, startDate, endDate, selectedStatus]);
 
-  // Các trạng thái có thể lọc
+
   const orderStatuses = [
     "Tất cả",
     "Chờ xác nhận",
@@ -62,7 +60,7 @@ const PurchaseHistory = () => {
     "Đã hoàn thành"
   ];
 
-  // Hàm để mở rộng hoặc thu gọn chi tiết đơn hàng
+
   const toggleOrderDetails = (orderId) => {
     setExpandedOrderIds((prev) =>
       prev.includes(orderId)
@@ -71,7 +69,7 @@ const PurchaseHistory = () => {
     );
   };
 
-  // Hàm để hủy đơn hàng
+
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm("Xác nhận hủy đơn hàng?", "", { type: "warning" })) {
       return;
@@ -93,7 +91,7 @@ const PurchaseHistory = () => {
 
   return (
     <div className="bg-gray-50 px-6 rounded-md -mt-4 pt-4 shadow-xl w-[870px]">
-      {/* Filter and Date Range */}
+
       <div className="flex items-center justify-between mb-6 flex-wrap ">
         <div className="flex items-center flex-wrap gap-4">
           <div>
@@ -119,12 +117,12 @@ const PurchaseHistory = () => {
             />
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 mt-4 md:mt-4">
+        <div className="flex flex-wrap gap-3 mt-4 md:mt-4 text-[14px] ">
           {orderStatuses.map((status) => (
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-4 py-2 rounded ${
+              className={`px-4 py-2 rounded  ${
                 selectedStatus === status
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700"
@@ -136,7 +134,6 @@ const PurchaseHistory = () => {
         </div>
       </div>
 
-      {/* Order List */}
       <div className="space-y-6 w-[820px] pb-4">
         {loading ? (
           <div className="flex justify-center items-center">
@@ -171,7 +168,7 @@ const PurchaseHistory = () => {
                 key={order.id}
                 className="bg-white shadow rounded-lg p-6 flex flex-col gap-4"
               >
-                {/* Order Header */}
+
                 <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-xl font-semibold">Đơn hàng #{order.id}</h2>
@@ -191,7 +188,6 @@ const PurchaseHistory = () => {
                   </div>
                 </div>
 
-                {/* Order Actions */}
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => toggleOrderDetails(order.id)}
@@ -209,10 +205,10 @@ const PurchaseHistory = () => {
                   )}
                 </div>
 
-                {/* Order Details */}
+        
                 {isExpanded && (
                   <div className="mt-4 ">
-                    {/* Order Products */}
+      
                     {order.OrderProductDetails.length > 0 ? (
                       <div className="space-y-4 ">
                         {order.OrderProductDetails.map((product) => (
@@ -250,7 +246,7 @@ const PurchaseHistory = () => {
                       <p className="text-gray-600">Không có sản phẩm nào trong đơn hàng này.</p>
                     )}
 
-                    {/* Hủy Đơn Hàng */}
+ 
                     {order.OrderStatus === "Chờ xác nhận" && (
                       <div className="mt-4">
                         {cancelError && (
@@ -271,7 +267,7 @@ const PurchaseHistory = () => {
             );
           })
         ) : (
-          <p>Không có đơn hàng nào phù hợp với bộ lọc đã chọn.</p>
+          <p className="text-[15px]">Không có đơn hàng nào phù hợp với bộ lọc đã chọn.</p>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useLocation , useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../../components/Client/Header";
@@ -11,14 +11,14 @@ const CatalogSearch = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get("query")?.toLowerCase() || "";
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortType, setSortType] = useState("relevant");
 
   useEffect(() => {
-    const fetchProducts =  () => {
+    const fetchProducts = () => {
       try {
         setLoading(true);
         setTimeout(async () => {
@@ -27,7 +27,7 @@ const CatalogSearch = () => {
           );
           setProducts(response.data);
           setLoading(false);
-        },300);
+        }, 300);
       } catch (err) {
         setError("Lỗi khi lấy dữ liệu sản phẩm.");
         console.error(err);
@@ -70,7 +70,7 @@ const CatalogSearch = () => {
       {loading && (
         <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-70 z-10">
           <div className="relative -translate-y-[140px]">
-            <Loading  status={loading} />
+            <Loading status={loading} />
           </div>
         </div>
       )}
@@ -86,31 +86,28 @@ const CatalogSearch = () => {
         <div className="flex justify-start items-center ml-[183px] mb-4">
           <span className="font-semibold mr-4">Sắp xếp theo:</span>
           <button
-            className={`mr-2 px-4 py-2 rounded-lg ${
-              sortType === "relevant"
+            className={`mr-2 px-4 py-2 rounded-lg ${sortType === "relevant"
                 ? "bg-red-100 text-red-500"
                 : "bg-gray-200 text-gray-700"
-            }`}
+              }`}
             onClick={() => setSortType("relevant")}
           >
             Liên quan
           </button>
           <button
-            className={`mr-2 px-4 py-2 rounded-lg ${
-              sortType === "price_high"
+            className={`mr-2 px-4 py-2 rounded-lg ${sortType === "price_high"
                 ? "bg-red-100 text-red-500"
                 : "bg-gray-200 text-gray-700"
-            }`}
+              }`}
             onClick={() => setSortType("price_high")}
           >
             Giá cao
           </button>
           <button
-            className={`px-4 py-2 rounded-lg ${
-              sortType === "price_low"
+            className={`px-4 py-2 rounded-lg ${sortType === "price_low"
                 ? "bg-red-100 text-red-500"
                 : "bg-gray-200 text-gray-700"
-            }`}
+              }`}
             onClick={() => setSortType("price_low")}
           >
             Giá thấp
@@ -136,9 +133,14 @@ const CatalogSearch = () => {
                 <h3 className="mt-2 text-[16px] font-bold text-left transition-colors duration-300 ease-in-out hover:text-[#e0052b]">
                   {product.ProductName || "Unknown Product"}
                 </h3>
-                <p className="text-[16px] font-bold text-[#e0052b] text-left mt-1">
-                  {product.ListedPrice + " ₫"}
+                <p className="text-red-500 text-[16px] font-bold">
+                  {product.PromotionalPrice?.toLocaleString()} ₫
                 </p>
+                {product.ListedPrice && (
+                  <p className="text-gray-400 font-medium line-through text-[14px]">
+                    {product.ListedPrice.toLocaleString()} ₫
+                  </p>
+                )}
                 <p
                   className="text-xs text-gray-600 bg-gray-100 mt-2 p-2 border border-gray-300 rounded-md group-hover:bg-gray-200 line-clamp-2"
                   style={{ minHeight: "50px" }}

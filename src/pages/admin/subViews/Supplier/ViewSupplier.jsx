@@ -178,8 +178,8 @@ const ViewSupplier = () => {
                 key: product.ProductID,
                 ProductID: product.ProductID,
                 ProductName: product.ProductName,
-                StartDate: product.StartDate ? moment(product.StartDate).format("YYYY-MM-DD") : "N/A",
-                EndDate: product.EndDate ? moment(product.EndDate).format("YYYY-MM-DD") : "N/A",
+                StartDate: product.StartDate ? moment(product.StartDate).format("YYYY-MM-DD") : null,
+                EndDate: product.EndDate ? moment(product.EndDate).format("YYYY-MM-DD") : null,
             }))
         );
 
@@ -202,6 +202,7 @@ const ViewSupplier = () => {
                 ...updatedSupplier,
                 Products: selectedProducts.map(({ ...rest }) => rest), // Lấy danh sách sản phẩm đã chỉnh sửa
             };
+            console.log("Payload gửi lên API:", supplierData);
 
             await axios.put(
                 `${import.meta.env.VITE_BACKEND_URL}/api/update-supplier?id=${editingSupplier.SupplierID}`,
@@ -550,6 +551,7 @@ const ViewSupplier = () => {
                                 title: "Ngày kết thúc",
                                 dataIndex: "EndDate",
                                 key: "EndDate",
+                                render: (date) => (date ? date : "Chưa có"), // Hiển thị ngày hoặc "Chưa có" nếu không có giá trị
                             },
                             {
                                 title: "Thao tác",

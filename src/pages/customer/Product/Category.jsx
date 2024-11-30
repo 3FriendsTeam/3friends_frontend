@@ -37,9 +37,9 @@ const Category = () => {
         >
           <img
             src={category.pathImg}
-            className="w-[48px] h-[60px] mb-4"
+            className="mb-4 "
           />
-          <span className="text-[13px] font-bold mt-2 text-nowrap">{category.CategoryName}</span>
+          <span className="text-[13px] font-bold text-nowrap mt-4">{category.CategoryName}</span>
         </NavLink>
       ))}
     </div>

@@ -10,11 +10,6 @@ import Loading from "../../../components/Client/Loading";
 import { path } from "../../../utils/constant";
 
 
-const getImagePath = (imageName) => {
-  if (!imageName) return "";
-  return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
-};
-
 const ListOfProductsByCategory = () => {
   const [products, setProducts] = useState([]);
   const [isLoading,setIsLoading] = useState(false);
@@ -131,8 +126,6 @@ const ListOfProductsByCategory = () => {
               <img
                 src={
                   product.RepresentativeImage
-                    ? getImagePath(product.RepresentativeImage)
-                    : ""
                 }
                 alt={product.ProductName}
                 className="rounded-lg object-cover w-full h-auto"

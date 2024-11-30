@@ -39,10 +39,13 @@ export const CartContext = createContext();export const CartProvider = ({ childr
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
+  const removeAllItemCart = () => {
+    setCartItems([]);
+  };
 
   return (
     <CartContext.Provider
-      value={{ cartItems, setCartItems, addToCart, removeFromCart }}
+      value={{ cartItems, setCartItems, addToCart, removeFromCart, removeAllItemCart }}
     >
       {children}
     </CartContext.Provider>

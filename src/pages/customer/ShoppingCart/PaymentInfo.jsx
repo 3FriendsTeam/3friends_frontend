@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Modal, List, message } from "antd";
 import PropTypes from "prop-types";
 import icons from "../../../utils/icons";
@@ -9,6 +9,9 @@ import payment1 from "../../../assets/client/payment1.jpg";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { path } from "../../../utils/constant";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { CartContext } from "./CartContext";
+
 const PaymentModal = ({ isVisible, isSuccess, onClose }) => {
   return (
     <Modal
@@ -44,8 +47,8 @@ const PaymentModal = ({ isVisible, isSuccess, onClose }) => {
   );
 };
 const PaymentInfo = () => {
-  const location = useLocation();
-  const { cartItems } = location.state || { cartItems: [] };
+  const { cartItems, removeAllItemCart } = useContext(CartContext);
+
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [selectedMethodIndex, setSelectedMethodIndex] = useState(null);
@@ -102,25 +105,33 @@ const PaymentInfo = () => {
     fetchAddresses();
   }, [cartItems, selectedAddress]);
 
+  const convertVNDtoUSD = (vndAmount) => {
+    const exchangeRate = 1 / 25000;
+  return vndAmount * exchangeRate;
+};
+
   const handleNextStep = () => {
     if (currentStep === 1) setCurrentStep(2);
     else {
+      console.log(paymentMethods);
       if (paymentMethods === null)
         return message.warning("Vui lòng chọn phương thức thanh toán!");
-      handleSubmitOrder();
+      if (paymentMethods === 1) handleSubmitOrder();
     }
   };
 
   const handleSubmitOrder = async () => {
     try {
+      console.log(totalAmount,selectedMethodIndex,promotion,selectedAddress,cartItems,selectedAddress);
       await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-order`, {
         TotalAmount: totalAmount,
-        PaymentMethodID: paymentMethods,
+        PaymentMethodID: selectedMethodIndex,
         PromotionID: promotion?.id,
         AddressID: selectedAddress.id,
         ListProduct: cartItems,
         Infomation: selectedAddress,
       });
+      removeAllItemCart();
       showModalSubmitOrder(true);
     } catch (error) {
       setIsPaymentSuccess(false);
@@ -558,6 +569,24 @@ const PaymentInfo = () => {
                       Thanh toán tại cửa hàng
                     </button>
                   </div>
+                  <div
+                    onClick={() =>
+                      handlePaymentMethodSelect("Thanh toán paypal", 2)
+                    }
+                    className={`flex border p-1 rounded-lg mb-4 cursor-pointer ${
+                      selectedMethodIndex === 2
+                        ? "border-[#e0052b]"
+                        : "border-gray-300"
+                    } hover:bg-[#ffdada]`}
+                  >
+                    <img src={payment1} className="w-[50px] h-[50px]" />
+                    <button
+                      onClick={ChoosePaymentMethod}
+                      className="w-full py-2 px-4 rounded-lg mb-2"
+                    >
+                      Thanh toán bằng paypal
+                    </button>
+                  </div>
 
                   <button
                     onClick={handleConfirmSelection}
@@ -662,12 +691,39 @@ const PaymentInfo = () => {
             </p>
           </div>
           <div className="flex justify-center">
-            <button
-              onClick={handleNextStep}
-              className="w-[580px] bg-[#e0052b] text-white py-3 rounded-lg font-bold "
-            >
-              {currentStep === 1 ? "Tiếp tục" : "Thanh toán"}
-            </button>
+            {selectedMethodIndex === 2 ? (
+              <PayPalScriptProvider options={{ "client-id": "ASw75GpZvhBDAxAPvaQ28B4Y9ajOyjksFgNSrbSuVnY0DDE34_gjYuhCwiQh8yTE0c_FSdFSq-dftQet" }}>
+              <PayPalButtons
+               className="w-[580px] py-3 rounded-lg font-bold "
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          currency_code: "USD",
+                          value: convertVNDtoUSD(totalAmount).toFixed(2),
+                        },
+                      },
+                    ],
+                  });
+                }}
+                onApprove={(data, actions) => {
+                  return actions.order.capture().then(() => {
+                    setIsPaymentSuccess(true);
+                    handleSubmitOrder();
+                  });
+                }}
+              />
+              </PayPalScriptProvider>
+            ) : (
+              <button
+                onClick={handleNextStep}
+                className="w-[580px] bg-[#e0052b] text-white py-3 rounded-lg font-bold "
+              >
+                {currentStep === 1 ? "Tiếp tục" : "Thanh toán"}
+              </button>
+            )}
+            
           </div>
         </div>
       </div>

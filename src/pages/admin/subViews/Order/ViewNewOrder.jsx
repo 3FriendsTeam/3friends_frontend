@@ -49,6 +49,7 @@ const ViewNewOrder = () => {
     fetchOrderData();
     fetchCustomerData();
   }, []);
+// }, [orders,customers]);
 
   const getCustomerName = (CustomerID) => {
     if (!customers || customers.length === 0) {

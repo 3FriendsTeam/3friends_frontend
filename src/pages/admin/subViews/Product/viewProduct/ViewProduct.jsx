@@ -628,7 +628,7 @@ const ViewProduct = () => {
           columns={columns}
           dataSource={filteredProducts}
           pagination={{
-            pageSize: 5,
+            pageSize: 10,
             showSizeChanger: false,
           }}
         />

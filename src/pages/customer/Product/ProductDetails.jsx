@@ -31,6 +31,7 @@ const ProductDetails = () => {
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -58,6 +59,14 @@ const ProductDetails = () => {
   };
 
   const handleBuyNow = () => {
+    const token = localStorage.getItem('token'); // Kiểm tra xem có token trong localStorage không
+  
+    if (!token) { // Nếu chưa đăng nhập
+      message.error("Vui lòng đăng nhập để mua hàng.");
+      return;  // Dừng lại và không thực hiện thêm vào giỏ hàng
+    }
+  
+    // Tiếp tục xử lý khi người dùng đã đăng nhập
     if (product?.Colors?.length > 0) {
       if (selectedColorIndex !== null && product?.Colors) {
         const selectedColor = product.Colors[selectedColorIndex];
@@ -70,7 +79,7 @@ const ProductDetails = () => {
             imgSrc: product.RepresentativeImage,
             quantity: 1,
           };
-
+  
           addToCart(selectedProduct);
           message.success(
             "Đã thêm vào giỏ hàng thành công! nhanh tay vào mục giỏ hàng để thanh toán sản phẩm nhé."
@@ -89,14 +98,13 @@ const ProductDetails = () => {
         imgSrc: product.RepresentativeImage,
         quantity: 1,
       };
-
+  
       addToCart(selectedProduct);
       message.success(
         "Đã thêm vào giỏ hàng thành công! nhanh tay vào mục giỏ hàng để thanh toán sản phẩm nhé."
       );
     }
   };
-
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 

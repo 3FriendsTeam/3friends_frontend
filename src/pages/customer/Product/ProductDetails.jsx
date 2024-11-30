@@ -59,14 +59,6 @@ const ProductDetails = () => {
   };
 
   const handleBuyNow = () => {
-    const token = localStorage.getItem('token'); // Kiểm tra xem có token trong localStorage không
-  
-    if (!token) { // Nếu chưa đăng nhập
-      message.error("Vui lòng đăng nhập để mua hàng.");
-      return;  // Dừng lại và không thực hiện thêm vào giỏ hàng
-    }
-  
-    // Tiếp tục xử lý khi người dùng đã đăng nhập
     if (product?.Colors?.length > 0) {
       if (selectedColorIndex !== null && product?.Colors) {
         const selectedColor = product.Colors[selectedColorIndex];

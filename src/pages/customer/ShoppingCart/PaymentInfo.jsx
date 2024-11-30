@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Modal, List, message } from "antd";
+import { Button, Modal, List, message, Form, Input } from "antd";
 import PropTypes from "prop-types";
 import icons from "../../../utils/icons";
 import api from "../../../middlewares/tokenMiddleware";
@@ -65,7 +65,41 @@ const PaymentInfo = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState(null);
+  const openModal = () => {
+    setIsModalOpen(true);
+    setIsAddressModalOpen(false);
+  };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setIsAddressModalOpen(true);
+    setCurrentAddress(null);
+  };
+  const saveAddress = async (values) => {
+    try {
+      if (currentAddress) {
+        await api.put(
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-address?id=${currentAddress.id}`, 
+          { ...values }
+        );
+        setAddresses(addresses.map((addr) =>
+          addr.id === currentAddress.id ? { ...addr, ...values } : addr
+        ));
+        message.success('Địa chỉ đã được cập nhật!');
+      } else {
+        console.log(values);
+        const response = await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-address`, values); 
+        setAddresses([...addresses, response.data]);
+        message.success('Địa chỉ đã được thêm!');
+      }
+      closeModal();
+    } catch (error){
+      console.log(error);
+      message.error('Lỗi khi lưu địa chỉ');
+    }
+  };
   const checkDiscount = () => {
     return new Promise((resolve) => {
       Modal.confirm({
@@ -107,8 +141,8 @@ const PaymentInfo = () => {
 
   const convertVNDtoUSD = (vndAmount) => {
     const exchangeRate = 1 / 25000;
-  return vndAmount * exchangeRate;
-};
+    return vndAmount * exchangeRate;
+  };
 
   const handleNextStep = () => {
     if (currentStep === 1) setCurrentStep(2);
@@ -122,7 +156,14 @@ const PaymentInfo = () => {
 
   const handleSubmitOrder = async () => {
     try {
-      console.log(totalAmount,selectedMethodIndex,promotion,selectedAddress,cartItems,selectedAddress);
+      console.log(
+        totalAmount,
+        selectedMethodIndex,
+        promotion,
+        selectedAddress,
+        cartItems,
+        selectedAddress
+      );
       await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-order`, {
         TotalAmount: totalAmount,
         PaymentMethodID: selectedMethodIndex,
@@ -398,13 +439,111 @@ const PaymentInfo = () => {
                 </div>
               )}
             </div>
+            <Modal
+              title={"Thêm địa chỉ mới"}
+              open={isModalOpen}
+              onCancel={closeModal}
+              footer={null}
+              destroyOnClose
+              className=""
+            >
+              <Form
+                initialValues={currentAddress}
+                onFinish={saveAddress}
+                layout="vertical"
+              >
+                <Form.Item
+                  label="Họ và Tên"
+                  name="RecipientName"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập họ và tên!" },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
 
+                <Form.Item
+                  label="Số điện thoại"
+                  name="PhoneNumber"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập số điện thoại!" },
+                    {
+                      pattern: new RegExp(/^0\d{9,10}$/),
+                      message: "Số điện thoại không hợp lệ!",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="Địa chỉ cụ thể"
+                  name="SpecificAddress"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập địa chỉ cụ thể!",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Phường/Xã"
+                  name="Ward"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập địa chỉ phường/xã!",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Quận/Huyện"
+                  name="District"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập quận/huyện!" },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item
+                  label="Thành phố"
+                  name="City"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập thành phố!" },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item className="text-center">
+                  <Button type="default" onClick={closeModal} className="mr-4">
+                    Hủy
+                  </Button>
+                  <Button type="primary" htmlType="submit">
+                    Lưu
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Modal>
             <Modal
               title="Chọn địa chỉ nhận hàng"
               visible={isAddressModalOpen}
               onCancel={closeAddressModal}
               footer={null}
             >
+              <Button
+                type="primary"
+                onClick={() => openModal()}
+                className="float-right -mt-9 mr-36 p-2"
+              >
+                Thêm địa chỉ mới
+              </Button>
+
               <List
                 bordered
                 dataSource={addresses}
@@ -692,28 +831,33 @@ const PaymentInfo = () => {
           </div>
           <div className="flex justify-center">
             {selectedMethodIndex === 2 ? (
-              <PayPalScriptProvider options={{ "client-id": "ASw75GpZvhBDAxAPvaQ28B4Y9ajOyjksFgNSrbSuVnY0DDE34_gjYuhCwiQh8yTE0c_FSdFSq-dftQet" }}>
-              <PayPalButtons
-               className="w-[580px] py-3 rounded-lg font-bold "
-                createOrder={(data, actions) => {
-                  return actions.order.create({
-                    purchase_units: [
-                      {
-                        amount: {
-                          currency_code: "USD",
-                          value: convertVNDtoUSD(totalAmount).toFixed(2),
+              <PayPalScriptProvider
+                options={{
+                  "client-id":
+                    "ASw75GpZvhBDAxAPvaQ28B4Y9ajOyjksFgNSrbSuVnY0DDE34_gjYuhCwiQh8yTE0c_FSdFSq-dftQet",
+                }}
+              >
+                <PayPalButtons
+                  className="w-[580px] py-3 rounded-lg font-bold "
+                  createOrder={(data, actions) => {
+                    return actions.order.create({
+                      purchase_units: [
+                        {
+                          amount: {
+                            currency_code: "USD",
+                            value: convertVNDtoUSD(totalAmount).toFixed(2),
+                          },
                         },
-                      },
-                    ],
-                  });
-                }}
-                onApprove={(data, actions) => {
-                  return actions.order.capture().then(() => {
-                    setIsPaymentSuccess(true);
-                    handleSubmitOrder();
-                  });
-                }}
-              />
+                      ],
+                    });
+                  }}
+                  onApprove={(data, actions) => {
+                    return actions.order.capture().then(() => {
+                      setIsPaymentSuccess(true);
+                      handleSubmitOrder();
+                    });
+                  }}
+                />
               </PayPalScriptProvider>
             ) : (
               <button
@@ -723,7 +867,6 @@ const PaymentInfo = () => {
                 {currentStep === 1 ? "Tiếp tục" : "Thanh toán"}
               </button>
             )}
-            
           </div>
         </div>
       </div>

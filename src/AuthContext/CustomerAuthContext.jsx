@@ -95,21 +95,21 @@ const checkEmail = async ({ email }) => {
                         });
                         localStorage.setItem("token", await user.getIdToken());
                         localStorage.setItem("username", user.displayName);
-                        alert('Đăng nhập thành công!');
+                        message.success('Đăng nhập thành công!');
                     } catch (error) {
                         console.error('Error saving account: ', error);
-                        alert('Đã xảy ra lỗi khi lưu tài khoản.');
+                        message.error('Đã xảy ra lỗi khi lưu tài khoản.');
                     }
                 } else {
                     localStorage.setItem("token", await user.getIdToken());
                     localStorage.setItem("username", user.displayName);
-                    alert('Đăng nhập thành công!');
+                    message.success('Đăng nhập thành công!');
                 }
             }
         }
     } catch (error) {
         console.error('Error signing in with Google:', error);
-        alert('Đã xảy ra lỗi khi đăng nhập.');
+        message.error('Đã xảy ra lỗi khi đăng nhập.');
     }
 }
 

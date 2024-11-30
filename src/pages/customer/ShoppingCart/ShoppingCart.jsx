@@ -5,11 +5,18 @@ import { NavLink, useNavigate } from "react-router-dom";
 import icons from "../../../utils/icons";
 import { CartContext } from "./CartContext";
 import { path } from "../../../utils/constant";
+import { message } from "antd";
 
 const ShoppingCart = () => {
   const { cartItems, setCartItems, removeFromCart } = useContext(CartContext);
   const navigate = useNavigate();
   const handleCheckout = () => {
+    const token = localStorage.getItem('token');
+  
+    if (!token) {
+      message.warning("Bạn ơi. Bạn đã quên đăng nhập kìa! Bạn vui lòng đăng nhập để tiếp tục thanh toán!");
+      return; 
+    }
     if (cartItems.length === 0) {
       alert("Giỏ hàng của bạn đang trống!");
       return;

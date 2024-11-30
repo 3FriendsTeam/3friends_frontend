@@ -28,7 +28,7 @@ const PaymentModal = ({ isVisible, isSuccess, onClose }) => {
           <CloseCircleOutlined className="text-red-500 text-6xl mb-4" />
         )}
         <h3 className="text-xl font-semibold">
-          {isSuccess ? "Thanh toán thành công!" : "Thanh toán thất bại!"}
+          {isSuccess ? "Đặt hàng thành công!" : "Đặt hàng thất bại!"}
         </h3>
         <p className="text-center mt-2">
           {isSuccess

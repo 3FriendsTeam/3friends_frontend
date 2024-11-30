@@ -127,7 +127,7 @@ const ProductDetails = () => {
       setReviews([newReview, ...reviews]);
       setReviewContent("");
       closeModal();
-      message.success("Cảm ơn bạn đã đánh giá sản phẩm của chúng tôi.");
+      message.success("Đội ngũ 3Friend cảm ơn bạn đã đánh giá sản phẩm của chúng tôi!");
     } catch (error) {
       console.error("Error submitting review:", error);
       message.error("vui lòng thử lại sau!");

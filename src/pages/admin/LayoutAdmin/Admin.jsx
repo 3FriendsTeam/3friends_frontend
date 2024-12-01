@@ -22,6 +22,7 @@ import ViewDiscontinuedProducts from '../subViews/Product/viewProduct/ViewDiscon
 import ViewCompleteOrder from '../subViews/Order/ViewCompleteOrder';
 import ViewSupplier from '../subViews/Supplier/ViewSupplier';
 import ViewDeliveryReceipt from '../subViews/DeliveryReceipt/ViewDeliveryReceipt';
+import ViewWarrantyPolicy from '../subViews/WarrantyPolicy/ViewWarrantyPolicy';
 
 const { Header, Content } = Layout;
 
@@ -84,8 +85,8 @@ const Admin = () => {
                         <ViewPermission />
                     ) :activeContent === 'Danh sách đơn hàng' ? (
                         <ViewOrder />
-                    ) :activeContent === 'paymentMethods' ? (
-                        <ViewPaymentMethod />
+                    ) :activeContent === 'warrantyPolicy' ? (
+                        <ViewWarrantyPolicy />
                     ) :activeContent === 'productCategories' ? (
                         <ViewCategory />
                     ) :activeContent === 'promotionPrograms' ? (

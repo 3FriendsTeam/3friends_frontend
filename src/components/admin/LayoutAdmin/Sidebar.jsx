@@ -4,7 +4,7 @@ import { EmployeeAuthContext } from '../../../AuthContext/EmployeeAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 import { FaBoxOpen, FaUsers, FaTags, FaTruck, FaUser, FaChartLine, FaWarehouse  } from 'react-icons/fa6';
-import { MdAssignmentTurnedIn, MdAccountCircle } from 'react-icons/md';
+import { MdAssignmentTurnedIn, MdAccountCircle, MdPolicy } from 'react-icons/md';
 import { FiLogOut } from 'react-icons/fi';
 import logo3friend from '../../../assets/admin/3friends.png';
 const { Sider } = Layout;
@@ -84,15 +84,15 @@ const EmployeeSidebar = ({ onSectionClick }) => {
         { label: 'Chương trình Khuyến mãi', section: 'promotionPrograms' },// danh sách các chương trình khuyến mãi. ngừng Khuyến mãi, sửa tên, giá, số lượng, minValue, maxDiscount, ngày bắt đầu, kết thúc
       ],
     },
-    // {
-    //   positionIds: [1,2],
-    //   label: 'Quản lý Thanh toán',
-    //   icon: <FaCreditCard className="h-6 w-6 mr-2" />,
-    //   section: 'paymentManagement',
-    //   subItems: [
-    //     { label: 'Phương thức Thanh toán', section: 'paymentMethods' },// hiển thị danh sách phương thức thanh toán. chỉnh lại hoạt động hay không
-    //   ],
-    // },
+    {
+      positionIds: [1,2],
+      label: 'Quản lý Chính sách',
+      icon: <MdPolicy className="h-6 w-6 mr-2" />,
+      section: 'paymentManagement',
+      subItems: [
+        { label: 'Bảo hành & Đổi trả', section: 'warrantyPolicy' },// hiển thị danh sách phương thức thanh toán. chỉnh lại hoạt động hay không
+      ],
+    },
     {
       positionIds: [3],
       label: 'Đơn hàng Vận chuyển',

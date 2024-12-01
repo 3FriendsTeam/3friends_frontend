@@ -11,7 +11,11 @@ import axios from "axios";
 import { path } from "../../../utils/constant";
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { CartContext } from "./CartContext";
-
+import AddressSearch from "../../../components/Client/MapAPI";
+const getImagePath = (imageName) => {
+  if (!imageName) return "";
+  return new URL(`../../../assets/client/${imageName}`, import.meta.url).href;
+};
 const PaymentModal = ({ isVisible, isSuccess, onClose }) => {
   return (
     <Modal
@@ -48,7 +52,7 @@ const PaymentModal = ({ isVisible, isSuccess, onClose }) => {
 };
 const PaymentInfo = () => {
   const { cartItems, removeAllItemCart } = useContext(CartContext);
-
+  const [form] = Form.useForm();
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [selectedMethodIndex, setSelectedMethodIndex] = useState(null);
@@ -81,23 +85,30 @@ const PaymentInfo = () => {
     try {
       if (currentAddress) {
         await api.put(
-          `${import.meta.env.VITE_BACKEND_URL}/api/update-address?id=${currentAddress.id}`, 
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-address?id=${
+            currentAddress.id
+          }`,
           { ...values }
         );
-        setAddresses(addresses.map((addr) =>
-          addr.id === currentAddress.id ? { ...addr, ...values } : addr
-        ));
-        message.success('Địa chỉ đã được cập nhật!');
+        setAddresses(
+          addresses.map((addr) =>
+            addr.id === currentAddress.id ? { ...addr, ...values } : addr
+          )
+        );
+        message.success("Địa chỉ đã được cập nhật!");
       } else {
         console.log(values);
-        const response = await api.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-address`, values); 
+        const response = await api.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/create-address`,
+          values
+        );
         setAddresses([...addresses, response.data]);
-        message.success('Địa chỉ đã được thêm!');
+        message.success("Địa chỉ đã được thêm!");
       }
       closeModal();
-    } catch (error){
+    } catch (error) {
       console.log(error);
-      message.error('Lỗi khi lưu địa chỉ');
+      message.error("Lỗi khi lưu địa chỉ");
     }
   };
   const checkDiscount = () => {
@@ -388,7 +399,16 @@ const PaymentInfo = () => {
               </Button>
             </div>
             <div className="bg-white w-full max-w-[600px] p-4 rounded-lg shadow-sm border border-gray-300 ">
-              {selectedAddress && (
+            {selectedAddress === null ? (
+                <div className="text-center">
+                  <img
+                    src={getImagePath("delivery.png")}
+                    alt="noAddress"
+                    className="w-45 mx-auto"
+                  />
+                  <p className="text-gray-500 text-lg">Bạn chưa có địa chỉ nhận hàng</p>
+                </div>
+              ):(
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 font-semibold">
@@ -407,27 +427,9 @@ const PaymentInfo = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">
-                      Thành phố / Tỉnh{" "}
-                    </span>
+                    <span className="text-gray-500 font-semibold">Địa chỉ</span>
                     <span className="text-gray-500">
-                      {selectedAddress.City}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">
-                      Quận / huyện
-                    </span>
-                    <span className="text-gray-500">
-                      {selectedAddress.District}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">
-                      Phường / xã
-                    </span>
-                    <span className="text-gray-500">
-                      {selectedAddress.Ward}
+                      {selectedAddress.Address}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -445,9 +447,9 @@ const PaymentInfo = () => {
               onCancel={closeModal}
               footer={null}
               destroyOnClose
-              className=""
             >
               <Form
+                form={form}
                 initialValues={currentAddress}
                 onFinish={saveAddress}
                 layout="vertical"
@@ -477,6 +479,16 @@ const PaymentInfo = () => {
                 </Form.Item>
 
                 <Form.Item
+                  label="Địa chỉ"
+                  name="Address"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập địa chỉ!" },
+                  ]}
+                >
+                  <AddressSearch form={form} />
+                </Form.Item>
+
+                <Form.Item
                   label="Địa chỉ cụ thể"
                   name="SpecificAddress"
                   rules={[
@@ -484,37 +496,6 @@ const PaymentInfo = () => {
                       required: true,
                       message: "Vui lòng nhập địa chỉ cụ thể!",
                     },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Phường/Xã"
-                  name="Ward"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập địa chỉ phường/xã!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Quận/Huyện"
-                  name="District"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập quận/huyện!" },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Thành phố"
-                  name="City"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập thành phố!" },
                   ]}
                 >
                   <Input />
@@ -543,37 +524,37 @@ const PaymentInfo = () => {
               >
                 Thêm địa chỉ mới
               </Button>
-
               <List
-                bordered
-                dataSource={addresses}
-                renderItem={(address) => (
-                  <List.Item
-                    key={address.id}
-                    actions={[
-                      <Button
-                        key="select"
-                        type="primary"
-                        onClick={() => selectAddress(address)}
-                      >
-                        Chọn
-                      </Button>,
-                    ]}
-                    className="mb-4 rounded-lg shadow-lg p-4"
-                  >
-                    <div>
-                      <div className="font-semibold">
-                        Người nhận: {address.RecipientName} |{" "}
-                        {address.PhoneNumber}
-                      </div>
-                      <div>{address.SpecificAddress}</div>
-                      <div>
-                        {address.Ward}, {address.District}, {address.City}
-                      </div>
+              bordered
+              dataSource={addresses}
+              renderItem={(address) => (
+                <List.Item
+                  key={address.id}
+                  actions={[
+                    <Button
+                      key="select"
+                      type="primary"
+                      onClick={() => selectAddress(address)}
+                    >
+                      Chọn
+                    </Button>,
+                  ]}
+                  className="mb-4 rounded-lg shadow-lg p-4"
+                >
+                  <div>
+                    <div className="font-semibold">
+                      Người nhận: {address.RecipientName} |{" "}
+                      {address.PhoneNumber}
                     </div>
-                  </List.Item>
-                )}
-              />
+                    <div>{address.SpecificAddress}</div>
+                    <div>
+                      {address.Address}
+                    </div>
+                  </div>
+                </List.Item>
+              )}
+            />   
+              
             </Modal>
           </div>
         )}

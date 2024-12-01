@@ -13,7 +13,7 @@ const DefaultPageAdmin = () => (
             maxWidth: '600px'
         }}>
             <h1 style={{ fontSize: '1.8rem', color: '#1890ff', marginBottom: '16px' }}>
-                Chào mừng đến với trang quản trị 3Friend
+                Chào mừng đến với trang quản trị 3Friends
             </h1>
             <p style={{ fontSize: '1rem', color: '#595959', marginBottom: '24px' }}>
                 Khám phá những tính năng hỗ trợ làm việc và trao đổi hiệu quả. Chúng tôi luôn đồng hành cùng bạn để đạt hiệu suất tối ưu.

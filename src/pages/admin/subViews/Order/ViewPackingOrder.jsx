@@ -253,6 +253,53 @@ const ViewPackingOrder = () => {
             >
                 {orderDetails ? (
                     <div>
+
+                        {/* Thông tin sản phẩm */}
+                        <h3>Chi tiết sản phẩm</h3>
+                        <div
+                            style={{ borderBottom: "1px solid #ccc", marginBottom: "16px" }}
+                        >
+                            {orderDetails.OrderProductDetails.map((productDetail, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        marginBottom: "12px",
+                                    }}
+                                >
+                                    <div style={{ flex: 2 }}>
+                                        <p>
+                                            <strong>Tên sản phẩm:</strong>{" "}
+                                            {productDetail.Product.ProductName}
+                                        </p>
+                                        <p>
+                                            <strong>Giá niêm yết:</strong>{" "}
+                                            {productDetail.Product.ListedPrice.toLocaleString()} VND
+                                        </p>
+                                        <p>
+                                            <strong>Giá khuyến mãi:</strong>{" "}
+                                            {productDetail.Product.PromotionalPrice.toLocaleString()}{" "}
+                                            VND
+                                        </p>
+                                        <p>
+                                            <strong>Số lượng:</strong> {productDetail.Quantity}
+                                        </p>
+                                    </div>
+                                    <img
+                                        src={productDetail.Product.RepresentativeImage}
+                                        alt={productDetail.Product.ProductName}
+                                        style={{
+                                            width: "80px",
+                                            height: "80px",
+                                            borderRadius: "4px",
+                                        }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
                         {/* Tổng cộng */}
                         <div style={{ marginTop: "16px", fontWeight: "bold" }}>
                             <p>

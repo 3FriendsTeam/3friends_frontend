@@ -215,7 +215,7 @@ const ViewWarrantyPolicy = () => {
         <div className="container mx-auto">
             <h1 className="text-3xl font-bold mb-5">Danh sách chính sách</h1>
             <Input
-                placeholder="Tìm kiếm nhà cung cấp..."
+                placeholder="Tìm kiếm điều kiện bảo hành..."
                 className="mb-4"
                 style={{ width: "300px", height: "40px" }}
                 value={searchTerm}

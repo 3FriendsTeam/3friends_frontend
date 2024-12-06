@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Row, Col, Button, Image, Spin, message } from 'antd';
+import { Modal, Row, Col, Image, Spin, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import Header from '../../../components/Client/Header';
@@ -229,7 +229,11 @@ const LookOrders = () => {
                   </p>
                   <p>
                     <strong>Địa chỉ:</strong>{' '}
-                    {`${orderData.ShippingAddress.SpecificAddress}, ${orderData.ShippingAddress.Ward}, ${orderData.ShippingAddress.District}, ${orderData.ShippingAddress.City}`}
+                    {`${orderData.ShippingAddress.Address}`}
+                  </p>
+                  <p>
+                    <strong>Địa chỉ chi tiết:</strong>{' '}
+                    {`${orderData.ShippingAddress.SpecificAddress}`}
                   </p>
                 </div>
 
@@ -261,18 +265,6 @@ const LookOrders = () => {
                 </div>
               </Col>
             </Row>
-            {/* Nút hủy đơn hàng */}
-            {orderData.OrderStatus === 'Chờ xác nhận' && (
-              <div className="text-right mt-6">
-                <Button
-                  type="danger"
-                  onClick={() => message.info('Đơn hàng đã được hủy thành công!')}
-                  className='text-white bg-red-500 hover:bg-red-600'
-                >
-                  Hủy đơn hàng
-                </Button>
-              </div>
-            )}
           </>
         ) : (
           <p>Không có dữ liệu đơn hàng!</p>

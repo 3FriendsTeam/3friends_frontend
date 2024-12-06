@@ -348,10 +348,10 @@ const ViewDeliveryReceipt = () => {
       dataIndex: "TotalPrice",
       key: "TotalPrice",
       render: (price) =>
-        Number(price).toLocaleString("en-US", {
+        new Intl.NumberFormat("vi-VN", {
           style: "currency",
-          currency: "USD",
-        }),
+          currency: "VND",
+        }).format(price),
     },
     {
       title: "Thao tác",
@@ -396,7 +396,7 @@ const ViewDeliveryReceipt = () => {
       key: "ProductName",
     },
     {
-      title: "Giá (USD)",
+      title: "Giá (VND)",
       dataIndex: "UnitPrice",
       key: "UnitPrice",
       render: (_, record) => (

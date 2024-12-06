@@ -186,8 +186,8 @@ const PaymentInfo = () => {
       removeAllItemCart();
       showModalSubmitOrder(true);
     } catch (error) {
+      message.error(error.response.data.error + " vui lòng quay lại sau!");
       setIsPaymentSuccess(false);
-      console.log(error);
     }
   };
 
@@ -647,9 +647,6 @@ const PaymentInfo = () => {
                         <p className="font-semibold text-[#e0052b] text-[16px]">
                           Chọn phương thức thanh toán
                         </p>
-                        <p className="text-[11px] text-gray-400">
-                          Giảm thêm tới 500.000đ
-                        </p>
                       </>
                     )}
                   </div>
@@ -752,36 +749,16 @@ const PaymentInfo = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-semibold">
-                    Thành phố / Tỉnh
+                    Địa chỉ nhận hàng
                   </span>
                   <span className="text-gray-500">
                     {selectedAddress
-                      ? selectedAddress.City
-                      : "Chưa có thông tin"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">
-                    Quận / Huyện
-                  </span>
-                  <span className="text-gray-500">
-                    {selectedAddress
-                      ? selectedAddress.District
+                      ? selectedAddress.Address
                       : "Chưa có thông tin địa chỉ"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">
-                    Phường / Xã
-                  </span>
-                  <span className="text-gray-500">
-                    {selectedAddress
-                      ? selectedAddress.Ward
-                      : "Chưa có thông tin địa chỉ"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500 font-semibold">Địa chỉ </span>
+                  <span className="text-gray-500 font-semibold">Địa chỉ chi tiết</span>
                   <span className="text-gray-500">
                     {selectedAddress
                       ? selectedAddress.SpecificAddress

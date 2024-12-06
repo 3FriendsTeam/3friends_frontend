@@ -133,7 +133,6 @@ const PurchaseHistory = () => {
           ))}
         </div>
       </div>
-
       <div className="space-y-6 w-[820px] pb-4">
         {loading ? (
           <div className="flex justify-center items-center">
@@ -182,9 +181,9 @@ const PurchaseHistory = () => {
                       Tổng tiền: {Number(order.TotalAmount).toLocaleString()} VND
                     </p>
                     <p className="text-gray-600">
-                      Tổng thanh toán: {Number(order.SumTotalAmount).toLocaleString()} VND
+                      Tổng thanh toán: {Number(order.TotalAmount).toLocaleString()} VND
                     </p>
-                    <p className="text-gray-600">Số sản phẩm: {order.CountOrders}</p>
+                    <p className="text-gray-600">Số lượng sản phẩm: {order.OrderProductDetails.length}</p>
                   </div>
                 </div>
 

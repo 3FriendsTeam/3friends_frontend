@@ -185,6 +185,9 @@ const ProductDetails = () => {
               <span className="text-gray-500 ml-4">
                 {product.Sold > 9999 ? `9.999+` : `${product.Sold}`} lượt đã bán
               </span>
+              <span className="text-gray-500 ml-4">
+                Kho: {product.Sold > 9999 ? `9.999+` : `${product.Stock}`} sản phẩm
+              </span>
             </div>
             <div className="flex space-x-2 mt-4 items-center">
               <p className="text-red-500 text-2xl font-bold">

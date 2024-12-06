@@ -93,7 +93,7 @@ const ViewPromotion = () => {
                     ...values,
                     StartDate: values.StartDate.format("YYYY-MM-DD"),
                     EndDate: values.EndDate.format("YYYY-MM-DD"),
-                    nameAdmin,
+                    CreatedBy: nameAdmin,
                 }
             );
             message.success("Cập nhật khuyến mãi thành công!");
@@ -127,7 +127,7 @@ const ViewPromotion = () => {
                 ...values,
                 StartDate: values.StartDate.format("YYYY-MM-DD"),
                 EndDate: values.EndDate.format("YYYY-MM-DD"),
-                nameAdmin,
+                CreatedBy: nameAdmin,
             });
 
             message.success("Thêm khuyến mãi thành công!");

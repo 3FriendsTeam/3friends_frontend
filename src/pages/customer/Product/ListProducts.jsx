@@ -64,7 +64,7 @@ const ListProducts = () => {
       );
     }
 
- 
+
     if (sortOrder === "price_low") {
       updatedProducts.sort(
         (a, b) =>
@@ -84,8 +84,8 @@ const ListProducts = () => {
     }
 
     setFilteredAndSortedProducts(updatedProducts);
-  }, [priceFilter, sortOrder, products]);  
-   const handleProductClick = (productId) => {
+  }, [priceFilter, sortOrder, products]);
+  const handleProductClick = (productId) => {
     navigate(`${path.PRODUCTSDETAILS}/${productId}`);
   };
   return (
@@ -94,13 +94,13 @@ const ListProducts = () => {
         <Header />
       </div>
       <div className="bg-[#F2F2F2] w-full">
-      <NavigationBar />
-      <Animation />
-      <ProductClassification
-        onFilterChange={(filter) => setPriceFilter(filter.priceRange)}
-        onSortChange={(sort) => setSortOrder(sort.sortOrder)}
-      />
-      <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
+        <NavigationBar />
+        <Animation />
+        <ProductClassification
+          onFilterChange={(filter) => setPriceFilter(filter.priceRange)}
+          onSortChange={(sort) => setSortOrder(sort.sortOrder)}
+        />
+        <div className="w-full lg:w-[1170px] mx-auto flex flex-wrap justify-center rounded-lg bg-white mt-2 gap-x-4 gap-y-6 pb-4 mb-6">
           {filteredAndSortedProducts.map((product, index) => (
             <div
               key={index}
@@ -121,17 +121,14 @@ const ListProducts = () => {
               </h3>
 
               <div className="w-full mt-2 text-left">
-                <p className="text-[16px] font-bold text-red-500">
-                  {product.PromotionalPrice + " ₫"}
-                  
+                <p className="text-red-500 text-[16px] font-bold">
+                  {product.PromotionalPrice?.toLocaleString()} ₫
                 </p>
-                <p
-                  className="text-[16px] font-bold text-[#bdbdbd] line-through"
-                  style={{ minHeight: "20px" }}
-                >
-                  {product.ListedPrice + " ₫"}
-                  
-                </p>
+                {product.ListedPrice && (
+                  <p className="text-gray-400 font-medium line-through text-[14px]">
+                    {product.ListedPrice.toLocaleString()} ₫
+                  </p>
+                )}
               </div>
 
               <p

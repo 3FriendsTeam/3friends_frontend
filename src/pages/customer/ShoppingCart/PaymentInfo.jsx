@@ -433,7 +433,7 @@ const PaymentInfo = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 font-semibold">Địa chỉ</span>
+                    <span className="text-gray-500 font-semibold">Địa chỉ cụ thể</span>
                     <span className="text-gray-500">
                       {selectedAddress.SpecificAddress}
                     </span>

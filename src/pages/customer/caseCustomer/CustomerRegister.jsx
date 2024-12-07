@@ -11,6 +11,7 @@ import login1 from "../../../assets/client/login1.png";
 import google from "../../../assets/client/google.png";
 import Loading from '../../../components/Client/Loading.jsx';
 import { CustomerAuthContext } from "../../../AuthContext/CustomerAuthContext.jsx";
+import moment from "moment";
 import { message } from "antd";
 
 const CustomerRegister = () => {
@@ -177,8 +178,8 @@ const CustomerRegister = () => {
     try {
         const checkCreatedEmail = await checkEmail({ email });
         if (checkCreatedEmail) {
-            message.warning('Email đã tồn tại trên hệ thống. Vui lý đăng ký lại!');
-            throw new Error('Email đã đăng ký');
+            message.warning('Email đã tồn tại trên hệ thống. Vui lòng đăng ký lại!');
+            throw new Error('Email đã đăng ký');
         }
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -192,28 +193,30 @@ const CustomerRegister = () => {
                     birthDate: formData.birthday,
                 });
                 if (!success) {
-                    message.error('lỗi hệ thống vui lòng thử lại sau');
+                    message.error('Lỗi hệ thống vui lòng thử lại sau');
                     throw new Error('Error saving account');
                 }
-            
-            setFormData({
-                customerName: '',
-                email: '',
-                phoneNumber: '',
-                birthday: '',
-                password: '',
-                confirmPassword: '',
-            });
-            message.sussces('Đăng ký thành công vui lòng xác thực email!');
-            navigate(path.CUSTOMERLOGIN)
-            sendEmailVerification(userCredential.user);
-            
-          }else{
-            message.error("Đăng kí thất bại vui lòng thử lại sau!");
-          }
+
+                setFormData({
+                    customerName: '',
+                    email: '',
+                    phoneNumber: '',
+                    birthday: '',
+                    password: '',
+                    confirmPassword: '',
+                });
+                message.success('Đăng ký thành công vui lòng xác thực email!');
+                await sendEmailVerification(userCredential.user);
+                navigate(path.CUSTOMERLOGIN);
+            } else {
+                message.error("Đăng ký thất bại vui lòng thử lại sau!");
+            }
         } catch (error) {
             if (error.code === 'auth/email-already-in-use') {
-              message.warning('Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!');
+                message.warning('Email đã tồn tại trên hệ thống. Vui lòng đăng ký với email khác!');
+            } else {
+                message.error('Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại.');
+                console.error('Error:', error);
             }
         }
     } catch (error) {
@@ -326,24 +329,55 @@ const CustomerRegister = () => {
               } focus:outline-none focus:ring-0 focus:border-red-400`}
               value={formData.birthday}
               onChange={handleChange}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                const birthday = new Date(e.target.value);
+                const age = moment().diff(birthday, "years");
+                if (age < 16) {
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    birthday: "Phải trên 16 tuổi",
+                  }));
+                } else {
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    birthday: "",
+                  }));
+                }
+              }}
             />
             {errors.birthday && (
               <p className="text-sm text-red-500 mt-1">{errors.birthday}</p>
             )}
           </div>
-
           {/* Phone Input */}
           <div className="relative">
             <input
               type="text"
               name="phoneNumber"
               placeholder="Số điện thoại (không bắt buộc)"
-              className="w-full p-2 border-b border-gray-300 focus:outline-none focus:ring-0 focus:border-red-400"
+              className={`w-full p-2 border-b ${
+                errors.phoneNumber ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-0 focus:border-red-400`}
               value={formData.phoneNumber}
               onChange={handleChange}
-              onBlur={handleBlur}
+              onBlur={() => {
+                const phoneNumberPattern = /^\d{10}$/;
+                if (!phoneNumberPattern.test(formData.phoneNumber)) {
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    phoneNumber: "Số điện thoại phải bao gồm 10 chữ số.",
+                  }));
+                } else {
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    phoneNumber: "",
+                  }));
+                }
+              }}
             />
+            {errors.phoneNumber && (
+              <p className="text-sm text-red-500 mt-1">{errors.phoneNumber}</p>
+            )}
           </div>
 
           {/* Email */}

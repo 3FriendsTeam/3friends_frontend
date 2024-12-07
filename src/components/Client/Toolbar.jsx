@@ -46,15 +46,13 @@ function Toolbar() {
     setTimeout(() => setShowHistory(false), 200);
   };
 
-  const [username, setUsername] = useState(
-    localStorage.getItem("username") || ""
-  );
+  const [token, setToken] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
+    const storedUsername = localStorage.getItem("token");
     if (storedUsername) {
-      setUsername(storedUsername);
+      setToken(storedUsername);
     }
   }, []);
 
@@ -184,7 +182,7 @@ function Toolbar() {
                   className="flex flex-col items-center"
                   onClick={toggleDropdown}
                 >
-                  {username ? (
+                  {token ? (
                     <span className="font-bold whitespace-nowrap">
                       Xin chào, Member
                     </span>

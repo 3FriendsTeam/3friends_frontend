@@ -174,7 +174,13 @@ const CustomerRegister = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
-
+    //kiểm tra tất cả giá trị có trong formdata
+    const values = Object.values(formData);
+    const hasEmptyValue = values.some((value) => value === null || value === '');
+    if (hasEmptyValue) {
+        message.error('Vui lòng điền đầy đủ thông tin!');
+        return;
+    }
     try {
         const checkCreatedEmail = await checkEmail({ email });
         if (checkCreatedEmail) {
@@ -354,7 +360,7 @@ const CustomerRegister = () => {
             <input
               type="text"
               name="phoneNumber"
-              placeholder="Số điện thoại (không bắt buộc)"
+              placeholder="Số điện thoại*"
               className={`w-full p-2 border-b ${
                 errors.phoneNumber ? "border-red-500" : "border-gray-300"
               } focus:outline-none focus:ring-0 focus:border-red-400`}

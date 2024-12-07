@@ -38,7 +38,7 @@ const ListBestSellingProducts = ({ categoryId }) => {
               ?.ImgProfile || "";
           return { ...product, warrantyImg };
         });
-
+        combinedProducts.sort((a, b) => b.Sold - a.Sold);
         setProducts(combinedProducts);
       } catch (error) {
         console.error("Error fetching products or warranty policies:", error);

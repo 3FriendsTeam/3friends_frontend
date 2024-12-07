@@ -42,7 +42,8 @@ const ProductDetails = () => {
           }
         );
         setProduct(response.data);
-        setReviews(response.data.Reviews);
+        const sortedReviews = response.data.Reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setReviews(sortedReviews);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product details:", error);
@@ -114,16 +115,26 @@ const ProductDetails = () => {
     }
 
     try {
+      const bought = await api.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-status-bought-product`,
+        {
+            params: { id: product.id },
+        }
+      );
       const newReview = {
         ReviewContent: reviewContent,
         RatingLevel: rating,
         ReviewDate: new Date().toISOString(),
+        Bought:bought.data.bought,
         Customer: { CustomerName: userName },
       };
       await api.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/re-view?id=${product.id}`,
-        newReview
-      );
+        `${import.meta.env.VITE_BACKEND_URL}/api/re-view`,
+        newReview, 
+        {
+            params: { id: product.id }, // Query parameter
+        }
+    );
       setReviews([newReview, ...reviews]);
       setReviewContent("");
       closeModal();
@@ -543,8 +554,13 @@ const ProductDetails = () => {
                         {review.Customer.CustomerName}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {new Date(review.ReviewDate).toLocaleDateString()}
+                        {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(review.ReviewDate))}
                       </p>
+                      {review.Bought ? (
+                        <p className="text-sm text-green-500">Đã mua hàng</p>
+                      ) : (
+                        <p className="text-sm text-red-500">Chưa mua hàng</p>
+                      )}                      
                     </div>
                   </div>
                   <div className="flex items-center mt-2">

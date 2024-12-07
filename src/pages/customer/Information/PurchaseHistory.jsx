@@ -24,7 +24,10 @@ const PurchaseHistory = () => {
       const response = await api.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/get-orders-by-id-customer`
       );
-      setPurchaseHistory(response.data);
+      const sortedReviews = response.data.sort((a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setPurchaseHistory(sortedReviews);
       console.log("Dữ liệu purchaseHistory sau khi set:", response.data);
     } catch (error) {
       console.error("Lỗi khi tải đơn hàng:", error);
@@ -57,7 +60,7 @@ const PurchaseHistory = () => {
     "Đang vận chuyển",
     "Đã giao hàng",
     "Đã hủy",
-    "Đã hoàn thành"
+    "Hoàn thành"
   ];
 
 

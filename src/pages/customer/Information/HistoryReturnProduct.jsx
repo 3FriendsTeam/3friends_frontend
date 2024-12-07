@@ -9,7 +9,12 @@ const HistoryReturnProduct = () => {
                 const response = await api.get(
                     `${import.meta.env.VITE_BACKEND_URL}/api/get-history-return-product`
                 );
-                setListHistoryReturnProduct(response.data);
+                console.log(response.data);
+                const sortedReviews = response.data.sort((a, b) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                console.log(sortedReviews);
+                setListHistoryReturnProduct(sortedReviews);
             } catch (error) {
                 console.error("Error fetching history return products:", error);
             }

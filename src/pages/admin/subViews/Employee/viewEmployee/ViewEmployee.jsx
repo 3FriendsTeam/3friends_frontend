@@ -68,6 +68,7 @@ const ViewEmployee = () => {
 
     fetchPositionData();
     fetchEmployeeData();
+    console.log(positions, employees);
   }, []);
 
   const reloadEmployee = async () => {
@@ -84,8 +85,8 @@ const ViewEmployee = () => {
   };
   // Hàm tìm tên chức vụ dựa trên PositionID
   const getPositionName = (PositionID) => {
-    const position = positions.find((p) => p.id === parseInt(PositionID));
-    return position ? position.PositionName : "Chưa xác định";
+    const position = positions.find((p) => p.value === parseInt(PositionID)); 
+    return position ? position.label : "Chưa xác định";
   };
 
   // Hàm xử lý xóa nhân viên

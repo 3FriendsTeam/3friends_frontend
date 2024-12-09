@@ -89,11 +89,9 @@ const ViewProduct = () => {
         setContryOfOrigin(response.data);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
-        message.error(
-          "Không thể tải xuất xứ sản phẩm. Vui lòng thử lại sau."
-        );
+        message.error("Không thể tải xuất xứ sản phẩm. Vui lòng thử lại sau.");
       }
-    }
+    };
     const fetchCategoryData = async () => {
       try {
         const response = await axios.get(
@@ -176,7 +174,7 @@ const ViewProduct = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/get-product-by-id`,
         {
-          params: { id: product.id }
+          params: { id: product.id },
         }
       );
       console.log(response.data);
@@ -191,9 +189,13 @@ const ViewProduct = () => {
         CountryID: productDetails.CountryID,
         Description: productDetails.Description,
         WarrantyPolicyID: productDetails.WarrantyPolicyID,
+        RepresentativeImage: productDetails.RepresentativeImage,
+        Images: productDetails.Images,
+        ProductAttributeDetails : productDetails.ProductAttributeDetails
       });
 
       setEditingProduct(productDetails);
+      console.log(editingProduct);
       // Map colors
       setColors(
         productDetails.Colors
@@ -204,10 +206,10 @@ const ViewProduct = () => {
       setSpecifications(
         productDetails.ProductAttributeDetails
           ? productDetails.ProductAttributeDetails.map((attr) => ({
-            key: attr.id,
-            name: attr.ProductAttribute.AttributeName, 
-            value: attr.AttributeValue,
-          }))
+              key: attr.id,
+              name: attr.ProductAttribute.AttributeName,
+              value: attr.AttributeValue,
+            }))
           : []
       );
 
@@ -224,18 +226,13 @@ const ViewProduct = () => {
       setGalleryFileList(
         productDetails.Images
           ? productDetails.Images.map((image, index) => ({
-            uid: index.toString(),
-            name: `GalleryImage${index}`,
-            status: "done",
-            url: image.FilePath,
-          }))
+              uid: index.toString(),
+              name: `GalleryImage${index}`,
+              status: "done",
+              url: image.FilePath,
+            }))
           : []
       );
-
-      // Reset files
-      setRepresentativeImageFile(null);
-      setGalleryFiles([]);
-      setColorInput("");
 
       setIsEditModalVisible(true);
     } catch (error) {
@@ -303,6 +300,7 @@ const ViewProduct = () => {
   // Lưu chỉnh sửa sản phẩm
   const handleEditSave = async () => {
     try {
+      console.log(editingProduct);
       setLoading(true);
       const formData = form.getFieldsValue();
       let representativeImageUrl = editingProduct.RepresentativeImage;
@@ -353,9 +351,10 @@ const ViewProduct = () => {
 
       // Prepare colors
       const productColors = colors.map((colorName, index) => ({
-        id: editingProduct.Colors && editingProduct.Colors[index]
-          ? editingProduct.Colors[index].id
-          : null,
+        id:
+          editingProduct.Colors && editingProduct.Colors[index]
+            ? editingProduct.Colors[index].id
+            : null,
         ColorName: colorName,
       }));
 
@@ -365,16 +364,19 @@ const ViewProduct = () => {
         ProductAttributeDetails: productAttributes,
         RepresentativeImage: representativeImageUrl,
         Images: galleryUrls.map((url, index) => ({
-          id: editingProduct.Images && editingProduct.Images[index]
-            ? editingProduct.Images[index].id
-            : null,
+          id:
+            editingProduct.Images && editingProduct.Images[index]
+              ? editingProduct.Images[index].id
+              : null,
           FilePath: url,
           ThuTu: index + 1,
         })),
       };
       console.log(updatedProduct, nameEmployee);
       await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/update-product?id=${editingProduct.id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/update-product?id=${
+          editingProduct.id
+        }`,
         {
           updatedProduct,
           nameEmployee,
@@ -446,7 +448,7 @@ const ViewProduct = () => {
           ThuTu: index + 1,
         })),
       };
-      console.log(newProduct)
+      console.log(newProduct);
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-product`,
         { newProduct, nameEmployee }
@@ -606,9 +608,7 @@ const ViewProduct = () => {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-5">
-        Danh sách sản phẩm kinh doanh
-      </h1>
+      <h1 className="text-3xl font-bold mb-5">Danh sách sản phẩm kinh doanh</h1>
       <Input
         placeholder="Tìm kiếm sản phẩm..."
         className="mb-4"
@@ -782,7 +782,10 @@ const ViewProduct = () => {
                 >
                   <Select placeholder="Chọn loại bảo hành">
                     {warrantyPolicies.map((warrantyPolicies) => (
-                      <Select.Option key={warrantyPolicies.id} value={warrantyPolicies.id}>
+                      <Select.Option
+                        key={warrantyPolicies.id}
+                        value={warrantyPolicies.id}
+                      >
                         {warrantyPolicies.WarrantyConditions}
                       </Select.Option>
                     ))}
@@ -941,9 +944,12 @@ const ViewProduct = () => {
             form={form}
             layout="vertical"
             onFinish={handleEditSave}
+            onFinishFailed={(errorInfo) => {
+              console.log("Failed:", errorInfo);
+            }}
             initialValues={{
-              promotion: 0,
-              promotionalPrice: 0,
+              Promotion: 0, // Sửa tên trường
+              PromotionalPrice: 0, // Sửa tên trường
             }}
           >
             <div className="grid grid-cols-2 gap-4">
@@ -1028,10 +1034,7 @@ const ViewProduct = () => {
                   />
                 </Form.Item>
 
-                <Form.Item
-                  name="PromotionalPrice"
-                  label="Giá khuyến mãi (VND)"
-                >
+                <Form.Item name="PromotionalPrice" label="Giá khuyến mãi (VND)">
                   <Input type="number" disabled />
                 </Form.Item>
               </div>
@@ -1056,8 +1059,6 @@ const ViewProduct = () => {
                     ))}
                   </Select>
                 </Form.Item>
-
-
 
                 <Form.Item
                   name="Description"
@@ -1130,10 +1131,7 @@ const ViewProduct = () => {
 
             {/* Chọn ảnh sản phẩm */}
             <h3 className="text-lg font-bold mt-5 mb-3">Chọn ảnh sản phẩm</h3>
-            <Form.Item
-              name="RepresentativeImage"
-              label="Ảnh đại diện"
-            >
+            <Form.Item name="RepresentativeImage" label="Ảnh đại diện">
               <Upload
                 name="image"
                 listType="picture-card"
@@ -1151,10 +1149,7 @@ const ViewProduct = () => {
               </Upload>
             </Form.Item>
 
-            <Form.Item
-              name="Images"
-              label="Ảnh minh họa"
-            >
+            <Form.Item name="Images" label="Ảnh minh họa">
               <Upload
                 name="images"
                 listType="picture-card"

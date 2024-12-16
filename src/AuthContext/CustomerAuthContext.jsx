@@ -11,6 +11,9 @@ export const CustomerAuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [customer, setCustomer] = useState(null);
 
+  const IsLogin = () => {
+    return !!localStorage.getItem("token"); // Trả về true nếu token tồn tại, ngược lại false
+  };
   const saveAccount = async ({
     uid,
     customerName,
@@ -57,23 +60,39 @@ const checkEmail = async ({ email }) => {
   };
 
   const login = async (email, password) => {
+    if (!checkEmail(email)) {
+      message.error('Sai tài khoản hoặc mật khẩu!');
+      return;
+    }
+  
     try {
       const userCredential = await signInWithEmailPassword(email, password);
-      console.log(userCredential);
-      console.log(userCredential.emailVerified);
+  
+      // Check if email is verified
       if (!userCredential.emailVerified) {
         throw new Error('Vui lòng xác thực email trong thư mục tin nhắn để đăng nhập!');
       }
   
-      localStorage.setItem("token", await userCredential.getIdToken());
-      if(userCredential.displayName)
+      // Store token and username in localStorage
+      const token = await userCredential.getIdToken();
+      localStorage.setItem("token", token);
+  
+      if (userCredential.displayName) {
         localStorage.setItem("username", userCredential.displayName);
+      }
+  
       message.success('Đăng nhập thành công!');
-      
-    } catch {
-      message.warning('vui lòng kiểm tra và xác thực email trước khi đăng nhập!.');
+    } catch (error) {
+      // Handle different error cases
+      // if (error.message.includes('xác thực email')) {
+      //   message.warning('Vui lòng kiểm tra và xác thực email trước khi đăng nhập!');
+      // } else {
+      //   message.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!');
+      // }
+      throw new Error(error);
     }
   };
+  
 
   const loginWithGoogle = async () => {
     try {
@@ -121,7 +140,7 @@ const checkEmail = async ({ email }) => {
   };
 
   return (
-    <CustomerAuthContext.Provider value={{ isAuthenticated, customer, login, loginWithGoogle, logout }}>
+    <CustomerAuthContext.Provider value={{ isAuthenticated, customer, login, loginWithGoogle, logout, IsLogin }}>
       {children}
     </CustomerAuthContext.Provider>
   );

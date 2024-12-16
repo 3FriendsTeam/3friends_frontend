@@ -39,7 +39,7 @@ const CustomerLogin = () => {
         email: "",
       }));
     }
-
+  
     if (formData.password && formData.password.length < 6) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -52,22 +52,47 @@ const CustomerLogin = () => {
       }));
     }
   }, [formData]);
-
+  
+  const hasErrors = (errors) => {
+    return Object.values(errors).some((error) => error !== "");
+  };
+  
   const handleSubmitLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+  
+    // Check for validation errors
+    if (hasErrors(errors)) {
+      setLoginError("Vui lòng nhập đúng định dạng email và mật khẩu để đăng nhập.");
+      setIsLoading(false);
+      return;
+    }
+  
     const { email, password } = formData;
-
+  
     try {
+      // Validate empty fields
+      if (!email || !password) {
+        setLoginError("Vui lòng nhập đầy đủ email và mật khẩu.");
+        setIsLoading(false);
+        return;
+      }
+  
+      // Call the login function
       await login(email, password);
+  
+      // Navigate to homepage if successful
       navigate(path.HOMEPAGE);
-    } catch (error) {
-      setLoginError("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.");
-      console.error("Login error:", error);
+    } catch {
+      // Handle login errors
+      setLoginError("Sai tài khoản và mật khẩu. Vui lòng kiểm tra lại.");
     } finally {
+      // Stop the loading spinner
       setIsLoading(false);
     }
   };
+  
+  
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);

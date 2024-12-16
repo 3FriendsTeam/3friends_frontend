@@ -1,10 +1,21 @@
-// Import necessary libraries
 import React from "react";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import PropTypes from "prop-types";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+
+// Chart.js và react-chartjs-2
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+// MUI
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
@@ -24,6 +35,8 @@ import {
   ArrowRight as RightOutlined,
 } from "@mui/icons-material";
 import axios from "axios";
+
+// date-fns
 import {
   format,
   subDays,
@@ -36,18 +49,72 @@ import {
   addYears,
 } from "date-fns";
 
-// Define period options for cleaner code
+// Component Demo
+import GenderAndAgeStatisticsChart from "./ChartReport";
+
+// Đăng ký các component của Chart.js
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+// Các period khả dụng và dạng hiển thị
 const periodOptions = {
-  date: { dataKey: "date", label: "Ngày", views: ["year", "month", "day"] },
-  week: { dataKey: "week", label: "Tuần", views: ["year", "month", "day"] },
+  date:  { dataKey: "date",  label: "Ngày",  views: ["year", "month", "day"] },
+  week:  { dataKey: "week",  label: "Tuần",  views: ["year", "month", "day"] },
   month: { dataKey: "month", label: "Tháng", views: ["year", "month"] },
-  year: { dataKey: "year", label: "Năm", views: ["year"] },
+  year:  { dataKey: "year",  label: "Năm",   views: ["year"] },
 };
 
-// PeriodSelector component using ToggleButtonGroup for better UI
+// **Hàm tính startDate, endDate mặc định** khi thay đổi period.
+function getDefaultDatesForPeriod(period) {
+  const now = new Date();
+  let start, end;
+
+  switch (period) {
+    case "date": {
+      // Mặc định lấy ngày hiện tại
+      start = now;
+      end = now;
+      break;
+    }
+    case "week": {
+      // Lấy thứ 2 đầu tuần (theo quy ước: Monday-based)
+      const dayOfWeek = now.getDay(); // 0=Chủ Nhật, 1=Thứ Hai, ...
+      // Ta coi “thứ 2 đầu tuần” = now - (dayOfWeek - 1)
+      // Trường hợp dayOfWeek=0 (Chủ Nhật), weekStart = now - (-1) => +1 ngày => Thứ Hai liền sau
+      // Tuỳ yêu cầu mà bạn adjust logic (hoặc coi Thứ Hai trong tuần contain now)
+      const weekStart = subDays(now, dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+      const weekEnd = addDays(weekStart, 6);
+      start = weekStart;
+      end = weekEnd;
+      break;
+    }
+    case "month": {
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      start = firstDay;
+      end = lastDay;
+      break;
+    }
+    case "year": {
+      const firstDay = new Date(now.getFullYear(), 0, 1);
+      const lastDay = new Date(now.getFullYear(), 11, 31);
+      start = firstDay;
+      end = lastDay;
+      break;
+    }
+    default: {
+      start = now;
+      end = now;
+      break;
+    }
+  }
+
+  return { start, end };
+}
+
+// PeriodSelector component
 function PeriodSelector({ period, setPeriod }) {
   const handlePeriodChange = (event, newPeriod) => {
-    if (newPeriod !== null) {
+    if (newPeriod !== null && newPeriod !== period) {
       setPeriod(newPeriod);
     }
   };
@@ -74,36 +141,27 @@ PeriodSelector.propTypes = {
   setPeriod: PropTypes.func.isRequired,
 };
 
-// Chart settings with improved styling
-const chartSetting = {
-  series: [{ dataKey: "totalRevenue", label: "Doanh thu" }],
-  height: 300,
-  sx: {
-    [`& .${axisClasses.directionY} .${axisClasses.label}`]: {
-      transform: "translateX(-10px)",
-    },
-  },
-};
-
 export default function RevenueChart() {
-  // State variables
-  const [totalAmount, setTotalAmount] = React.useState(0);
+  // State
   const [period, setPeriod] = React.useState("week");
   const [dateStart, setDateStart] = React.useState(new Date());
   const [dateEnd, setDateEnd] = React.useState(new Date());
+
   const [data, setData] = React.useState([]);
-  const [xAxisDataKey, setXAxisDataKey] = React.useState("date");
-  const [xAxisLabel, setXAxisLabel] = React.useState("Ngày");
+  const [totalAmount, setTotalAmount] = React.useState(0);
+
+  const [xAxisDataKey, setXAxisDataKey] = React.useState("week");
+  const [xAxisLabel, setXAxisLabel] = React.useState("Tuần");
+
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
 
-  // Helper function to format dates based on period
-  const formatDateForPeriod = (date, period) => {
-    switch (period) {
-      case "year":
-        return format(date, "yyyy");
-      case "month":
-        return format(date, "yyyy-MM");
+  // Helper: format date theo period
+  const formatDateForPeriod = (date, prd) => {
+    if (!date) return "";
+    switch (prd) {
+      case "year":  return format(date, "yyyy");
+      case "month": return format(date, "yyyy-MM");
       case "date":
       case "week":
       default:
@@ -111,12 +169,40 @@ export default function RevenueChart() {
     }
   };
 
-  // Function to fetch data from the backend with error handling
+  // Khi period thay đổi => set lại ngày mặc định
+  React.useEffect(() => {
+    const { start, end } = getDefaultDatesForPeriod(period);
+    setDateStart(start);
+    setDateEnd(end);
+
+    // Cập nhật xAxis
+    const { dataKey, label } = periodOptions[period];
+    setXAxisDataKey(dataKey);
+    setXAxisLabel(label);
+  }, [period]);
+
+  // Fetch data mỗi khi period/dateStart/dateEnd thay đổi
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [period, dateStart, dateEnd]);
+
+  // Hàm fetch
   const fetchData = async () => {
-    setLoading(true);
+    if (!dateStart || !dateEnd) return;
+
+    // Nếu logic yêu cầu: không cho phép dateStart > dateEnd
+    if (dateStart > dateEnd) {
+      setError("Ngày bắt đầu không được sau ngày kết thúc.");
+      setData([]);
+      setTotalAmount(0);
+      return;
+    }
     setError(null);
+    setLoading(true);
+
     try {
-      // Determine the endpoint based on period
+      // Endpoint theo period
       let endpoint;
       switch (period) {
         case "date":
@@ -133,6 +219,7 @@ export default function RevenueChart() {
           break;
         default:
           endpoint = `${import.meta.env.VITE_BACKEND_URL}/api/revenue`;
+          break;
       }
 
       const response = await axios.get(endpoint, {
@@ -142,146 +229,96 @@ export default function RevenueChart() {
         },
       });
 
-      // Process data if necessary
-      setData(response.data.orders || response.data);
-      setTotalAmount(response.data.totalAmount);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      const resData = response.data;
+      setData(resData.orders || []);
+      setTotalAmount(resData.totalAmount || 0);
+    } catch (err) {
+      console.error("Error fetching data:", err);
       setError(
-        error.response?.data?.message || "Đã xảy ra lỗi khi tải dữ liệu."
+        err.response?.data?.message || "Đã xảy ra lỗi khi tải dữ liệu."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  // Update xAxis settings and fetch data when period or dates change
-  React.useEffect(() => {
-    const { dataKey, label } = periodOptions[period];
-    setXAxisDataKey(dataKey);
-    setXAxisLabel(label);
-
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, dateStart, dateEnd]);
-
-  // Adjust dateStart and dateEnd when period changes
-  React.useEffect(() => {
-    const now = new Date();
-    switch (period) {
-      case "date":
-        setDateStart(now);
-        setDateEnd(now);
-        break;
-      case "week": {
-        const weekStart = subDays(now, now.getDay() - 1);
-        const weekEnd = addDays(weekStart, 6);
-        setDateStart(weekStart);
-        setDateEnd(weekEnd);
-        break;
-      }
-      case "month": {
-        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const lastDayOfMonth = new Date(
-          now.getFullYear(),
-          now.getMonth() + 1,
-          0
-        );
-        setDateStart(firstDayOfMonth);
-        setDateEnd(lastDayOfMonth);
-        break;
-      }
-      case "year": {
-        const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-        const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
-        setDateStart(firstDayOfYear);
-        setDateEnd(lastDayOfYear);
-        break;
-      }
-      default:
-        break;
-    }
-  }, [period]);
-
-  // Function to adjust the date range to the previous period
+  // Logic nút chuyển kỳ (previous / next)
   const handlePreviousPeriod = () => {
     switch (period) {
       case "date":
-        setDateStart(subDays(dateStart, 1));
-        setDateEnd(subDays(dateEnd, 1));
+        setDateStart((prev) => subDays(prev, 1));
+        setDateEnd((prev) => subDays(prev, 1));
         break;
       case "week":
-        setDateStart(subWeeks(dateStart, 1));
-        setDateEnd(subWeeks(dateEnd, 1));
+        setDateStart((prev) => subWeeks(prev, 1));
+        setDateEnd((prev) => subWeeks(prev, 1));
         break;
       case "month":
-        setDateStart(subMonths(dateStart, 1));
-        setDateEnd(subMonths(dateEnd, 1));
+        setDateStart((prev) => subMonths(prev, 1));
+        setDateEnd((prev) => subMonths(prev, 1));
         break;
       case "year":
-        setDateStart(subYears(dateStart, 1));
-        setDateEnd(subYears(dateEnd, 1));
+        setDateStart((prev) => subYears(prev, 1));
+        setDateEnd((prev) => subYears(prev, 1));
         break;
       default:
         break;
     }
   };
 
-  // Function to adjust the date range to the next period
   const handleNextPeriod = () => {
     const now = new Date();
+    // Chỉ cho nhảy tiếp nếu dateEnd vẫn < now (để không vượt quá thời gian hiện tại)
+    if (dateEnd >= now) return;
+
     switch (period) {
       case "date":
-        if (dateEnd < now) {
-          setDateStart(addDays(dateStart, 1));
-          setDateEnd(addDays(dateEnd, 1));
-        }
+        setDateStart((prev) => addDays(prev, 1));
+        setDateEnd((prev) => addDays(prev, 1));
         break;
       case "week":
-        if (dateEnd < now) {
-          setDateStart(addWeeks(dateStart, 1));
-          setDateEnd(addWeeks(dateEnd, 1));
-        }
+        setDateStart((prev) => addWeeks(prev, 1));
+        setDateEnd((prev) => addWeeks(prev, 1));
         break;
       case "month":
-        if (dateEnd < now) {
-          setDateStart(addMonths(dateStart, 1));
-          setDateEnd(addMonths(dateEnd, 1));
-        }
+        setDateStart((prev) => addMonths(prev, 1));
+        setDateEnd((prev) => addMonths(prev, 1));
         break;
       case "year":
-        if (dateEnd < now) {
-          setDateStart(addYears(dateStart, 1));
-          setDateEnd(addYears(dateEnd, 1));
-        }
+        setDateStart((prev) => addYears(prev, 1));
+        setDateEnd((prev) => addYears(prev, 1));
         break;
       default:
         break;
     }
   };
 
-  // Function to export data to Excel with improved formatting
+  // Export Excel
   const exportToExcel = async () => {
-    if (data.length === 0) {
-      setError("Không có dữ liệu để xuất.");
+    if (!data || data.length === 0) {
+      setError("Không có dữ liệu để xuất Excel.");
       return;
     }
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Revenue");
 
-    // Add main title
+    // Merge tiêu đề
     worksheet.mergeCells("A1", "B1");
     const titleCell = worksheet.getCell("A1");
     titleCell.value = "BÁO CÁO DOANH THU";
     titleCell.font = { bold: true, size: 16, color: { argb: "FF0000" } };
     titleCell.alignment = { horizontal: "center", vertical: "middle" };
 
-    // Add report generation date
+    // Ngày xuất báo cáo
     const dateCell = worksheet.getCell("A2");
     dateCell.value = `Ngày xuất báo cáo: ${format(new Date(), "dd/MM/yyyy")}`;
     dateCell.alignment = { horizontal: "left" };
 
-    // Add column headers
+    // Thêm row trống để phân cách
+    worksheet.addRow([]);
+
+    // Tạo header
     const columnHeaders = Object.keys(data[0] || {});
     const headerRow = worksheet.addRow(columnHeaders);
     headerRow.eachCell((cell) => {
@@ -294,7 +331,7 @@ export default function RevenueChart() {
       cell.alignment = { horizontal: "center" };
     });
 
-    // Add data rows
+    // Thêm data rows
     data.forEach((item) => {
       const rowValues = columnHeaders.map((key) => item[key]);
       const row = worksheet.addRow(rowValues);
@@ -303,7 +340,7 @@ export default function RevenueChart() {
       });
     });
 
-    // Export Excel file
+    // Xuất file Excel
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -311,7 +348,7 @@ export default function RevenueChart() {
     saveAs(blob, "RevenueReport.xlsx");
   };
 
-  // Validation to ensure dateStart is not after dateEnd
+  // Validate: dateStart <= dateEnd (đã check khi fetch)
   const handleDateStartChange = (newValue) => {
     if (newValue > dateEnd) {
       setError("Ngày bắt đầu không được sau ngày kết thúc.");
@@ -330,10 +367,64 @@ export default function RevenueChart() {
     }
   };
 
-  // Render the component with improved UI
+  // Tạo dữ liệu cho Chart.js
+  const chartData = React.useMemo(() => {
+    return {
+      labels: data.map((item) => item[xAxisDataKey]?.toString() || ""),
+      datasets: [
+        {
+          label: "Doanh thu",
+          data: data.map((item) => item.totalRevenue || 0),
+          backgroundColor: "#42a5f5", // Màu cột
+          borderColor: "#1e88e5",    // Màu viền cột
+          borderWidth: 1,
+        },
+      ],
+    };
+  }, [data, xAxisDataKey]);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: xAxisLabel,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Doanh thu (VNĐ)",
+        },
+        beginAtZero: true,
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const value = context.parsed.y || 0;
+            return `Doanh thu: ${new Intl.NumberFormat("vi-VN").format(value)} VNĐ`;
+          },
+        },
+      },
+    },
+  };
+
   return (
     <div style={{ width: "100%" }}>
+      {/* Ví dụ import thêm chart khác: */}
+      <GenderAndAgeStatisticsChart />
+
+      {/* Chọn period */}
       <PeriodSelector period={period} setPeriod={setPeriod} />
+
+      {/* Thanh chọn ngày + nút Previous / Next */}
       <Grid
         container
         spacing={2}
@@ -352,7 +443,6 @@ export default function RevenueChart() {
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
-              format="dd-MM-yyyy"
               label="Ngày bắt đầu"
               value={dateStart}
               onChange={handleDateStartChange}
@@ -366,7 +456,6 @@ export default function RevenueChart() {
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
-              format="dd-MM-yyyy"
               label="Ngày kết thúc"
               value={dateEnd}
               onChange={handleDateEndChange}
@@ -388,6 +477,7 @@ export default function RevenueChart() {
         </Grid>
       </Grid>
 
+      {/* Loading / Error / Chart */}
       {loading ? (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
           <CircularProgress />
@@ -406,22 +496,8 @@ export default function RevenueChart() {
               Tổng doanh thu:{" "}
               {new Intl.NumberFormat("vi-VN").format(totalAmount)} VNĐ
             </Typography>
-            <div
-            className="p-4" style={{ position: "relative" }}>
-              <BarChart
-                dataset={data}
-                xAxis={[
-                  {
-                    scaleType: "band",
-                    dataKey: xAxisDataKey,
-                    label: xAxisLabel,
-                    tickPlacement: "middle",
-                    tickLabelPlacement: "middle",
-                  },
-                ]}
-                {...chartSetting}
-                margin={{ left: 78 }}
-              />
+            <div className="p-4" style={{ position: "relative", height: 300 }}>
+              <Bar data={chartData} options={chartOptions} />
               <Button
                 variant="contained"
                 color="primary"

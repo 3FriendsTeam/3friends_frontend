@@ -119,7 +119,7 @@ const EmployeeSidebar = ({ onSectionClick }) => {
       icon: <FaChartLine className="h-6 w-6 mr-2" />,
       section: 'reportStatistics',
       subItems: [
-        { label: 'Bảng thống kê doanh thu', section: 'orderReports' }, // hiển thị bảng thống kê doanh thu xuất file báo cáo
+        { label: 'Bảng thống kê', section: 'orderReports' }, // hiển thị bảng thống kê doanh thu xuất file báo cáo
       ],
     },
     {

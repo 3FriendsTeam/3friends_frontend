@@ -77,10 +77,9 @@ const CustomerLogin = () => {
         setIsLoading(false);
         return;
       }
-  
+      
       // Call the login function
       await login(email, password);
-  
       // Navigate to homepage if successful
       navigate(path.HOMEPAGE);
     } catch {

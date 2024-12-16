@@ -117,7 +117,7 @@ const ViewShippingOrder = () => {
         try {
             await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/api/update-order-status?id=${id}`,
-                { OrderStatus: "Đã hoàn thành" }
+                { OrderStatus: "Hoàn thành" }
             );
             message.success("Đơn hàng đã được giao thành công.");
             setIsModalVisible(false);

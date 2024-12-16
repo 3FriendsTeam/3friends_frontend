@@ -265,7 +265,7 @@ const ProductDetails = () => {
           </div>
 
           <div className="flex flex-col p-4 w-full lg:w-1/2">
-            <h2 className="text-lg font-semibold">LỰA CHỌN MÀU SẮC</h2>
+            {/* <h2 className="text-lg font-semibold">LỰA CHỌN MÀU SẮC</h2> */}
             {product.Colors && product.Colors.length > 0 ? (
               <div className="flex items-center space-x-4 mt-2 text-sm">
                 {product.Colors.map((color, index) => (
@@ -283,9 +283,10 @@ const ProductDetails = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 mt-2">
-                Sản phẩm này không có tùy chọn màu sắc.
-              </p>
+              <div></div>
+              // <p className="text-gray-500 mt-2">
+              //   Sản phẩm này không có tùy chọn màu sắc.
+              // </p>
             )}
 
 

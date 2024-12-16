@@ -14,7 +14,6 @@ const Home = () => {
       <Category />
       <Animation />
       <AdvertisingImage />
-      <BestSellingPhone categoryId="1" />
       <BestSellingPhone categoryId="2" />
       <BestSellingPhone categoryId="3" />
       <BestSellingPhone categoryId="4" />
@@ -22,6 +21,7 @@ const Home = () => {
       <BestSellingPhone categoryId="6" />
       <BestSellingPhone categoryId="7" />
       <BestSellingPhone categoryId="8" />
+      <BestSellingPhone categoryId="1" />
       <Footer  />
     </div>
   );

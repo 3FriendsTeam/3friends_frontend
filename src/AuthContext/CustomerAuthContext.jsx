@@ -14,7 +14,7 @@ export const CustomerAuthProvider = ({ children }) => {
   const IsLogin = () => {
     return !!localStorage.getItem("token"); // Trả về true nếu token tồn tại, ngược lại false
   };
-  
+
   const saveAccount = async ({
     uid,
     customerName,
@@ -54,12 +54,8 @@ const checkEmail = async ({ email }) => {
     const { success, message: msg } = response.data;
 
     if (success) {
-      // success = true => Email đã tồn tại & không bị khóa (theo server)
-      // => return true (cho login)
       return true;
     } else {
-      // success = false => user bị khóa HOẶC email chưa tồn tại
-      // => không login được => hiển thị thông báo
       message.error(msg);
       return false;
     }

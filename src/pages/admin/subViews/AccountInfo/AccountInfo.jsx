@@ -3,6 +3,7 @@ import { Modal, Form, Input, message, Select } from 'antd';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
 import { getEmployeeLogin, getPositionName } from '../../../../helper/getInfoAdmin';
+import { useNavigate } from 'react-router-dom';
 
 const AccountInfo = () => {
     const [employee, setEmployee] = useState(null);
@@ -11,7 +12,7 @@ const AccountInfo = () => {
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [passwordForm] = Form.useForm();
     const [editForm] = Form.useForm();
-
+    const navigate = useNavigate();
     // Lấy dữ liệu nhân viên
     useEffect(() => {
         try {
@@ -60,6 +61,8 @@ const AccountInfo = () => {
                 message.success('Đổi mật khẩu thành công!');
                 setIsPasswordModalVisible(false);
                 passwordForm.resetFields();
+                message.success('vui lòng đăng nhập lại!');
+                navigate('/employee/login');
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -87,9 +90,8 @@ const AccountInfo = () => {
             if (response.status === 200) {
                 message.success('Cập nhật thông tin thành công!');
                 setIsEditModalVisible(false);
-                const newEmployee = { ...employee, ...values };
-                setEmployee(newEmployee);
-                localStorage.setItem('employee', JSON.stringify(newEmployee));
+                message.success('vui lòng đăng nhập lại!');
+                navigate('/employee/login');
             }
         } catch (error) {
             message.error('Không thể cập nhật thông tin. Vui lòng thử lại!');

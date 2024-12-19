@@ -10,7 +10,7 @@ export const CartContext = createContext();export const CartProvider = ({ childr
       : `${product.name}`;
     
     const existingProductIndex = cartItems.findIndex(
-      (item) => item.id === productId
+      (item) => item.id === productId && item.color === product.color
     );
   
     if (existingProductIndex !== -1) {
@@ -29,6 +29,7 @@ export const CartContext = createContext();export const CartProvider = ({ childr
           name: productName,
           quantity: 1,
           price: String(product.price),
+          color: product.color || "", 
         },
       ]);
     }

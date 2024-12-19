@@ -39,13 +39,11 @@ const ShoppingCart = () => {
     );
     setCartItems(updatedCartItems);
   };
-
+  
   const handleDecreaseQuantity = (productId, color = null) => {
     const updatedCartItems = cartItems.map((item) =>
-      item.id === productId &&
-      (item.color === color || !item.color) &&
-      item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
+      item.id === productId && (item.color === color || !item.color)
+        ? { ...item, quantity: item.quantity - 1 <= 0 ? 1 : item.quantity - 1 }
         : item
     );
     setCartItems(updatedCartItems);

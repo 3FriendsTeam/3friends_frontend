@@ -6,6 +6,7 @@ import icons from "../../../utils/icons";
 import api from "../../../middlewares/tokenMiddleware";
 import Toolbar from "../../../components/Client/Toolbar";
 import payment1 from "../../../assets/client/payment1.jpg";
+import paypal from "../../../assets/client/paypal.png";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { path } from "../../../utils/constant";
@@ -364,7 +365,7 @@ const PaymentInfo = () => {
 
                     <div className="ml-6 flex-1">
                       <h2 className="font-semibold">
-                        {item?.name} {item?.color && `- ${item.color}`}
+                        {item?.name}
                       </h2>
                       <span className="text-[#e0052b]">
                         {formatPrice(
@@ -513,7 +514,7 @@ const PaymentInfo = () => {
             </Modal>
             <Modal
               title="Chọn địa chỉ nhận hàng"
-              visible={isAddressModalOpen}
+              open={isAddressModalOpen}
               onCancel={closeAddressModal}
               footer={null}
             >
@@ -696,7 +697,7 @@ const PaymentInfo = () => {
                         : "border-gray-300"
                     } hover:bg-[#ffdada]`}
                   >
-                    <img src={payment1} className="w-[50px] h-[50px]" />
+                    <img src={paypal} className="w-[50px] h-[50px]" />
                     <button
                       onClick={ChoosePaymentMethod}
                       className="w-full py-2 px-4 rounded-lg mb-2"

@@ -96,24 +96,10 @@ const LookOrders = () => {
         {/* Sidebar */}
         <div className="w-64 mr-5 ml-[183px] mt-8">
           <ul className="space-y-2">
+           
             <li>
-              <a href="/" className="text-gray-700 hover:text-blue-500">
-                Những câu hỏi thường gặp
-              </a>
-            </li>
-            <li>
-              <a href="/" className="text-gray-700 hover:text-blue-500">
-                Phương thức thanh toán
-              </a>
-            </li>
-            <li>
-              <a href="/" className="text-blue-500 font-bold">
+              <a className="text-blue-500 font-bold">
                 Tra cứu đơn hàng trực tuyến
-              </a>
-            </li>
-            <li>
-              <a href="/" className="text-gray-700 hover:text-blue-500">
-                Tìm trung tâm bảo hành
               </a>
             </li>
           </ul>

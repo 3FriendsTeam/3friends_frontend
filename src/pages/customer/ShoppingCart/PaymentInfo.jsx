@@ -157,8 +157,12 @@ const PaymentInfo = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep === 1) setCurrentStep(2);
-    else {
+    if (currentStep === 1) {
+      if(selectedAddress == null)
+      message.warning("Vui lòng chọn điểm giao hàng!");
+      else 
+      setCurrentStep(2)
+    }else {
       console.log(paymentMethods);
       if (paymentMethods === null)
         return message.warning("Vui lòng chọn phương thức thanh toán!");
